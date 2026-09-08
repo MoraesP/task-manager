@@ -1,0 +1,63 @@
+<!--ACTIVE:config-->
+<div class="app">
+  <!--SIDEBAR-->
+  <div class="content">
+    <div class="topbar">
+      <h1>Plataforma de Pagamentos</h1>
+      <span class="badge admin">Admin</span>
+      <span class="crumb">·</span>
+      <span class="crumb">Configurações</span>
+    </div>
+
+    <div class="page">
+      <div class="page-head">
+        <div>
+          <h2>Configurações do projeto</h2>
+          <div class="sub">Detalhes gerais e ações administrativas. Visível apenas para administradores.</div>
+        </div>
+      </div>
+
+      <div style="max-width:640px;display:flex;flex-direction:column;gap:18px">
+        <div class="card" style="padding:20px">
+          <div class="section-title">Detalhes</div>
+          <div class="section-sub">Nome e descrição exibidos para toda a equipe.</div>
+          <div style="display:flex;flex-direction:column;gap:14px">
+            <div class="field">
+              <label class="label">Nome</label>
+              <input class="input" type="text" value="Plataforma de Pagamentos">
+            </div>
+            <div class="field">
+              <label class="label">Descrição</label>
+              <textarea class="input" rows="3">Gateway de pagamentos: Pix, cartão e conciliação. Integrações com Stripe e adquirentes locais.</textarea>
+            </div>
+            <div style="display:flex;gap:9px">
+              <button class="btn primary">Salvar alterações</button>
+              <button class="btn ghost">Descartar</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="card" style="padding:20px">
+          <div class="section-title">Informações</div>
+          <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-top:14px">
+            <div><div class="hint">Dono</div><div style="font-weight:600;margin-top:2px">Pedro Moraes <span class="hint">(Você)</span></div></div>
+            <div><div class="hint">Criado em</div><div style="font-weight:600;margin-top:2px">12 fev 2026</div></div>
+            <div><div class="hint">Membros</div><div style="font-weight:600;margin-top:2px">7</div></div>
+          </div>
+          <div class="callout" style="margin-top:16px">O papel de <b>dono</b> é sempre <b>Admin</b> e não pode ser alterado nem removido. O dono também é o único que pode excluir o projeto.</div>
+        </div>
+
+        <div class="card" style="padding:20px;border-color:#e7c7c4">
+          <div class="section-title" style="color:var(--red)">Zona de perigo</div>
+          <div style="display:flex;align-items:flex-start;gap:16px;margin-top:12px">
+            <div style="flex:1">
+              <div style="font-weight:600">Excluir projeto</div>
+              <p class="hint" style="margin-top:3px">Remove permanentemente o projeto, todas as tarefas, o histórico, os membros e os convites. Esta ação é irreversível e só pode ser feita pelo dono.</p>
+            </div>
+            <button class="btn danger">Excluir projeto</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

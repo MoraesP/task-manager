@@ -1,0 +1,147 @@
+<!--ACTIVE:quadro-->
+<div class="app">
+  <!-- sidebar -->
+  <!--SIDEBAR-->
+
+  <!-- content -->
+  <div class="content">
+    <div class="topbar">
+      <h1>Plataforma de Pagamentos</h1>
+      <span class="badge admin">Admin</span>
+      <span class="crumb">·</span>
+      <span class="crumb">Quadro</span>
+    </div>
+
+    <div class="toolbar">
+      <div class="search">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+        Buscar tarefas por título ou descrição…
+      </div>
+      <span class="fchip on">Status: Todos
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="m6 9 6 6 6-6"/></svg></span>
+      <span class="fchip">Prioridade
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="m6 9 6 6 6-6"/></svg></span>
+      <span class="fchip">Responsável
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="m6 9 6 6 6-6"/></svg></span>
+      <span class="fchip">Prazo
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="m6 9 6 6 6-6"/></svg></span>
+      <span class="fchip">Ordenar: Prioridade
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="m6 9 6 6 6-6"/></svg></span>
+      <div class="spacer"></div>
+      <div class="seg">
+        <button class="on">Quadro</button>
+        <button>Lista</button>
+      </div>
+      <button class="btn primary">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+        Nova tarefa
+      </button>
+    </div>
+
+    <div class="reportbar">
+      <span><span class="rb-dot" style="background:var(--text-3)"></span><b>8</b> a fazer</span>
+      <span><span class="rb-dot" style="background:var(--accent)"></span><b>3</b> em progresso</span>
+      <span><span class="rb-dot" style="background:var(--green)"></span><b>45</b> concluídas</span>
+      <span style="color:var(--border-strong)">|</span>
+      <span>Prioridade&nbsp; <b>2</b> crítica · <b>12</b> alta · <b>20</b> média · <b>22</b> baixa</span>
+      <div class="spacer"></div>
+      <a href="#">Ver relatório completo →</a>
+    </div>
+
+    <div class="board">
+      <!-- A FAZER -->
+      <div class="col">
+        <div class="col-head"><span class="status-dot" style="background:var(--text-3)"></span> A fazer <span class="count">8</span></div>
+        <div class="col-body">
+          <div class="task">
+            <div class="task-top"><span class="prio critical">Crítica</span><span class="task-id">PAG-151</span></div>
+            <div class="task-title">Corrigir timeout no gateway Pix em horário de pico</div>
+            <div class="task-meta">
+              <span class="who"><span class="avatar a-green">AR</span> Ana Ribeiro</span>
+              <span class="chip late"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg> Atrasada · 14 fev</span>
+            </div>
+          </div>
+          <div class="task">
+            <div class="task-top"><span class="prio high">Alta</span><span class="task-id">PAG-142</span></div>
+            <div class="task-title">Validar tratamento de webhook de reembolso da Stripe</div>
+            <div class="task-meta">
+              <span class="who"><span class="avatar a-amber">MA</span> Marina Alves</span>
+              <span class="chip"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 11h18"/></svg> 18 fev</span>
+            </div>
+          </div>
+          <div class="task">
+            <div class="task-top"><span class="prio medium">Média</span><span class="task-id">PAG-149</span></div>
+            <div class="task-title">Adicionar retry com backoff exponencial no cliente HTTP</div>
+            <div class="task-meta"><span class="who"><span class="avatar a-blue">PM</span> Você</span></div>
+          </div>
+          <div class="task">
+            <div class="task-top"><span class="prio low">Baixa</span><span class="task-id">PAG-138</span></div>
+            <div class="task-title">Documentar a API de conciliação no OpenAPI</div>
+            <div class="task-meta"><span class="who"><span class="avatar">JP</span> João Pedro</span></div>
+          </div>
+          <button class="add-task">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+            Adicionar tarefa
+          </button>
+        </div>
+      </div>
+
+      <!-- EM PROGRESSO -->
+      <div class="col">
+        <div class="col-head"><span class="status-dot" style="background:var(--accent)"></span> Em progresso <span class="count">3</span></div>
+        <div class="col-body">
+          <div class="task">
+            <div class="task-top"><span class="prio critical">Crítica</span><span class="task-id">PAG-145</span></div>
+            <div class="task-title">Tela de detalhe da transação com linha do tempo</div>
+            <div class="task-meta">
+              <span class="who"><span class="avatar a-blue">PM</span> Você</span>
+              <span class="wip">carga <span class="bar"><i class="f"></i><i class="f"></i><i></i><i></i><i></i></span> 2/5</span>
+            </div>
+            <span class="chip lock"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg> Regra: tarefa CRITICAL só é concluída por um Admin</span>
+          </div>
+          <div class="task">
+            <div class="task-top"><span class="prio high">Alta</span><span class="task-id">PAG-133</span></div>
+            <div class="task-title">Refatorar a máquina de estados de cobrança</div>
+            <div class="task-meta">
+              <span class="who"><span class="avatar a-amber">MA</span> Marina Alves</span>
+              <span class="wip" style="color:var(--amber)">carga <span class="bar"><i class="f" style="background:var(--amber)"></i><i class="f" style="background:var(--amber)"></i><i class="f" style="background:var(--amber)"></i><i class="f" style="background:var(--amber)"></i><i></i></span> 4/5</span>
+            </div>
+          </div>
+          <div class="task dragging">
+            <div class="task-top"><span class="prio medium">Média</span><span class="task-id">PAG-140</span></div>
+            <div class="task-title">Migrar a busca textual para índice GIN (pg_trgm)</div>
+            <div class="task-meta"><span class="who"><span class="avatar a-green">CN</span> Carlos Nunes</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CONCLUÍDO -->
+      <div class="col drop">
+        <div class="col-head"><span class="status-dot" style="background:var(--green)"></span> Concluído <span class="count">45</span></div>
+        <div class="drop-hint">Soltar aqui para concluir “PAG-140”</div>
+        <div class="col-body">
+          <div class="task">
+            <div class="task-top"><span class="prio high">Alta</span><span class="task-id">PAG-101</span></div>
+            <div class="task-title">Implementar autenticação JWT com refresh token rotativo</div>
+            <div class="task-meta"><span class="who"><span class="avatar a-amber">MA</span> Marina Alves</span></div>
+          </div>
+          <div class="task" style="position:relative">
+            <div class="task-top"><span class="prio medium">Média</span><span class="task-id">PAG-118</span></div>
+            <div class="task-title">Endpoint de relatório do projeto com cache Caffeine</div>
+            <div class="task-meta"><span class="who"><span class="avatar a-green">CN</span> Carlos Nunes</span></div>
+            <div class="menu" style="right:8px;top:40px">
+              <div class="mh">Mover para</div>
+              <div class="mi"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg> Em progresso <span class="mono" style="margin-left:auto;color:var(--text-3)">reabrir</span></div>
+              <div class="mnote">Tarefas concluídas não voltam para “A fazer” — só podem ser reabertas.</div>
+            </div>
+          </div>
+          <div class="task">
+            <div class="task-top"><span class="prio low">Baixa</span><span class="task-id">PAG-99</span></div>
+            <div class="task-title">Seed de dados de demonstração e finalização do README</div>
+            <div class="task-meta"><span class="who"><span class="avatar a-blue">PM</span> Você</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

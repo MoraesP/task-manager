@@ -1,0 +1,20 @@
+{
+  "artboards": [
+    { "file": "Login.dc.html", "x": 0, "y": 0, "w": 940, "h": 720, "title": "Login" },
+    { "file": "Cadastro.dc.html", "x": 1030, "y": 0, "w": 940, "h": 760, "title": "Cadastro" },
+    { "file": "Projetos.dc.html", "x": 0, "y": 980, "w": 1400, "h": 920, "title": "Projetos (menu principal)" },
+    { "file": "Main.dc.html", "x": 1500, "y": 980, "w": 1520, "h": 1060, "title": "Quadro de tarefas" },
+    { "file": "GerenciarProjeto.dc.html", "x": 0, "y": 2260, "w": 1400, "h": 900, "title": "Gerenciar projeto" },
+    { "file": "MembrosDoProjeto.dc.html", "x": 1500, "y": 2260, "w": 1440, "h": 1000, "title": "Membros do projeto" },
+    { "file": "Convite.dc.html", "x": 0, "y": 3440, "w": 1120, "h": 740, "title": "Convite (gerar e aceitar)" },
+    { "file": "NovaTarefa.dc.html", "x": 1240, "y": 3440, "w": 900, "h": 820, "title": "Nova tarefa" },
+    { "file": "Sidebar.dc.html", "x": 0, "y": 4420, "w": 1180, "h": 880, "title": "Sidebar" }
+  ],
+  "annotations": [
+    { "id": "regra-papeis", "x": 0, "y": -140, "w": 620, "text": "Papéis são POR PROJETO: Admin ou Membro. O dono do projeto é sempre Admin e não pode ser removido nem rebaixado. Não existe papel global de sistema — cada pessoa se cadastra, cria projetos e entra em outros por convite. Por isso o \"menu\" principal é a lista de Projetos, não um painel de administração global." },
+    { "id": "regra-quadro", "x": 1500, "y": 760, "w": 620, "text": "Quadro — regras aplicadas nos cards: máquina de estados (Concluído nunca volta direto para \"A fazer\", só reabre em Em progresso); limite de 5 tarefas Em progresso (WIP) por pessoa, somando todos os projetos; tarefas de prioridade Crítica só um Admin conclui; prazo é opcional e ganha marca \"Atrasada\"." },
+    { "id": "regra-membros", "x": 1500, "y": 2110, "w": 620, "text": "Remover um membro exige reatribuir TODAS as tarefas ativas dele a outros membros, respeitando o limite de 5 em progresso (WIP). Se algum limite estourar, a remoção falha inteira (transação). Tarefas concluídas permanecem no nome da pessoa." },
+    { "id": "regra-convite", "x": 0, "y": 3270, "w": 620, "text": "Sem envio de e-mail: o Admin gera um link com token (validade 7 dias) e envia manualmente. Ao aceitar, a pessoa cria a conta (se ainda não tiver) e entra no projeto no papel definido." }
+  ],
+  "launch": { "view": "canvas" }
+}

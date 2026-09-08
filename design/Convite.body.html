@@ -1,0 +1,54 @@
+
+<div style="display:flex;gap:40px;padding:40px;background:var(--bg);min-height:100%;align-items:flex-start">
+
+  <!-- painel 1: admin gera o convite -->
+  <div style="flex:1;max-width:460px">
+    <div class="hint" style="font-weight:700;letter-spacing:.05em;text-transform:uppercase;margin-bottom:10px">1 · Admin convida</div>
+    <div class="modal" style="width:100%;box-shadow:var(--shadow-md)">
+      <div class="modal-head">
+        <div style="flex:1"><h3>Convidar membro</h3><p class="hint" style="margin-top:3px">Plataforma de Pagamentos</p></div>
+        <span style="color:var(--text-3);cursor:pointer"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></span>
+      </div>
+      <div class="modal-body">
+        <div style="display:flex;gap:12px">
+          <div class="field" style="flex:1"><label class="label">E-mail</label><input class="input" value="ana@exemplo.com"></div>
+          <div class="field" style="width:140px"><label class="label">Papel</label><span class="selbox" style="height:36px">Membro <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="m6 9 6 6 6-6"/></svg></span></div>
+        </div>
+        <div class="callout info">
+          <div style="font-weight:700;margin-bottom:6px">Convite gerado · expira em 7 dias</div>
+          <div style="display:flex;gap:8px;align-items:center">
+            <input class="input mono" style="flex:1;font-size:11.5px" readonly value="https://taskmanager.exemplo.com/convite/aceitar?token=Jd8f…">
+            <button class="btn sm"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg> Copiar</button>
+          </div>
+          <div style="margin-top:8px;font-size:11.5px">Não enviamos e-mail — envie este link para a pessoa. Ao aceitar, ela cria a conta (se ainda não tiver) e entra no projeto.</div>
+        </div>
+      </div>
+      <div class="modal-foot">
+        <button class="btn ghost">Fechar</button>
+        <button class="btn primary">Gerar outro convite</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- painel 2: pessoa aceita o convite -->
+  <div style="flex:1;max-width:420px">
+    <div class="hint" style="font-weight:700;letter-spacing:.05em;text-transform:uppercase;margin-bottom:10px">2 · Pessoa aceita (link público)</div>
+    <div class="authcard" style="width:100%">
+      <div class="brand" style="padding:0 0 18px">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="7" height="16" rx="1.5"/><rect x="14" y="4" width="7" height="10" rx="1.5"/></svg>
+        <span>Task Manager</span>
+      </div>
+      <h1 style="font-size:19px;font-weight:700">Você recebeu um convite</h1>
+      <p style="color:var(--text-2);font-size:13px;margin-top:6px;margin-bottom:18px">
+        Para o projeto <b>Plataforma de Pagamentos</b> como <span class="badge member">Membro</span>, por Pedro Moraes.
+      </p>
+      <div style="display:flex;flex-direction:column;gap:13px">
+        <div class="field"><label class="label">E-mail</label><input class="input" value="ana@exemplo.com" readonly style="color:var(--text-3)"></div>
+        <div class="field"><label class="label">Nome</label><input class="input" placeholder="Como você aparece para a equipe"><span class="hint">Ignorado se você já tem conta com este e-mail.</span></div>
+        <div class="field"><label class="label">Senha</label><input class="input" type="password" placeholder="Mínimo de 8 caracteres"><span class="hint">Já tem conta com este e-mail? Deixe em branco e apenas confirme.</span></div>
+        <button class="btn primary" style="width:100%;height:38px;justify-content:center;margin-top:2px">Aceitar convite e entrar</button>
+      </div>
+    </div>
+  </div>
+
+</div>
