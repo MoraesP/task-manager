@@ -46,6 +46,11 @@ public class AuthService {
 
     /** Used right after a user accepts an invitation so they land authenticated. */
     @Transactional
+    public AuthTokens issueForUserId(java.util.UUID userId) {
+        return issueFor(users.getById(userId));
+    }
+
+    @Transactional
     public AuthTokens issueFor(User user) {
         String access = jwtService.issueAccessToken(user.getId(), user.getEmail());
         String refresh = refreshTokens.issue(user.getId());

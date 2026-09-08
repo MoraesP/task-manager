@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.taskmanager.auth.api.AuthDtos.AcceptInvitationRequest;
 import com.taskmanager.auth.api.AuthDtos.LoginRequest;
 import com.taskmanager.auth.api.AuthDtos.LogoutRequest;
 import com.taskmanager.auth.api.AuthDtos.RefreshRequest;
@@ -14,6 +15,8 @@ import com.taskmanager.auth.api.AuthDtos.RegisterRequest;
 import com.taskmanager.auth.api.AuthDtos.TokenResponse;
 import com.taskmanager.auth.api.AuthDtos.UserResponse;
 import com.taskmanager.auth.domain.AuthService;
+import com.taskmanager.project.domain.InvitationService;
+import com.taskmanager.project.domain.InvitationService.AcceptedInvitation;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -24,9 +27,11 @@ import jakarta.validation.Valid;
 public class AuthController {
 
     private final AuthService authService;
+    private final InvitationService invitationService;
 
-    public AuthController(AuthService authService) {
+    public AuthController(AuthService authService, InvitationService invitationService) {
         this.authService = authService;
+        this.invitationService = invitationService;
     }
 
     @PostMapping("/register")
@@ -49,5 +54,11 @@ public class AuthController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void logout(@Valid @RequestBody LogoutRequest request) {
         authService.logout(request.refreshToken());
+    }
+
+    @PostMapping("/accept-invitation")
+    public TokenResponse acceptInvitation(@Valid @RequestBody AcceptInvitationRequest request) {
+        AcceptedInvitation accepted = invitationService.accept(request.token(), request.name(), request.password());
+        return TokenResponse.from(authService.issueForUserId(accepted.userId()));
     }
 }
