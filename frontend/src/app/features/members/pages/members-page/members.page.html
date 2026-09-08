@@ -62,11 +62,12 @@
                   } @else if (isAdmin()) {
                     <select
                       class="input input--sm"
-                      [value]="m.role"
                       (change)="changeRole(m, $any($event.target).value)"
                     >
                       @for (r of roles; track r) {
-                        <option [value]="r">{{ r === 'ADMIN' ? 'Admin' : 'Membro' }}</option>
+                        <option [value]="r" [selected]="r === m.role">
+                          {{ r === 'ADMIN' ? 'Admin' : 'Membro' }}
+                        </option>
                       }
                     </select>
                   } @else {
