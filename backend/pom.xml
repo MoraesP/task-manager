@@ -160,6 +160,23 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
+                <configuration>
+                    <!--
+                      Pin the Docker Engine API version: some daemons (e.g. Colima
+                      with a recent Docker Engine) reject the client's negotiated
+                      default as "too old". 1.43 is supported by Docker 24+.
+                    -->
+                    <environmentVariables>
+                        <DOCKER_API_VERSION>1.43</DOCKER_API_VERSION>
+                        <!-- Ryuk bind-mounts the docker socket; on Colima the host
+                             socket path does not exist inside the VM. Disable it and
+                             let Testcontainers' JVM shutdown hook clean up instead. -->
+                        <TESTCONTAINERS_RYUK_DISABLED>true</TESTCONTAINERS_RYUK_DISABLED>
+                    </environmentVariables>
+                    <systemPropertyVariables>
+                        <api.version>1.43</api.version>
+                    </systemPropertyVariables>
+                </configuration>
                 <executions>
                     <execution>
                         <goals>
