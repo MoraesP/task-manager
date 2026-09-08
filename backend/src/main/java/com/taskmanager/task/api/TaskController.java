@@ -39,7 +39,7 @@ import jakarta.validation.constraints.Size;
 
 @RestController
 @RequestMapping("/api/v1/projects/{projectId}/tasks")
-@Tag(name = "Tasks")
+@Tag(name = "Tarefas")
 @SecurityRequirement(name = "bearerAuth")
 @Validated
 public class TaskController {

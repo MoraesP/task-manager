@@ -27,7 +27,7 @@ import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/v1/projects/{projectId}/invitations")
-@Tag(name = "Project invitations")
+@Tag(name = "Convites do projeto")
 @SecurityRequirement(name = "bearerAuth")
 public class InvitationController {
 

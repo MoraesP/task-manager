@@ -31,7 +31,7 @@ public class InvitationService {
         this.properties = properties;
     }
 
-    /** @return the created invitation and the raw token (shown once). */
+    /** @return o convite criado e o token bruto (exibido uma única vez). */
     @Transactional
     public CreatedInvitation create(UUID projectId, UUID actorId, String email, Role role) {
         authorization.requireAdmin(projectId, actorId);
@@ -40,14 +40,14 @@ public class InvitationService {
         users.findByEmail(normalizedEmail)
                 .filter(user -> memberships.existsByProjectIdAndUserId(projectId, user.getId()))
                 .ifPresent(user -> {
-                    throw Errors.conflict("already-a-member", "Already a member",
-                            "%s is already a member of this project.".formatted(normalizedEmail));
+                    throw Errors.conflict("already-a-member", "Já é membro",
+                            "%s já é membro deste projeto.".formatted(normalizedEmail));
                 });
 
         if (invitations.existsByProjectIdAndEmailIgnoreCaseAndStatus(projectId, normalizedEmail,
                 InvitationStatus.PENDING)) {
-            throw Errors.conflict("pending-invitation-exists", "Pending invitation exists",
-                    "There is already a pending invitation for %s in this project.".formatted(normalizedEmail));
+            throw Errors.conflict("pending-invitation-exists", "Já existe convite pendente",
+                    "Já existe um convite pendente para %s neste projeto.".formatted(normalizedEmail));
         }
 
         String rawToken = OpaqueTokens.generate();
@@ -68,10 +68,10 @@ public class InvitationService {
         authorization.requireAdmin(projectId, actorId);
         Invitation invitation = invitations.findById(invitationId)
                 .filter(i -> i.getProjectId().equals(projectId))
-                .orElseThrow(() -> Errors.notFound("Invitation", invitationId));
+                .orElseThrow(() -> Errors.notFound("Convite", invitationId));
         if (!invitation.isPending()) {
-            throw Errors.unprocessable("invitation-not-pending", "Invitation not pending",
-                    "Only a pending invitation can be revoked.");
+            throw Errors.unprocessable("invitation-not-pending", "Convite não está pendente",
+                    "Somente um convite pendente pode ser revogado.");
         }
         invitation.revoke();
     }
@@ -79,23 +79,23 @@ public class InvitationService {
     @Transactional
     public AcceptedInvitation accept(String rawToken, String name, String rawPassword) {
         Invitation invitation = invitations.findByTokenHash(OpaqueTokens.hash(rawToken))
-                .orElseThrow(() -> Errors.unprocessable("invitation-invalid", "Invalid invitation",
-                        "This invitation token is not valid."));
+                .orElseThrow(() -> Errors.unprocessable("invitation-invalid", "Convite inválido",
+                        "Este token de convite não é válido."));
 
         if (!invitation.isPending()) {
-            throw Errors.unprocessable("invitation-not-pending", "Invitation not pending",
-                    "This invitation has already been used or was revoked.");
+            throw Errors.unprocessable("invitation-not-pending", "Convite não está pendente",
+                    "Este convite já foi usado ou foi revogado.");
         }
         if (invitation.isExpired(Instant.now())) {
             invitation.markExpired();
-            throw Errors.unprocessable("invitation-expired", "Invitation expired",
-                    "This invitation has expired. Ask an admin for a new one.");
+            throw Errors.unprocessable("invitation-expired", "Convite expirado",
+                    "Este convite expirou. Peça um novo a um ADMIN do projeto.");
         }
 
         User user = users.findByEmail(invitation.getEmail()).orElseGet(() -> {
             if (name == null || name.isBlank() || rawPassword == null || rawPassword.isBlank()) {
-                throw Errors.unprocessable("account-details-required", "Account details required",
-                        "No account exists for %s; name and password are required to accept."
+                throw Errors.unprocessable("account-details-required", "Dados da conta obrigatórios",
+                        "Não existe conta para %s; nome e senha são obrigatórios para aceitar."
                                 .formatted(invitation.getEmail()));
             }
             return users.create(name, invitation.getEmail(), rawPassword);

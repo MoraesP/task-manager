@@ -4,7 +4,8 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Task lifecycle states and the allowed transitions between them (RN-01..03).
+ * Estados do ciclo de vida da tarefa e as transições permitidas entre eles
+ * (RN-01..03).
  */
 public enum TaskStatus {
 

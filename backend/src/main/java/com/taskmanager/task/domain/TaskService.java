@@ -84,14 +84,14 @@ public class TaskService {
         ProjectMembership membership = authorization.requireMembership(task.getProjectId(), actorId);
 
         if (task.getStatus() == target) {
-            return task; // RN-04 idempotent no-op
+            return task; // RN-04: no-op idempotente
         }
         if (!task.getStatus().canTransitionTo(target)) {
-            throw Errors.unprocessable("invalid-status-transition", "Invalid status transition",
-                    "A task cannot move from %s to %s.".formatted(task.getStatus(), target));
+            throw Errors.unprocessable("invalid-status-transition", "Transição de status inválida",
+                    "Uma tarefa não pode ir de %s para %s.".formatted(task.getStatus(), target));
         }
         if (task.getPriority() == TaskPriority.CRITICAL && target == TaskStatus.DONE && !membership.isAdmin()) {
-            throw Errors.forbidden("Only a project ADMIN can close a CRITICAL task.");
+            throw Errors.forbidden("Apenas um ADMIN do projeto pode fechar uma tarefa CRITICAL.");
         }
         if (target == TaskStatus.IN_PROGRESS) {
             wipLimit.assertCanTakeAnother(task.getAssigneeId(), task.getId());
@@ -106,20 +106,20 @@ public class TaskService {
         Task task = load(taskId);
         ProjectMembership membership = authorization.requireMembership(task.getProjectId(), actorId);
         if (!membership.isAdmin() && !task.isAssignedTo(actorId)) {
-            throw Errors.forbidden("Only a project ADMIN or the task assignee can delete this task.");
+            throw Errors.forbidden("Apenas um ADMIN do projeto ou o responsável pela tarefa pode excluí-la.");
         }
         tasks.delete(task);
         events.publishEvent(new TaskChangedEvent(task.getProjectId()));
     }
 
     private Task load(UUID taskId) {
-        return tasks.findById(taskId).orElseThrow(() -> Errors.notFound("Task", taskId));
+        return tasks.findById(taskId).orElseThrow(() -> Errors.notFound("Tarefa", taskId));
     }
 
     private void requireAssigneeIsMember(UUID projectId, UUID assigneeId) {
         if (!authorization.isMember(projectId, assigneeId)) {
-            throw Errors.unprocessable("assignee-not-member", "Assignee is not a project member",
-                    "The assignee must be a member of the project.");
+            throw Errors.unprocessable("assignee-not-member", "Responsável não é membro do projeto",
+                    "O responsável precisa ser membro do projeto.");
         }
     }
 
@@ -131,14 +131,14 @@ public class TaskService {
         return trimmed.isEmpty() ? null : trimmed;
     }
 
-    // --- used by the member-removal reassignment adapter ---
+    // --- usado pelo adapter de realocação na remoção de membro ---
 
     public List<Task> activeTasksOf(UUID projectId, UUID assigneeId) {
         return tasks.findByProjectIdAndAssigneeIdAndStatusIn(projectId, assigneeId,
                 List.of(TaskStatus.TODO, TaskStatus.IN_PROGRESS));
     }
 
-    /** Reassign one task during a member removal: validates membership (RN-62) and WIP (RN-10). */
+    /** Realoca uma tarefa durante a remoção de um membro: valida pertencimento (RN-62) e o WIP limit (RN-10). */
     public void reassignForRemoval(UUID projectId, Task task, UUID newAssigneeId) {
         requireAssigneeIsMember(projectId, newAssigneeId);
         if (task.getStatus() == TaskStatus.IN_PROGRESS) {

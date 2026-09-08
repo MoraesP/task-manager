@@ -1,5 +1,5 @@
--- Demo account so the API can be exercised immediately.
--- Email: demo@taskmanager.local   Password: password123
+-- Conta de demonstração para exercitar a API imediatamente.
+-- E-mail: demo@taskmanager.local   Senha: password123
 INSERT INTO users (id, name, email, password_hash, created_at, updated_at)
 VALUES (
     '00000000-0000-0000-0000-000000000001',

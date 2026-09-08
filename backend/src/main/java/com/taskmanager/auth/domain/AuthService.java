@@ -28,7 +28,7 @@ public class AuthService {
     public AuthTokens login(String email, String rawPassword) {
         User user = users.findByEmail(email)
                 .filter(u -> users.matchesPassword(u, rawPassword))
-                .orElseThrow(() -> Errors.unauthorized("Invalid email or password."));
+                .orElseThrow(() -> Errors.unauthorized("E-mail ou senha inválidos."));
         return issueFor(user);
     }
 
@@ -44,7 +44,7 @@ public class AuthService {
         refreshTokens.revoke(rawRefreshToken);
     }
 
-    /** Used right after a user accepts an invitation so they land authenticated. */
+    /** Usado logo após um usuário aceitar um convite, para que ele já fique autenticado. */
     @Transactional
     public AuthTokens issueForUserId(java.util.UUID userId) {
         return issueFor(users.getById(userId));

@@ -27,7 +27,7 @@ import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/v1/projects/{projectId}/members")
-@Tag(name = "Project members")
+@Tag(name = "Membros do projeto")
 @SecurityRequirement(name = "bearerAuth")
 public class MembershipController {
 

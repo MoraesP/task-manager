@@ -34,7 +34,7 @@ class AuthFlowIT extends AbstractIntegrationTest {
                 .andReturn();
         String rotatedRefresh = body(refreshed).get("refreshToken").asText();
 
-        // the old refresh token was rotated out
+        // o refresh token antigo foi rotacionado
         mvc.perform(post("/api/v1/auth/refresh").contentType(MediaType.APPLICATION_JSON)
                 .content("""
                         {"refreshToken":"%s"}""".formatted(refreshToken)))

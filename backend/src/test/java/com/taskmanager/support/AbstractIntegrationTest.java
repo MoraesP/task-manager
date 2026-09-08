@@ -19,12 +19,13 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
- * Base for HTTP-level integration tests: full Spring context, real PostgreSQL via
- * Testcontainers, Flyway migrations applied. Requires a running Docker daemon
- * ({@code mvn verify}).
+ * Base para os testes de integração no nível HTTP: contexto Spring completo,
+ * PostgreSQL real via Testcontainers, migrations Flyway aplicadas. Exige um
+ * daemon Docker rodando ({@code mvn verify}).
  *
- * <p>Uses the singleton-container pattern: one PostgreSQL container is started
- * once for the whole suite and shared by the (single) cached Spring context.
+ * <p>Usa o padrão de container singleton: um único container PostgreSQL é
+ * iniciado uma vez para toda a suíte e compartilhado pelo (único) contexto
+ * Spring em cache.
  */
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -61,7 +62,7 @@ public abstract class AbstractIntegrationTest {
         return content.isBlank() ? json.createObjectNode() : json.readTree(content);
     }
 
-    /** Registers a user and returns their access token. */
+    /** Registra um usuário e devolve o access token dele. */
     protected String registerAndLogin(String name, String email, String password) throws Exception {
         mvc.perform(post("/api/v1/auth/register").contentType(MediaType.APPLICATION_JSON)
                 .content("""

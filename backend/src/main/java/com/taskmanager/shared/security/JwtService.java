@@ -17,8 +17,8 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 
 /**
- * Issues and validates the short-lived access token (HS256). Refresh tokens are
- * opaque and handled by the auth feature, not here.
+ * Emite e valida o access token de curta duração (HS256). Os refresh tokens são
+ * opacos e tratados pela feature de autenticação, não aqui.
  */
 @Service
 public class JwtService {
@@ -47,8 +47,8 @@ public class JwtService {
     }
 
     /**
-     * @return the authenticated user, or {@code null} when the token is missing,
-     *         malformed, expired or badly signed.
+     * @return o usuário autenticado, ou {@code null} quando o token está ausente,
+     *         malformado, expirado ou com assinatura inválida.
      */
     public AuthenticatedUser parse(String token) {
         try {

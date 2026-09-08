@@ -17,7 +17,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
 @RequestMapping("/api/v1/projects/{projectId}/report")
-@Tag(name = "Reports")
+@Tag(name = "Relatórios")
 @SecurityRequirement(name = "bearerAuth")
 public class ReportController {
 

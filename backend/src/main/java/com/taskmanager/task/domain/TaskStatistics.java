@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Read-only task aggregates exposed to the report feature.
+ * Agregados de tarefas somente leitura expostos à feature de relatório.
  */
 @Service
 public class TaskStatistics {

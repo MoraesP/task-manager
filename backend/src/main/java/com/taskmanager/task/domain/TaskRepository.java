@@ -21,8 +21,8 @@ public interface TaskRepository extends JpaRepository<Task, UUID>, JpaSpecificat
             Collection<TaskStatus> statuses);
 
     /**
-     * Full-text-ish search backed by the pg_trgm GIN indexes (ADR 0005). The
-     * {@code %term%} pattern is index-assisted thanks to the trigram indexes.
+     * Busca textual apoiada pelos índices GIN do pg_trgm (ADR 0005). O padrão
+     * {@code %termo%} é acelerado pelos índices de trigramas.
      */
     @Query(value = """
             SELECT * FROM tasks t

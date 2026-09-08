@@ -5,8 +5,8 @@ import java.time.Duration;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
- * Strongly-typed application configuration bound from the {@code app.*} tree in
- * {@code application.yml}.
+ * Configuração da aplicação com tipagem forte, vinculada à árvore {@code app.*}
+ * do {@code application.yml}.
  */
 @ConfigurationProperties(prefix = "app")
 public record AppProperties(

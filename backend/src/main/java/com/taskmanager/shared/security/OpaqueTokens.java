@@ -8,9 +8,9 @@ import java.util.Base64;
 import java.util.HexFormat;
 
 /**
- * Generates high-entropy opaque tokens and their storage hashes. Used for
- * refresh tokens and invitation tokens: the raw value is shown once, only the
- * SHA-256 hash is persisted.
+ * Gera tokens opacos de alta entropia e seus hashes de armazenamento. Usado por
+ * refresh tokens e tokens de convite: o valor bruto é exibido uma única vez,
+ * apenas o hash SHA-256 é persistido.
  */
 public final class OpaqueTokens {
 

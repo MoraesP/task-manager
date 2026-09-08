@@ -4,8 +4,8 @@ import java.time.Instant;
 import java.util.UUID;
 
 /**
- * Optional, combinable filters for the task list (RF-40). A null field means
- * "no constraint".
+ * Filtros opcionais e combináveis para a listagem de tarefas (RF-40). Um campo
+ * nulo significa "sem restrição".
  */
 public record TaskFilter(
         TaskStatus status,

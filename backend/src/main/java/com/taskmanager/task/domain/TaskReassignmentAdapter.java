@@ -13,9 +13,9 @@ import com.taskmanager.project.domain.MemberTasksPort;
 import com.taskmanager.shared.error.Errors;
 
 /**
- * Task-side implementation of {@link MemberTasksPort}: reassigns every active
- * task of a member being removed (RN-61..64). Runs in the caller's transaction,
- * so any violation rolls the whole removal back.
+ * Implementação, no lado da tarefa, de {@link MemberTasksPort}: realoca toda
+ * tarefa ativa de um membro que está sendo removido (RN-61..64). Roda na
+ * transação do chamador, então qualquer violação reverte a remoção inteira.
  */
 @Component
 public class TaskReassignmentAdapter implements MemberTasksPort {
@@ -37,10 +37,11 @@ public class TaskReassignmentAdapter implements MemberTasksPort {
         for (Task task : activeTasks) {
             UUID newAssignee = newAssigneeByTask.get(task.getId());
             if (newAssignee == null) {
-                throw Errors.unprocessable("reassignment-required", "Reassignment required",
-                        "Task %s must be reassigned before the member can be removed.".formatted(task.getId()));
+                throw Errors.unprocessable("reassignment-required", "Realocação obrigatória",
+                        "A tarefa %s precisa ser realocada antes de o membro poder ser removido."
+                                .formatted(task.getId()));
             }
-            // isMember + WIP limit are validated inside TaskService.reassign / assignee check
+            // pertencimento + WIP limit são validados dentro de TaskService.reassignForRemoval
             taskService.reassignForRemoval(projectId, task, newAssignee);
         }
     }

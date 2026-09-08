@@ -10,8 +10,8 @@ import com.taskmanager.shared.error.Errors;
 import com.taskmanager.shared.security.OpaqueTokens;
 
 /**
- * Issues, rotates and revokes opaque refresh tokens. Reuse of an already-revoked
- * token revokes the whole family for that user (theft signal).
+ * Emite, rotaciona e revoga refresh tokens opacos. O reuso de um token já
+ * revogado revoga toda a cadeia daquele usuário (indício de roubo).
  */
 @Service
 public class RefreshTokenService {
@@ -24,7 +24,7 @@ public class RefreshTokenService {
         this.properties = properties;
     }
 
-    /** @return the raw token to hand to the client (never persisted). */
+    /** @return o token bruto para entregar ao cliente (nunca persistido). */
     @Transactional
     public String issue(java.util.UUID userId) {
         String raw = OpaqueTokens.generate();
@@ -36,10 +36,10 @@ public class RefreshTokenService {
     @Transactional
     public RefreshToken consume(String rawToken) {
         RefreshToken token = tokens.findByTokenHash(OpaqueTokens.hash(rawToken))
-                .orElseThrow(() -> Errors.unauthorized("Invalid refresh token."));
+                .orElseThrow(() -> Errors.unauthorized("Refresh token inválido."));
         if (!token.isActive(Instant.now())) {
             tokens.revokeAllForUser(token.getUserId());
-            throw Errors.unauthorized("Refresh token is expired or has been revoked.");
+            throw Errors.unauthorized("O refresh token está expirado ou foi revogado.");
         }
         token.revoke(Instant.now());
         return token;

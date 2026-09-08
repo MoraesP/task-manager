@@ -75,8 +75,9 @@ public class SecurityConfig {
     }
 
     /**
-     * Delegate security-filter exceptions to the {@link com.taskmanager.shared.error.GlobalExceptionHandler}
-     * so 401/403 bodies are also RFC 7807.
+     * Delega as exceções da cadeia de filtros de segurança ao
+     * {@link com.taskmanager.shared.error.GlobalExceptionHandler} para que os
+     * corpos 401/403 também sigam o RFC 7807.
      */
     @Bean
     AuthenticationEntryPoint authenticationEntryPoint(

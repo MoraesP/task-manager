@@ -19,6 +19,6 @@ CREATE INDEX idx_tasks_project_created     ON tasks (project_id, created_at);
 CREATE INDEX idx_tasks_project_deadline    ON tasks (project_id, deadline);
 CREATE INDEX idx_tasks_assignee_status     ON tasks (assignee_id, status);
 
--- Trigram indexes backing the text search (ADR 0005).
+-- Índices de trigramas que apoiam a busca textual (ADR 0005).
 CREATE INDEX idx_tasks_title_trgm       ON tasks USING gin (title gin_trgm_ops);
 CREATE INDEX idx_tasks_description_trgm  ON tasks USING gin (description gin_trgm_ops);

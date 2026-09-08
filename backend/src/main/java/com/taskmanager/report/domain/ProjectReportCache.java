@@ -17,9 +17,9 @@ import com.taskmanager.task.domain.TaskStatistics;
 import com.taskmanager.task.domain.TaskStatus;
 
 /**
- * Computes and caches the per-project report. Invalidation is explicit: every
- * {@link TaskChangedEvent} evicts that project's entry (ADR 0006). The cache TTL
- * is only a safety net.
+ * Calcula e cacheia o relatório por projeto. A invalidação é explícita: cada
+ * {@link TaskChangedEvent} remove a entrada daquele projeto (ADR 0006). O TTL do
+ * cache é apenas uma rede de segurança.
  */
 @Component
 public class ProjectReportCache {
@@ -41,7 +41,7 @@ public class ProjectReportCache {
     @CacheEvict(cacheNames = CacheConfig.PROJECT_REPORT_CACHE, key = "#event.projectId()")
     @EventListener
     public void onTaskChanged(TaskChangedEvent event) {
-        // annotation does the eviction
+        // a anotação faz a evicção
     }
 
     private static Map<String, Long> fill(Map<String, Long> counts, String[] allKeys) {

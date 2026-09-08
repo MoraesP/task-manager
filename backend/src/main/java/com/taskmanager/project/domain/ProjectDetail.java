@@ -1,8 +1,8 @@
 package com.taskmanager.project.domain;
 
 /**
- * A project plus the calling user's role in it and its member count, as returned
- * by the project endpoints.
+ * Um projeto somado ao papel do usuário chamador nele e à sua contagem de
+ * membros, como retornado pelos endpoints de projeto.
  */
 public record ProjectDetail(Project project, Role callerRole, long memberCount) {
 }

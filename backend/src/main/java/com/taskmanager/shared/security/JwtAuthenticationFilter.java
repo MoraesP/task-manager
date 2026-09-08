@@ -15,9 +15,9 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 /**
- * Reads the {@code Authorization: Bearer} header and, when the access token is
- * valid, populates the security context. Invalid tokens are ignored here; the
- * entry point turns the resulting anonymous access into a 401.
+ * Lê o header {@code Authorization: Bearer} e, quando o access token é válido,
+ * popula o contexto de segurança. Tokens inválidos são ignorados aqui; o entry
+ * point transforma o acesso anônimo resultante em 401.
  */
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {

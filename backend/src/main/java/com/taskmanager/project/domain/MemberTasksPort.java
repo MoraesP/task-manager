@@ -4,16 +4,16 @@ import java.util.List;
 import java.util.UUID;
 
 /**
- * Outbound port the project feature uses to hand off task bookkeeping when a
- * member is removed (RN-60..65). Implemented by the task feature so the project
- * feature never depends on task internals.
+ * Porta de saída que a feature de projeto usa para delegar o tratamento das
+ * tarefas quando um membro é removido (RN-60..65). Implementada pela feature de
+ * tarefa, para que a feature de projeto nunca dependa dos detalhes de tarefa.
  */
 public interface MemberTasksPort {
 
     /**
-     * Reassign every active task the member owns in the project. Must throw
-     * (rolling back the enclosing transaction) if a reassignment is missing, the
-     * new assignee is not a project member, or the WIP limit would be exceeded.
+     * Realoca toda tarefa ativa do membro no projeto. Deve lançar exceção
+     * (revertendo a transação corrente) se faltar uma realocação, se o novo
+     * responsável não for membro do projeto ou se o WIP limit for estourado.
      */
     void reassignForMemberRemoval(UUID projectId, UUID memberUserId, List<Reassignment> reassignments);
 

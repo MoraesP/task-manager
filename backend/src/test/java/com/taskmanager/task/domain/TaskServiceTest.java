@@ -45,7 +45,7 @@ class TaskServiceTest {
     private final UUID assigneeId = UUID.randomUUID();
     private final UUID taskId = UUID.randomUUID();
 
-    // --- creation ---
+    // --- criação ---
 
     @Test
     void create_rejectsAssigneeThatIsNotAMember() {
@@ -68,7 +68,7 @@ class TaskServiceTest {
         assertThat(task.getTitle()).isEqualTo("t");
     }
 
-    // --- state machine ---
+    // --- máquina de estados ---
 
     @Test
     void changeStatus_todoToDoneIsBlocked() {
@@ -118,7 +118,7 @@ class TaskServiceTest {
                         ex -> assertThat(ex.getStatus()).isEqualTo(HttpStatus.CONFLICT));
     }
 
-    // --- CRITICAL rule ---
+    // --- regra CRITICAL ---
 
     @Test
     void changeStatus_memberCannotCloseCriticalTask() {
@@ -147,7 +147,7 @@ class TaskServiceTest {
         assertThat(result.getStatus()).isEqualTo(TaskStatus.IN_PROGRESS);
     }
 
-    // --- edit / reassignment ---
+    // --- edição / realocação ---
 
     @Test
     void edit_reassignToNonMemberIsRejected() {
@@ -162,11 +162,11 @@ class TaskServiceTest {
                 .isInstanceOf(ApiException.class);
     }
 
-    // --- delete ---
+    // --- exclusão ---
 
     @Test
     void delete_memberWhoIsNotAssigneeIsForbidden() {
-        Task task = task(TaskPriority.LOW, TaskStatus.TODO); // assignee = assigneeId, not actorId
+        Task task = task(TaskPriority.LOW, TaskStatus.TODO); // responsável = assigneeId, não actorId
         when(tasks.findById(taskId)).thenReturn(Optional.of(task));
         when(authorization.requireMembership(any(), any()))
                 .thenReturn(new ProjectMembership(projectId, actorId, Role.MEMBER));
@@ -187,7 +187,7 @@ class TaskServiceTest {
         verify(tasks).delete(task);
     }
 
-    // --- helpers ---
+    // --- auxiliares ---
 
     private Task task(TaskPriority priority, TaskStatus status) {
         Task task = new Task(projectId, "t", "d", priority, assigneeId, null);

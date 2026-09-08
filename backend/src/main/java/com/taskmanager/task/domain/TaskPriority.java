@@ -1,8 +1,8 @@
 package com.taskmanager.task.domain;
 
 /**
- * Declared low-to-high so {@link Enum#ordinal()} is the natural priority order
- * used when sorting "by priority".
+ * Declarado do menor para o maior, de modo que {@link Enum#ordinal()} seja a
+ * ordem natural de prioridade usada na ordenação "por prioridade".
  */
 public enum TaskPriority {
     LOW,

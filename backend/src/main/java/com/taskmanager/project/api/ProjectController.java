@@ -29,7 +29,7 @@ import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/v1/projects")
-@Tag(name = "Projects")
+@Tag(name = "Projetos")
 @SecurityRequirement(name = "bearerAuth")
 public class ProjectController {
 

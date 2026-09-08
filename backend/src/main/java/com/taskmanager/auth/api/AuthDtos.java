@@ -8,7 +8,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
 /**
- * Request/response payloads for the auth endpoints.
+ * Payloads de requisição/resposta dos endpoints de autenticação.
  */
 public final class AuthDtos {
 

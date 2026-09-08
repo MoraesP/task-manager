@@ -6,7 +6,7 @@ import java.util.function.Function;
 import org.springframework.data.domain.Page;
 
 /**
- * Standard pagination envelope returned by every list endpoint.
+ * Envelope de paginação padrão retornado por todos os endpoints de listagem.
  */
 public record PageResponse<T>(
         List<T> content,

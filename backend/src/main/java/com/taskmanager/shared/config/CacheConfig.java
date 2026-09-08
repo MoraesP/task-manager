@@ -10,8 +10,9 @@ import org.springframework.context.annotation.Configuration;
 import com.github.benmanes.caffeine.cache.Caffeine;
 
 /**
- * The only cache in the system is the per-project report (ADR 0006). TTL is a
- * safety net; the report service evicts explicitly on every task write.
+ * O único cache do sistema é o relatório por projeto (ADR 0006). O TTL é uma
+ * rede de segurança; o serviço de relatório faz a evicção explícita a cada
+ * escrita de tarefa.
  */
 @Configuration
 public class CacheConfig {

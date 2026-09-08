@@ -6,8 +6,9 @@ import java.util.Map;
 import org.springframework.http.HttpStatus;
 
 /**
- * Base type for expected, client-facing errors. Each instance carries everything
- * the {@link GlobalExceptionHandler} needs to build an RFC 7807 response.
+ * Tipo base para erros esperados e voltados ao cliente. Cada instância carrega
+ * tudo o que o {@link GlobalExceptionHandler} precisa para montar uma resposta
+ * no formato RFC 7807.
  */
 public class ApiException extends RuntimeException {
 

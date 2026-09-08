@@ -10,8 +10,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Read-only view of users for other features that need to show names/emails
- * (e.g. the project members list, task assignee labels).
+ * Visão somente leitura de usuários para features que precisam exibir nome/e-mail
+ * (ex.: lista de membros do projeto, rótulo do responsável pela tarefa).
  */
 @Service
 public class UserDirectory {

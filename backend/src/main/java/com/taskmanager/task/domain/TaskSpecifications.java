@@ -13,6 +13,7 @@ final class TaskSpecifications {
     private TaskSpecifications() {
     }
 
+    /** Monta o predicado combinando o projeto com os filtros preenchidos (RF-40). */
     static Specification<Task> forProject(UUID projectId, TaskFilter filter) {
         return (root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();

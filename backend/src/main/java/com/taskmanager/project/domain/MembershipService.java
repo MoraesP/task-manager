@@ -37,8 +37,8 @@ public class MembershipService {
                 .map(m -> {
                     User user = usersById.get(m.getUserId());
                     return new ProjectMember(m.getUserId(),
-                            user == null ? "(unknown)" : user.getName(),
-                            user == null ? "(unknown)" : user.getEmail(),
+                            user == null ? "(desconhecido)" : user.getName(),
+                            user == null ? "(desconhecido)" : user.getEmail(),
                             m.getRole());
                 })
                 .sorted(Comparator.comparing(ProjectMember::name, String.CASE_INSENSITIVE_ORDER))
@@ -50,16 +50,16 @@ public class MembershipService {
         authorization.requireAdmin(projectId, actorId);
         Project project = authorization.requireProject(projectId);
         ProjectMembership target = memberships.findByProjectIdAndUserId(projectId, targetUserId)
-                .orElseThrow(() -> Errors.notFound("Project member", targetUserId));
+                .orElseThrow(() -> Errors.notFound("Membro do projeto", targetUserId));
         if (project.isOwnedBy(targetUserId)) {
-            throw Errors.unprocessable("owner-role-immutable", "Owner role is immutable",
-                    "The project owner is always ADMIN and cannot be changed.");
+            throw Errors.unprocessable("owner-role-immutable", "Papel do dono é imutável",
+                    "O dono do projeto é sempre ADMIN e não pode ser alterado.");
         }
         target.changeRole(newRole);
         User user = userDirectory.findAllById(List.of(targetUserId)).get(targetUserId);
         return new ProjectMember(targetUserId,
-                user == null ? "(unknown)" : user.getName(),
-                user == null ? "(unknown)" : user.getEmail(),
+                user == null ? "(desconhecido)" : user.getName(),
+                user == null ? "(desconhecido)" : user.getEmail(),
                 target.getRole());
     }
 
@@ -69,9 +69,9 @@ public class MembershipService {
         authorization.requireAdmin(projectId, actorId);
         Project project = authorization.requireProject(projectId);
         ProjectMembership target = memberships.findByProjectIdAndUserId(projectId, targetUserId)
-                .orElseThrow(() -> Errors.notFound("Project member", targetUserId));
+                .orElseThrow(() -> Errors.notFound("Membro do projeto", targetUserId));
         if (project.isOwnedBy(targetUserId)) {
-            throw Errors.forbidden("The project owner cannot be removed.");
+            throw Errors.forbidden("O dono do projeto não pode ser removido.");
         }
         memberTasks.reassignForMemberRemoval(projectId, targetUserId, reassignments);
         memberships.delete(target);

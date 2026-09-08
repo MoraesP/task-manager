@@ -17,8 +17,8 @@ import com.taskmanager.task.api.TaskDtos.TaskResponse;
 import com.taskmanager.task.domain.Task;
 
 /**
- * Builds {@link TaskResponse}s, resolving assignee display names in one batch
- * lookup to avoid an N+1 on list/search responses.
+ * Monta os {@link TaskResponse}, resolvendo o nome do responsável em uma única
+ * consulta em lote para evitar N+1 nas respostas de listagem/busca.
  */
 @Component
 public class TaskResponseAssembler {
@@ -48,7 +48,7 @@ public class TaskResponseAssembler {
         return new TaskResponse(
                 task.getId(), task.getProjectId(), task.getTitle(), task.getDescription(),
                 task.getStatus(), task.getPriority(), task.getAssigneeId(),
-                names.getOrDefault(task.getAssigneeId(), "(unknown)"),
+                names.getOrDefault(task.getAssigneeId(), "(desconhecido)"),
                 task.getDeadline(), task.isOverdue(Instant.now()),
                 task.getCreatedAt(), task.getUpdatedAt());
     }

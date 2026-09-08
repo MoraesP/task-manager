@@ -22,7 +22,7 @@ class TaskLifecycleIT extends AbstractIntegrationTest {
         String projectId = createProject(admin, "Alpha");
         String memberId = inviteAndAccept(admin, projectId, "member@example.com");
 
-        // create a task assigned to the member
+        // cria uma tarefa atribuída ao membro
         JsonNode task = body(mvc.perform(post("/api/v1/projects/{p}/tasks", projectId)
                         .header("Authorization", "Bearer " + admin)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -37,11 +37,11 @@ class TaskLifecycleIT extends AbstractIntegrationTest {
         String member = login("member@example.com", "password1");
 
         changeStatus(member, projectId, taskId, "IN_PROGRESS", status().isOk());
-        // DONE -> TODO is rejected once done; first finish it
+        // DONE -> TODO é rejeitado; primeiro concluir a tarefa
         changeStatus(member, projectId, taskId, "DONE", status().isOk());
         changeStatus(member, projectId, taskId, "TODO", status().isUnprocessableEntity());
 
-        // report reflects one DONE task
+        // o relatório reflete uma tarefa DONE
         mvc.perform(get("/api/v1/projects/{p}/report", projectId)
                         .header("Authorization", "Bearer " + admin))
                 .andExpect(status().isOk())
@@ -99,7 +99,7 @@ class TaskLifecycleIT extends AbstractIntegrationTest {
                 .andExpect(jsonPath("$.tasksInProgress").isArray());
     }
 
-    // --- helpers ---
+    // --- auxiliares ---
 
     private String createProject(String token, String name) throws Exception {
         return body(mvc.perform(post("/api/v1/projects")

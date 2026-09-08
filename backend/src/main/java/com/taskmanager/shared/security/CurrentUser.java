@@ -7,9 +7,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import com.taskmanager.shared.error.Errors;
 
 /**
- * Convenience accessor for the authenticated principal. Controllers usually take
- * {@code @AuthenticationPrincipal AuthenticatedUser}; services that are far from
- * the web layer use this.
+ * Acesso conveniente ao principal autenticado. Controllers normalmente recebem
+ * {@code @AuthenticationPrincipal AuthenticatedUser}; serviços distantes da
+ * camada web usam esta classe.
  */
 public final class CurrentUser {
 
@@ -21,7 +21,7 @@ public final class CurrentUser {
         if (authentication != null && authentication.getPrincipal() instanceof AuthenticatedUser user) {
             return user;
         }
-        throw Errors.unauthorized("No authenticated user in context.");
+        throw Errors.unauthorized("Nenhum usuário autenticado no contexto.");
     }
 
     public static UUID id() {

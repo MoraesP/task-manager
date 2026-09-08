@@ -10,8 +10,8 @@ import com.taskmanager.shared.config.AppProperties;
 import com.taskmanager.shared.error.Errors;
 
 /**
- * Enforces RN-10..12: at most N tasks IN_PROGRESS per assignee, counted across
- * every project.
+ * Aplica RN-10..12: no máximo N tarefas IN_PROGRESS por responsável, contando
+ * todos os projetos.
  */
 @Component
 public class WipLimitPolicy {
@@ -25,16 +25,16 @@ public class WipLimitPolicy {
     }
 
     /**
-     * @param excludingTaskId the task about to move/land in IN_PROGRESS, so it is
-     *                        not double-counted; may be {@code null}.
+     * @param excludingTaskId a tarefa prestes a entrar em IN_PROGRESS, para não
+     *                        ser contada duas vezes; pode ser {@code null}.
      */
     public void assertCanTakeAnother(UUID assigneeId, UUID excludingTaskId) {
         List<UUID> inProgress = tasks.findIdsByAssigneeAndStatus(assigneeId, TaskStatus.IN_PROGRESS).stream()
                 .filter(id -> !id.equals(excludingTaskId))
                 .toList();
         if (inProgress.size() >= limit) {
-            throw Errors.conflict("wip-limit-exceeded", "WIP limit exceeded",
-                    "The assignee already has %d tasks IN_PROGRESS (limit: %d)."
+            throw Errors.conflict("wip-limit-exceeded", "WIP limit excedido",
+                    "O responsável já tem %d tarefas IN_PROGRESS (limite: %d)."
                             .formatted(inProgress.size(), limit),
                     Map.of("limit", limit, "tasksInProgress", inProgress));
         }

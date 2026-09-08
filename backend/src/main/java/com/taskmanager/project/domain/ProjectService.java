@@ -32,7 +32,7 @@ public class ProjectService {
 
     @Transactional(readOnly = true)
     public Page<ProjectDetail> listForUser(UUID userId, Pageable pageable) {
-        // N+1 on membership count is acceptable: a user belongs to few projects.
+        // N+1 na contagem de membros é aceitável: um usuário pertence a poucos projetos.
         return projects.findAllForMember(userId, pageable).map(project -> toDetail(project, userId));
     }
 
@@ -61,9 +61,9 @@ public class ProjectService {
     public void delete(UUID projectId, UUID actorId) {
         Project project = authorization.requireProject(projectId);
         if (!project.isOwnedBy(actorId)) {
-            throw Errors.forbidden("Only the project owner can delete the project.");
+            throw Errors.forbidden("Apenas o dono do projeto pode excluí-lo.");
         }
-        projects.delete(project); // DB cascades memberships, invitations, tasks
+        projects.delete(project); // o banco faz cascade em memberships, convites e tarefas
     }
 
     private static String trimToNull(String value) {

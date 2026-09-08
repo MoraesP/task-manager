@@ -1,7 +1,7 @@
 package com.taskmanager.project.domain;
 
 /**
- * A member's role <em>within a project</em> (ADR 0003). There is no global role.
+ * Papel de um membro <em>dentro de um projeto</em> (ADR 0003). Não há papel global.
  */
 public enum Role {
     ADMIN,

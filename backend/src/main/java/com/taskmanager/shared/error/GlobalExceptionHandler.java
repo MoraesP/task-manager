@@ -21,8 +21,8 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 import jakarta.validation.ConstraintViolationException;
 
 /**
- * Translates every exception that reaches the dispatcher into an
- * {@code application/problem+json} body (RFC 7807).
+ * Traduz toda exceção que chega ao dispatcher para um corpo
+ * {@code application/problem+json} (RFC 7807).
  */
 @RestControllerAdvice
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
@@ -32,9 +32,9 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(ApiException.class)
     public ProblemDetail handleApiException(ApiException ex) {
         if (ex.getStatus().is5xxServerError()) {
-            log.error("API error", ex);
+            log.error("Erro de API", ex);
         } else {
-            log.warn("API error: {} - {}", ex.getStatus(), ex.getMessage());
+            log.warn("Erro de API: {} - {}", ex.getStatus(), ex.getMessage());
         }
         ProblemDetail problem = ProblemDetail.forStatusAndDetail(ex.getStatus(), ex.getMessage());
         problem.setTitle(ex.getTitle());
@@ -46,51 +46,51 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(AuthenticationException.class)
     public ProblemDetail handleAuthentication(AuthenticationException ex) {
         ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.UNAUTHORIZED,
-                "Authentication is required or has failed.");
-        problem.setTitle("Unauthorized");
+                "Autenticação é obrigatória ou falhou.");
+        problem.setTitle("Não autenticado");
         return problem;
     }
 
     @ExceptionHandler(AccessDeniedException.class)
     public ProblemDetail handleAccessDenied(AccessDeniedException ex) {
         ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.FORBIDDEN,
-                "You do not have permission to perform this action.");
-        problem.setTitle("Forbidden");
+                "Você não tem permissão para executar esta ação.");
+        problem.setTitle("Acesso negado");
         return problem;
     }
 
     @ExceptionHandler(ConstraintViolationException.class)
     public ProblemDetail handleConstraintViolation(ConstraintViolationException ex) {
-        List<Map<String, String>> errors = ex.getConstraintViolations().stream()
+        List<Map<String, String>> erros = ex.getConstraintViolations().stream()
                 .map(v -> Map.of("field", v.getPropertyPath().toString(), "message", v.getMessage()))
                 .toList();
         ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST,
-                "Request parameters failed validation.");
-        problem.setTitle("Validation failed");
-        problem.setProperty("errors", errors);
+                "Parâmetros da requisição inválidos.");
+        problem.setTitle("Falha de validação");
+        problem.setProperty("errors", erros);
         return problem;
     }
 
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex,
             HttpHeaders headers, HttpStatusCode status, WebRequest request) {
-        List<Map<String, String>> errors = ex.getBindingResult().getFieldErrors().stream()
+        List<Map<String, String>> erros = ex.getBindingResult().getFieldErrors().stream()
                 .map(fe -> Map.of("field", fe.getField(),
-                        "message", fe.getDefaultMessage() == null ? "invalid" : fe.getDefaultMessage()))
+                        "message", fe.getDefaultMessage() == null ? "inválido" : fe.getDefaultMessage()))
                 .toList();
         ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST,
-                "Request body failed validation.");
-        problem.setTitle("Validation failed");
-        problem.setProperty("errors", errors);
+                "Corpo da requisição inválido.");
+        problem.setTitle("Falha de validação");
+        problem.setProperty("errors", erros);
         return ResponseEntity.badRequest().body(problem);
     }
 
     @ExceptionHandler(Exception.class)
     public ProblemDetail handleUnexpected(Exception ex) {
-        log.error("Unexpected error", ex);
+        log.error("Erro inesperado", ex);
         ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.INTERNAL_SERVER_ERROR,
-                "An unexpected error occurred.");
-        problem.setTitle("Internal server error");
+                "Ocorreu um erro inesperado.");
+        problem.setTitle("Erro interno do servidor");
         return problem;
     }
 }

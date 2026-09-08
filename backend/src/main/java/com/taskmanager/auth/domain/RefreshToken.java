@@ -10,8 +10,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 
 /**
- * Opaque refresh token. Only the hash is persisted; the raw value is returned to
- * the client once and never stored (ADR 0004).
+ * Refresh token opaco. Apenas o hash é persistido; o valor bruto é devolvido ao
+ * cliente uma única vez e nunca armazenado (ADR 0004).
  */
 @Entity
 @Table(name = "refresh_tokens")

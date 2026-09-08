@@ -9,8 +9,9 @@ import org.springframework.data.domain.Sort;
 import com.taskmanager.shared.error.Errors;
 
 /**
- * Whitelists the sort keys accepted by the task list (RF-41) and maps them to
- * real entity attributes ("priority" sorts by the numeric rank, not the name).
+ * Lista branca das chaves de ordenação aceitas pela listagem de tarefas (RF-41),
+ * mapeadas para atributos reais da entidade ("priority" ordena pelo rank
+ * numérico, não pelo nome).
  */
 final class TaskSort {
 
@@ -32,8 +33,8 @@ final class TaskSort {
                 .map(order -> {
                     String target = ALLOWED.get(order.getProperty());
                     if (target == null) {
-                        throw Errors.unprocessable("invalid-sort", "Invalid sort",
-                                "Cannot sort tasks by '%s'. Allowed: priority, createdAt, deadline."
+                        throw Errors.unprocessable("invalid-sort", "Ordenação inválida",
+                                "Não é possível ordenar tarefas por '%s'. Permitido: priority, createdAt, deadline."
                                         .formatted(order.getProperty()));
                     }
                     return new Sort.Order(order.getDirection(), target);

@@ -30,7 +30,7 @@ server:
 app:
   security:
     jwt:
-      # 256-bit secret; override in every real environment.
+      # segredo de 256 bits; sobrescreva em todo ambiente real.
       secret: ${JWT_SECRET:dev-only-secret-change-me-0123456789abcdef0123456789abcdef}
       access-token-ttl: ${JWT_ACCESS_TTL:PT15M}
       refresh-token-ttl: ${JWT_REFRESH_TTL:P7D}

@@ -32,7 +32,7 @@ public class Task extends BaseEntity {
     @Column(nullable = false)
     private TaskPriority priority;
 
-    /** Numeric mirror of {@link #priority} so the DB can sort by semantic order. */
+    /** Espelho numérico de {@link #priority} para o banco ordenar pela ordem semântica. */
     @Column(name = "priority_rank", nullable = false)
     private short priorityRank;
 
