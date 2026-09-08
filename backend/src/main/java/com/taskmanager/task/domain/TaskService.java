@@ -4,6 +4,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -12,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.taskmanager.project.domain.ProjectAuthorization;
 import com.taskmanager.project.domain.ProjectMembership;
 import com.taskmanager.shared.error.Errors;
+import com.taskmanager.shared.event.TaskChangedEvent;
 
 @Service
 public class TaskService {
@@ -19,11 +21,14 @@ public class TaskService {
     private final TaskRepository tasks;
     private final ProjectAuthorization authorization;
     private final WipLimitPolicy wipLimit;
+    private final ApplicationEventPublisher events;
 
-    public TaskService(TaskRepository tasks, ProjectAuthorization authorization, WipLimitPolicy wipLimit) {
+    public TaskService(TaskRepository tasks, ProjectAuthorization authorization, WipLimitPolicy wipLimit,
+            ApplicationEventPublisher events) {
         this.tasks = tasks;
         this.authorization = authorization;
         this.wipLimit = wipLimit;
+        this.events = events;
     }
 
     @Transactional
@@ -31,7 +36,9 @@ public class TaskService {
             TaskPriority priority, UUID assigneeId, Instant deadline) {
         authorization.requireMembership(projectId, actorId);
         requireAssigneeIsMember(projectId, assigneeId);
-        return tasks.save(new Task(projectId, title.trim(), trimToNull(description), priority, assigneeId, deadline));
+        Task task = tasks.save(new Task(projectId, title.trim(), trimToNull(description), priority, assigneeId, deadline));
+        events.publishEvent(new TaskChangedEvent(projectId));
+        return task;
     }
 
     @Transactional(readOnly = true)
@@ -67,6 +74,7 @@ public class TaskService {
             }
         }
         task.edit(title.trim(), trimToNull(description), priority, assigneeId, deadline);
+        events.publishEvent(new TaskChangedEvent(task.getProjectId()));
         return task;
     }
 
@@ -89,6 +97,7 @@ public class TaskService {
             wipLimit.assertCanTakeAnother(task.getAssigneeId(), task.getId());
         }
         task.changeStatus(target);
+        events.publishEvent(new TaskChangedEvent(task.getProjectId()));
         return task;
     }
 
@@ -100,6 +109,7 @@ public class TaskService {
             throw Errors.forbidden("Only a project ADMIN or the task assignee can delete this task.");
         }
         tasks.delete(task);
+        events.publishEvent(new TaskChangedEvent(task.getProjectId()));
     }
 
     private Task load(UUID taskId) {
@@ -135,5 +145,6 @@ public class TaskService {
             wipLimit.assertCanTakeAnother(newAssigneeId, task.getId());
         }
         task.reassign(newAssigneeId);
+        events.publishEvent(new TaskChangedEvent(projectId));
     }
 }
