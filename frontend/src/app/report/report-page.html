@@ -1,0 +1,49 @@
+@if (project(); as p) {
+  <app-topbar [title]="p.name" crumb="Relatório">
+    <app-role-badge badge [value]="p.role" />
+  </app-topbar>
+
+  <div class="page">
+    <header class="ph">
+      <h2>Relatório do projeto</h2>
+      <p class="sub">Contadores de tarefas por status e por prioridade.</p>
+    </header>
+
+    @if (loading() && !report()) {
+      <app-page-loader />
+    } @else if (report()) {
+      <div class="total-card card">
+        <span class="n">{{ total() }}</span>
+        <span class="l">{{ total() === 1 ? 'tarefa no projeto' : 'tarefas no projeto' }}</span>
+      </div>
+
+      <div class="grid">
+        <section class="card pad">
+          <div class="section-title">Por status</div>
+          <div class="bars">
+            @for (row of statusRows(); track row.key) {
+              <div class="bar-row">
+                <span class="bl">{{ row.label }}</span>
+                <div class="track"><i [class]="row.tone" [style.width.%]="row.pct"></i></div>
+                <span class="bv">{{ row.value }}</span>
+              </div>
+            }
+          </div>
+        </section>
+
+        <section class="card pad">
+          <div class="section-title">Por prioridade</div>
+          <div class="bars">
+            @for (row of priorityRows(); track row.key) {
+              <div class="bar-row">
+                <span class="bl">{{ row.label }}</span>
+                <div class="track"><i [class]="row.tone" [style.width.%]="row.pct"></i></div>
+                <span class="bv">{{ row.value }}</span>
+              </div>
+            }
+          </div>
+        </section>
+      </div>
+    }
+  </div>
+}

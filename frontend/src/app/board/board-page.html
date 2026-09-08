@@ -1,0 +1,106 @@
+<app-topbar [title]="project()?.name ?? 'Quadro'" crumb="Quadro">
+  @if (project(); as p) {
+    <app-role-badge badge [value]="p.role" />
+  }
+</app-topbar>
+
+<app-board-toolbar
+  [members]="board.members()"
+  (newTask)="newTask()"
+  (filterChange)="onFilter($event)"
+  (searchChange)="onSearch($event)"
+/>
+
+@if (showBoard()) {
+  @if (board.loading() && board.tasks().length === 0) {
+    <app-page-loader />
+  } @else {
+    <div class="strip">
+      <span><b>{{ board.columns()['TODO'].length }}</b> a fazer</span>
+      <span><b>{{ board.columns()['IN_PROGRESS'].length }}</b> em progresso</span>
+      <span><b>{{ board.columns()['DONE'].length }}</b> concluídas</span>
+      @if (board.truncated()) {
+        <span class="spacer"></span>
+        <span class="hint">mostrando as primeiras {{ board.tasks().length }} de {{ board.total() }} — refine os filtros</span>
+      }
+    </div>
+
+    <div class="board">
+      @for (status of board.statuses; track status) {
+        <section class="col">
+          <header class="col-head">
+            <span class="dot" [class]="status.toLowerCase()"></span>
+            {{ statusLabel[status] }}
+            <span class="count">{{ board.columns()[status].length }}</span>
+          </header>
+
+          <div
+            class="col-body"
+            cdkDropList
+            [id]="'col-' + status"
+            [cdkDropListData]="board.columns()[status]"
+            [cdkDropListConnectedTo]="columnIds"
+            [cdkDropListSortingDisabled]="true"
+            (cdkDropListDropped)="drop($event, status)"
+          >
+            @for (task of board.columns()[status]; track task.id) {
+              <div cdkDrag [cdkDragData]="task">
+                <app-task-card
+                  [task]="task"
+                  [menuOpen]="openMenuId() === task.id"
+                  (menuToggled)="openMenuId.set($event ? task.id : null)"
+                  (open)="editTask(task)"
+                  (move)="menuMove(task, $event)"
+                  (delete)="removeTask(task)"
+                />
+              </div>
+            } @empty {
+              <p class="col-empty">Sem tarefas.</p>
+            }
+
+            @if (status === 'TODO') {
+              <button class="add" (click)="newTask()">
+                + Adicionar tarefa
+              </button>
+            }
+          </div>
+        </section>
+      }
+    </div>
+  }
+} @else {
+  <!-- resultados de busca -->
+  <div class="search-results">
+    <div class="sr-head">
+      <span>
+        @if (searching()) { Buscando… }
+        @else if (searchResult(); as r) { {{ r.totalElements }} resultado(s) para “{{ searchTerm() }}” }
+      </span>
+    </div>
+    @if (searchResult(); as r) {
+      @if (r.content.length === 0 && !searching()) {
+        <app-empty-state title="Nada encontrado" message="Nenhuma tarefa combina com o texto buscado." />
+      } @else {
+        <div class="sr-list">
+          @for (task of r.content; track task.id) {
+            <app-task-card
+              [task]="task"
+              [menuOpen]="openMenuId() === task.id"
+              (menuToggled)="openMenuId.set($event ? task.id : null)"
+              (open)="editTask(task)"
+              (move)="menuMove(task, $event)"
+              (delete)="removeTask(task)"
+            />
+          }
+        </div>
+        <app-paginator
+          [page]="r.page"
+          [size]="r.size"
+          [total]="r.totalElements"
+          [totalPages]="r.totalPages"
+          (go)="runSearch($event)"
+        />
+      }
+    }
+  </div>
+}
