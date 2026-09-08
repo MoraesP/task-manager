@@ -1,0 +1,58 @@
+spring:
+  application:
+    name: task-manager-backend
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/taskmanager}
+    username: ${DB_USERNAME:taskmanager}
+    password: ${DB_PASSWORD:taskmanager}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: UTC
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+  jackson:
+    default-property-inclusion: non_null
+  cache:
+    type: caffeine
+
+server:
+  port: ${SERVER_PORT:8080}
+  error:
+    include-message: never
+    include-stacktrace: never
+
+app:
+  security:
+    jwt:
+      # 256-bit secret; override in every real environment.
+      secret: ${JWT_SECRET:dev-only-secret-change-me-0123456789abcdef0123456789abcdef}
+      access-token-ttl: ${JWT_ACCESS_TTL:PT15M}
+      refresh-token-ttl: ${JWT_REFRESH_TTL:P7D}
+    cors:
+      allowed-origin: ${CORS_ALLOWED_ORIGIN:http://localhost:4200}
+  invitations:
+    ttl: P7D
+  tasks:
+    wip-limit: 5
+  report:
+    cache-ttl: PT60S
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info
+
+logging:
+  level:
+    org.springframework.security: INFO
