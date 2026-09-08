@@ -17,14 +17,34 @@ arquitetura e ADRs) está em [`docs/`](docs/README.md).
 ```bash
 # 1. Subir o PostgreSQL
 docker compose up -d
+# sem o plugin compose:
+# docker run -d --name taskmanager-postgres -p 5432:5432 \
+#   -e POSTGRES_DB=taskmanager -e POSTGRES_USER=taskmanager -e POSTGRES_PASSWORD=taskmanager \
+#   postgres:16-alpine
 
 # 2. Rodar o backend
 cd backend
 ./mvnw spring-boot:run
 ```
 
+Flyway cria o schema e semeia a conta de demonstração na primeira execução.
+
 API em `http://localhost:8080/api/v1`. Swagger UI em
 `http://localhost:8080/swagger-ui.html`.
+
+### Conta de demonstração
+
+Já existe um usuário semeado pela migration para testar rápido:
+
+| Email | Senha |
+|---|---|
+| `demo@taskmanager.local` | `password123` |
+
+```bash
+curl -s http://localhost:8080/api/v1/auth/login \
+  -H 'Content-Type: application/json' \
+  -d '{"email":"demo@taskmanager.local","password":"password123"}'
+```
 
 ## Testes
 
@@ -33,6 +53,14 @@ cd backend
 ./mvnw test      # unitários (services) — não exige Docker
 ./mvnw verify    # + testes de integração (Testcontainers) — exige Docker rodando
 ```
+
+Com Colima, exporte o socket antes do `verify`:
+
+```bash
+export DOCKER_HOST="unix://${HOME}/.colima/default/docker.sock"
+```
+
+(a versão da API do Docker e o Ryuk já vêm ajustados no `pom.xml` para o Colima.)
 
 ## Configuração
 
@@ -58,11 +86,21 @@ Ver [`docs/adr/`](docs/adr/). Resumo:
 - Busca textual com `pg_trgm` + índice GIN (ADR 0005)
 - Cache Caffeine só no relatório, invalidação por evicção (ADR 0006)
 
+## Estrutura do backend
+
+Monólito modular *package-by-feature* (`auth`, `project`, `task`, `report`,
+`shared`), módulo Maven único. Cada feature tem camadas internas `api` / `domain`
+/ `infra` e conversa com as outras apenas pelos serviços públicos
+(`ProjectAuthorization`, `UserDirectory`, `TaskStatistics`, `MemberTasksPort`).
+Detalhes em [docs/07-arquitetura.md](docs/07-arquitetura.md).
+
 ## O que eu faria diferente com mais tempo
 
-_(a preencher ao longo do desenvolvimento)_
-
-- Histórico de alterações da tarefa (audit log campo a campo).
-- Refresh token em cookie httpOnly no frontend.
-- Testes E2E de mais fluxos.
-- Envio real de email nos convites.
+- **Audit log da tarefa** (histórico campo a campo, `who/what/when`) — o
+  `TaskChangedEvent` já existe e seria o ponto de escrita natural.
+- **Refresh token no frontend em cookie httpOnly** em vez de corpo JSON.
+- **Envio real de e-mail** nos convites (hoje o token volta na resposta da API).
+- **Paginação keyset** na busca para datasets muito grandes, no lugar de offset.
+- **Cobrir mais flufos com testes E2E** e testes de contrato da API (ex.: schemas
+  OpenAPI versionados).
+- **Rate limiting** nos endpoints de autenticação.
