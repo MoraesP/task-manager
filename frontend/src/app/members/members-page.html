@@ -60,7 +60,7 @@
                 <td>
                   @if (isAdmin() && !isOwner(m)) {
                     <div class="rowmenu">
-                      <button class="iconbtn" (click)="menuFor.set(menuFor() === m.userId ? null : m.userId)" aria-label="Ações">
+                      <button class="iconbtn" (click)="$event.stopPropagation(); menuFor.set(menuFor() === m.userId ? null : m.userId)" aria-label="Ações">
                         <app-icon name="dots" [size]="15" [stroke]="2" />
                       </button>
                       @if (menuFor() === m.userId) {

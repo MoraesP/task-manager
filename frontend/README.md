@@ -1,59 +1,34 @@
-# Frontend
+# Task Manager — Frontend
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.3.32.
+Angular 20 (standalone, sem NgModules). Consome a API REST do backend.
 
-## Development server
-
-To start a local development server, run:
+## Rodar
 
 ```bash
-ng serve
+npm install
+npm start          # dev server em http://localhost:4200
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
-
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+O dev server faz proxy de `/api` para `http://localhost:8080` (ver
+`proxy.conf.json`), então o backend precisa estar no ar.
 
 ```bash
-ng generate component component-name
+npm run build      # build de produção em dist/
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+## Arquitetura
 
-```bash
-ng generate --help
-```
+- **Estado**: services com signals nativos (`signal`, `computed`); RxJS só para
+  operadores de fluxo (debounce da busca).
+- **`src/app/core/`**: models tipados, `AuthService`, interceptors (Authorization +
+  refresh automático em 401; erro → toast a partir do `ProblemDetail`), guards,
+  `ToastService`, `LayoutService`.
+- **Features**: `auth/`, `projects/`, `shell/` (sidebar + topbar), `project/`
+  (layout + configurações), `board/` (quadro, DnD, drawer de tarefa, filtros,
+  busca), `members/` (papéis, convites, remoção com reatribuição), `report/`.
+- **`src/styles.scss`**: design system global ("clara e arejada"), espelha
+  `../design/_head.html`.
+- Drag-and-drop: Angular CDK. Diálogos e drawer: CDK Dialog + CDK Overlay.
 
-## Building
-
-To build the project run:
-
-```bash
-ng build
-```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+Rotas em português (`/entrar`, `/cadastro`, `/convite`, `/projetos`,
+`/projetos/:id/quadro|relatorio|membros|configuracoes`), lazy com `loadComponent`.

@@ -1,14 +1,16 @@
 # Task Manager
 
 Sistema de gerenciamento de tarefas para equipes de desenvolvimento.
-Backend REST em Java 17 / Spring Boot 3 e frontend em Angular 20 (em construção).
+Backend REST em Java 17 / Spring Boot 3 e frontend em Angular 20.
 
 A especificação completa (requisitos, regras de negócio, contrato da API,
-arquitetura e ADRs) está em [`docs/`](docs/README.md).
+arquitetura e ADRs) está em [`docs/`](docs/README.md). Mockups das telas em
+[`design/`](design/) (Claude Design).
 
 ## Pré-requisitos
 
 - Java 17
+- Node 20.19+ ou 22.12+ (para o frontend)
 - Maven 3.9+ (ou use o wrapper `./mvnw` em `backend/`)
 - Docker (Colima, Docker Desktop, etc.) para o PostgreSQL e os testes de integração
 
@@ -25,12 +27,17 @@ docker compose up -d
 # 2. Rodar o backend
 cd backend
 ./mvnw spring-boot:run
+
+# 3. Rodar o frontend (em outro terminal)
+cd frontend
+npm install
+npm start
 ```
 
 Flyway cria o schema e semeia a conta de demonstração na primeira execução.
 
-API em `http://localhost:8080/api/v1`. Swagger UI em
-`http://localhost:8080/swagger-ui.html`.
+- API: `http://localhost:8080/api/v1` · Swagger UI: `http://localhost:8080/swagger-ui.html`
+- Frontend: `http://localhost:4200` (o dev server faz proxy de `/api` para `:8080`)
 
 ### Conta de demonstração
 
@@ -94,6 +101,24 @@ Monólito modular *package-by-feature* (`auth`, `project`, `task`, `report`,
 (`ProjectAuthorization`, `UserDirectory`, `TaskStatistics`, `MemberTasksPort`).
 Detalhes em [docs/07-arquitetura.md](docs/07-arquitetura.md).
 
+## Estrutura do frontend
+
+Angular 20 standalone (sem NgModules). Estado em **services com signals**; RxJS só
+para operadores de fluxo (debounce da busca). `core/` tem os interceptors
+(Authorization + refresh automático em 401, normalização de erro → toast),
+`AuthService` e guards. Cada feature (`auth`, `projects`, `board`, `members`,
+`report`, `project`) tem seu service e componentes. Drag-and-drop com Angular CDK;
+diálogos com CDK Dialog. Design system global em `src/styles.scss`
+("clara e arejada", espelha `design/`). Ver [docs/08-frontend.md](docs/08-frontend.md)
+e [ADR 0007](docs/adr/0007-estado-frontend-signals.md).
+
+Regras de negócio no cliente: transição de status inválida é barrada antes de
+chamar a API (e revertida com o `detail` do ProblemDetail se o servidor recusar);
+o menu de status de cada card só oferece transições válidas; a remoção de membro
+exige reatribuir as tarefas ativas.
+
+Testes de frontend ainda não foram escritos (fora do escopo desta iteração).
+
 ## O que eu faria diferente com mais tempo
 
 - **Audit log da tarefa** (histórico campo a campo, `who/what/when`) — o
@@ -101,6 +126,11 @@ Detalhes em [docs/07-arquitetura.md](docs/07-arquitetura.md).
 - **Refresh token no frontend em cookie httpOnly** em vez de corpo JSON.
 - **Envio real de e-mail** nos convites (hoje o token volta na resposta da API).
 - **Paginação keyset** na busca para datasets muito grandes, no lugar de offset.
-- **Cobrir mais flufos com testes E2E** e testes de contrato da API (ex.: schemas
+- **Cobrir mais fluxos com testes E2E** e testes de contrato da API (ex.: schemas
   OpenAPI versionados).
 - **Rate limiting** nos endpoints de autenticação.
+- **Testes de frontend** (componente do card / coluna, 1 fluxo E2E do quadro).
+- **Board paginado por coluna** (hoje carrega as primeiras 100 tarefas e mostra
+  aviso quando há mais — o suficiente para o desafio).
+- **Contagem global de WIP no cliente** exige um endpoint dedicado; hoje o front
+  confia na validação do backend (erro 409 com o detalhe).

@@ -25,6 +25,7 @@ import { TaskDrawerComponent, TaskDrawerData } from './task-drawer';
 @Component({
   selector: 'app-board-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  host: { '(document:click)': 'openMenuId.set(null)' },
   providers: [BoardService],
   imports: [
     CdkDropList,

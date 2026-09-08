@@ -19,6 +19,7 @@ import { RemoveMemberDialogComponent, RemoveMemberData } from './remove-member-d
 @Component({
   selector: 'app-members-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  host: { '(document:click)': 'menuFor.set(null)' },
   imports: [
     TopbarComponent,
     IconComponent,
