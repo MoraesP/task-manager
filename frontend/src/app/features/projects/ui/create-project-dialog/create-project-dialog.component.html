@@ -1,0 +1,31 @@
+<div class="modal">
+  <div class="modal__head">
+    <h3 class="modal__title">Novo projeto</h3>
+    <button class="modal__close" (click)="ref.close()" aria-label="Fechar">
+      <app-icon name="x" [size]="18" />
+    </button>
+  </div>
+  <form [formGroup]="form" (ngSubmit)="submit()">
+    <div class="modal__body">
+      <div class="field">
+        <label class="field__label" for="np-name">Nome</label>
+        <input id="np-name" class="input" formControlName="name" />
+      </div>
+      <div class="field">
+        <label class="field__label" for="np-desc">Descrição <span class="field__hint">(opcional)</span></label>
+        <textarea id="np-desc" class="input" rows="3" formControlName="description"></textarea>
+      </div>
+      <p class="field__hint">Você será o dono e Admin do projeto.</p>
+    </div>
+    <div class="modal__foot">
+      <button type="button" class="btn btn--ghost" (click)="ref.close()">Cancelar</button>
+      <button type="submit" class="btn btn--primary" [disabled]="form.invalid || loading()">
+        @if (loading()) {
+          <app-spinner [size]="14" />
+        } @else {
+          Criar projeto
+        }
+      </button>
+    </div>
+  </form>
+</div>

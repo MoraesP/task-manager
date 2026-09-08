@@ -1,0 +1,40 @@
+<app-auth-card>
+  <h1 class="register__title">Criar conta</h1>
+  <p class="register__lead">Comece criando um projeto e convidando sua equipe.</p>
+
+  <form class="register__form" [formGroup]="form" (ngSubmit)="submit()">
+    <div class="field">
+      <label class="field__label" for="nome">Nome</label>
+      <input id="nome" class="input" type="text" formControlName="name" autocomplete="name" />
+    </div>
+    <div class="field">
+      <label class="field__label" for="email">E-mail</label>
+      <input id="email" class="input" type="email" formControlName="email" autocomplete="email" />
+    </div>
+    <div class="field">
+      <label class="field__label" for="senha">Senha</label>
+      <input
+        id="senha"
+        class="input"
+        type="password"
+        formControlName="password"
+        autocomplete="new-password"
+      />
+      <span class="field__hint">Mínimo de 8 caracteres.</span>
+    </div>
+    <button class="btn btn--primary btn--block btn--lg" type="submit" [disabled]="form.invalid || loading()">
+      @if (loading()) {
+        <app-spinner [size]="15" />
+      } @else {
+        Criar conta
+      }
+    </button>
+  </form>
+
+  <p class="register__invite">
+    Recebeu um convite para um projeto?
+    <a routerLink="/convite">Aceitar convite</a>
+  </p>
+  <div class="register__sep"><span>já tem conta?</span></div>
+  <a routerLink="/entrar" class="register__alt">Entrar</a>
+</app-auth-card>

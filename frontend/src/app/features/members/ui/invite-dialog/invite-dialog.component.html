@@ -1,0 +1,58 @@
+<div class="modal">
+  <div class="modal__head">
+    <h3 class="modal__title">Convidar membro</h3>
+    <button class="modal__close" (click)="ref.close()" aria-label="Fechar">
+      <app-icon name="x" [size]="18" />
+    </button>
+  </div>
+  <div class="modal__body">
+    @if (!created()) {
+      <form class="invite" [formGroup]="form" (ngSubmit)="submit()">
+        <div class="invite__row">
+          <div class="field invite__email">
+            <label class="field__label" for="inv-email">E-mail</label>
+            <input id="inv-email" class="input" type="email" formControlName="email" />
+          </div>
+          <div class="field invite__role">
+            <label class="field__label" for="inv-role">Papel</label>
+            <select id="inv-role" class="input" formControlName="role">
+              <option value="MEMBER">Membro</option>
+              <option value="ADMIN">Admin</option>
+            </select>
+          </div>
+        </div>
+        <button class="btn btn--primary" type="submit" [disabled]="form.invalid || loading()">
+          @if (loading()) {
+            <app-spinner [size]="14" />
+          } @else {
+            Gerar convite
+          }
+        </button>
+      </form>
+    } @else {
+      <div class="callout callout--info">
+        <div class="invite__generated-title">
+          Convite gerado · expira {{ created()!.expiresAt | date: 'dd/MM/yyyy' }}
+        </div>
+        <div class="invite__link">
+          <input class="input mono" readonly [value]="link()" #linkInput />
+          <button class="btn btn--sm" (click)="copy(linkInput.value)">
+            <app-icon name="copy" [size]="13" [stroke]="1.8" /> Copiar
+          </button>
+        </div>
+        <p class="invite__note">
+          Não enviamos e-mail — envie este link para a pessoa. Ao aceitar, ela cria a conta (se
+          ainda não tiver) e entra no projeto.
+        </p>
+      </div>
+    }
+  </div>
+  <div class="modal__foot">
+    @if (created()) {
+      <button class="btn btn--ghost" (click)="reset()">Convidar outra pessoa</button>
+    }
+    <button class="btn" [class.btn--primary]="!!created()" (click)="close()">
+      {{ created() ? 'Concluir' : 'Cancelar' }}
+    </button>
+  </div>
+</div>

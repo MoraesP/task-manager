@@ -1,0 +1,50 @@
+<app-auth-card>
+  <h1 class="accept__title">Aceitar convite</h1>
+  <p class="accept__lead">Entre no projeto para o qual você foi convidado.</p>
+
+  <form class="accept__form" [formGroup]="form" (ngSubmit)="submit()">
+    <div class="field">
+      <label class="field__label" for="token">Token do convite</label>
+      <input
+        id="token"
+        class="input mono"
+        type="text"
+        formControlName="token"
+        [readonly]="hasLinkToken()"
+      />
+      @if (!hasLinkToken()) {
+        <span class="field__hint">Cole aqui o token que você recebeu.</span>
+      }
+    </div>
+    <div class="field">
+      <label class="field__label" for="nome">Nome</label>
+      <input id="nome" class="input" type="text" formControlName="name" autocomplete="name" />
+      <span class="field__hint">Ignorado se você já tem conta com este e-mail.</span>
+    </div>
+    <div class="field">
+      <label class="field__label" for="senha">Senha</label>
+      <input
+        id="senha"
+        class="input"
+        type="password"
+        formControlName="password"
+        autocomplete="new-password"
+        placeholder="Deixe em branco se já tem conta"
+      />
+    </div>
+    <button
+      class="btn btn--primary btn--block btn--lg"
+      type="submit"
+      [disabled]="form.controls.token.invalid || loading()"
+    >
+      @if (loading()) {
+        <app-spinner [size]="15" />
+      } @else {
+        Aceitar convite e entrar
+      }
+    </button>
+  </form>
+
+  <div class="accept__sep"></div>
+  <a routerLink="/entrar" class="accept__alt">Voltar para o login</a>
+</app-auth-card>

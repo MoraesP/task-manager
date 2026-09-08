@@ -1,0 +1,55 @@
+@if (project(); as p) {
+  <app-topbar [title]="p.name" crumb="Relatório">
+    <app-role-badge badge [value]="p.role" />
+  </app-topbar>
+
+  <div class="report">
+    <header class="report__header">
+      <h2 class="report__title">Relatório do projeto</h2>
+      <p class="report__subtitle">Contadores de tarefas por status e por prioridade.</p>
+    </header>
+
+    @if (loading() && !report()) {
+      <app-page-loader />
+    } @else if (report()) {
+      <div class="report__total">
+        <span class="report__total-value">{{ total() }}</span>
+        <span class="report__total-label">
+          {{ total() === 1 ? 'tarefa no projeto' : 'tarefas no projeto' }}
+        </span>
+      </div>
+
+      <div class="report__grid">
+        <section class="report-panel">
+          <div class="report-panel__title">Por status</div>
+          <div class="report-panel__bars">
+            @for (row of statusRows(); track row.key) {
+              <div class="bar-row">
+                <span class="bar-row__label">{{ row.label }}</span>
+                <div class="bar-row__track">
+                  <i class="bar-row__fill" [class]="'bar-row__fill--' + row.tone" [style.width.%]="row.pct"></i>
+                </div>
+                <span class="bar-row__value">{{ row.value }}</span>
+              </div>
+            }
+          </div>
+        </section>
+
+        <section class="report-panel">
+          <div class="report-panel__title">Por prioridade</div>
+          <div class="report-panel__bars">
+            @for (row of priorityRows(); track row.key) {
+              <div class="bar-row">
+                <span class="bar-row__label">{{ row.label }}</span>
+                <div class="bar-row__track">
+                  <i class="bar-row__fill" [class]="'bar-row__fill--' + row.tone" [style.width.%]="row.pct"></i>
+                </div>
+                <span class="bar-row__value">{{ row.value }}</span>
+              </div>
+            }
+          </div>
+        </section>
+      </div>
+    }
+  </div>
+}

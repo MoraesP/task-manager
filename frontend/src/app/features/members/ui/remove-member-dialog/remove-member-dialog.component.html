@@ -1,0 +1,72 @@
+<div class="modal modal--wide">
+  <div class="modal__head">
+    <span class="modal__head-icon modal__head-icon--danger">
+      <app-icon name="alert" [size]="20" [stroke]="1.8" />
+    </span>
+    <div class="modal__head-text">
+      <h3 class="modal__title">Remover {{ data.member.name }} do projeto</h3>
+      <p class="field__hint">
+        Ele perde o acesso imediatamente. Tarefas concluídas continuam registradas em seu nome.
+      </p>
+    </div>
+    <button class="modal__close" (click)="ref.close(false)" aria-label="Fechar">
+      <app-icon name="x" [size]="18" />
+    </button>
+  </div>
+
+  <div class="modal__body">
+    @if (data.activeTasks.length === 0) {
+      <div class="callout">
+        {{ data.member.name }} não tem tarefas ativas. A remoção é imediata.
+      </div>
+    } @else {
+      <div class="callout callout--warn">
+        {{ data.member.name }} tem <b>{{ data.activeTasks.length }}</b>
+        {{ data.activeTasks.length === 1 ? 'tarefa ativa' : 'tarefas ativas' }}. Escolha um novo
+        responsável para cada uma — respeitando o limite de 5 tarefas em progresso por pessoa.
+      </div>
+
+      <div class="reassign">
+        @for (task of data.activeTasks; track task.id) {
+          <div class="reassign__row">
+            <div class="reassign__task">
+              <div class="reassign__task-title">{{ task.title }}</div>
+              <div class="reassign__task-meta">
+                <span class="mono">{{ shortId(task.id) }}</span> ·
+                <app-status-pill [value]="task.status" />
+              </div>
+            </div>
+            <select
+              class="input reassign__select"
+              [value]="picks()[task.id] ?? ''"
+              (change)="setPick(task.id, $any($event.target).value)"
+            >
+              <option value="" disabled>Reatribuir a…</option>
+              @for (c of data.candidates; track c.userId) {
+                <option [value]="c.userId">{{ c.name }}</option>
+              }
+            </select>
+          </div>
+        }
+      </div>
+    }
+  </div>
+
+  <div class="modal__foot">
+    @if (data.activeTasks.length > 0 && !allAssigned()) {
+      <span class="modal__foot-hint">Escolha um responsável para todas as tarefas</span>
+    }
+    <button class="btn btn--ghost" (click)="ref.close(false)">Cancelar</button>
+    <button
+      class="btn btn--danger"
+      (click)="submit()"
+      [disabled]="loading() || (data.activeTasks.length > 0 && !allAssigned())"
+    >
+      @if (loading()) {
+        <app-spinner [size]="14" />
+      } @else {
+        {{ data.activeTasks.length > 0 ? 'Remover e reatribuir' : 'Remover' }}
+      }
+    </button>
+  </div>
+</div>

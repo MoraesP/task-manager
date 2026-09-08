@@ -103,13 +103,22 @@ Detalhes em [docs/07-arquitetura.md](docs/07-arquitetura.md).
 
 ## Estrutura do frontend
 
-Angular 20 standalone (sem NgModules). Estado em **services com signals**; RxJS só
-para operadores de fluxo (debounce da busca). `core/` tem os interceptors
-(Authorization + refresh automático em 401, normalização de erro → toast),
-`AuthService` e guards. Cada feature (`auth`, `projects`, `board`, `members`,
-`report`, `project`) tem seu service e componentes. Drag-and-drop com Angular CDK;
-diálogos com CDK Dialog. Design system global em `src/styles.scss`
-("clara e arejada", espelha `design/`). Ver [docs/08-frontend.md](docs/08-frontend.md)
+Angular 20 standalone (sem NgModules), em três camadas com aliases de path
+(`@core`, `@shared`, `@features`):
+
+- **`core/`** — infraestrutura, subdividida em `auth/`, `http/`, `interceptors/`,
+  `layout/`, `notifications/`. `core` nunca importa de `features`.
+- **`shared/`** — `models/` (interfaces da API + enums, um arquivo por domínio) e
+  `components/` (widgets reutilizáveis: icon, avatar, badges, paginator, topbar…).
+- **`features/`** — uma pasta por feature (`auth`, `projects`, `project`, `board`,
+  `members`, `report`, `shell`); dentro de cada: `<feature>.routes.ts`, `data/`
+  (services + estado em signals), `models/`, `pages/` (`*.page.ts`), `ui/`
+  (componentes locais).
+
+Todo componente tem `.ts` / `.html` / `.scss` separados. SCSS em **BEM**; o
+`styles.scss` global carrega só os tokens e primitivos do design system.
+Drag-and-drop com Angular CDK; diálogos com CDK Dialog. Detalhes em
+[frontend/README.md](frontend/README.md), [docs/08-frontend.md](docs/08-frontend.md)
 e [ADR 0007](docs/adr/0007-estado-frontend-signals.md).
 
 Regras de negócio no cliente: transição de status inválida é barrada antes de

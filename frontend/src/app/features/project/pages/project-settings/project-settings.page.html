@@ -1,0 +1,80 @@
+@if (project(); as p) {
+  <app-topbar [title]="p.name" crumb="Configurações">
+    <app-role-badge badge [value]="p.role" />
+  </app-topbar>
+
+  <div class="settings">
+    <header class="settings__header">
+      <h2 class="settings__title">Configurações do projeto</h2>
+      <p class="settings__subtitle">Detalhes gerais e ações administrativas.</p>
+    </header>
+
+    <div class="settings__cards">
+      <section class="settings-card">
+        <div class="settings-card__title">Detalhes</div>
+        <p class="settings-card__subtitle">Nome e descrição exibidos para toda a equipe.</p>
+        <form [formGroup]="form" (ngSubmit)="save()" class="settings-card__form">
+          <div class="field">
+            <label class="field__label" for="ps-name">Nome</label>
+            <input id="ps-name" class="input" formControlName="name" />
+          </div>
+          <div class="field">
+            <label class="field__label" for="ps-desc">Descrição</label>
+            <textarea id="ps-desc" class="input" rows="3" formControlName="description"></textarea>
+          </div>
+          <div class="settings-card__actions">
+            <button
+              class="btn btn--primary"
+              type="submit"
+              [disabled]="form.invalid || form.pristine || saving()"
+            >
+              @if (saving()) {
+                <app-spinner [size]="14" />
+              } @else {
+                Salvar alterações
+              }
+            </button>
+            <button class="btn btn--ghost" type="button" (click)="discard()" [disabled]="form.pristine">
+              Descartar
+            </button>
+          </div>
+        </form>
+      </section>
+
+      <section class="settings-card">
+        <div class="settings-card__title">Informações</div>
+        <div class="settings-card__info">
+          <div>
+            <span class="field__hint">Dono</span><strong>{{ isOwner() ? 'Você' : '—' }}</strong>
+          </div>
+          <div>
+            <span class="field__hint">Criado em</span><strong>{{ p.createdAt | date: 'dd MMM yyyy' }}</strong>
+          </div>
+          <div>
+            <span class="field__hint">Membros</span><strong>{{ p.memberCount }}</strong>
+          </div>
+        </div>
+        <div class="callout">
+          O papel de <b>dono</b> é sempre <b>Admin</b> e não pode ser alterado nem removido. O dono
+          também é o único que pode excluir o projeto.
+        </div>
+      </section>
+
+      @if (isOwner()) {
+        <section class="settings-card settings-card--danger">
+          <div class="settings-card__title settings-card__title--danger">Zona de perigo</div>
+          <div class="settings-card__danger-row">
+            <div>
+              <strong>Excluir projeto</strong>
+              <p class="field__hint">
+                Remove permanentemente o projeto, tarefas, histórico, membros e convites.
+                Irreversível.
+              </p>
+            </div>
+            <button class="btn btn--danger" (click)="confirmDelete()">Excluir projeto</button>
+          </div>
+        </section>
+      }
+    </div>
+  </div>
+}

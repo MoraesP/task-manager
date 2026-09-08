@@ -1,0 +1,13 @@
+<header class="topbar">
+  <button class="topbar__burger" (click)="layout.toggleSidebar()" aria-label="Menu">
+    <app-icon name="list" [size]="18" [stroke]="1.8" />
+  </button>
+  <h1 class="topbar__title">{{ title() }}</h1>
+  @if (crumb()) {
+    <span class="topbar__sep">·</span>
+    <span class="topbar__crumb">{{ crumb() }}</span>
+  }
+  <ng-content select="[badge]" />
+  <span class="topbar__spacer"></span>
+  <ng-content />
+</header>

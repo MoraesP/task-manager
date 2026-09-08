@@ -1,0 +1,133 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
+.report {
+  flex: 1;
+  overflow: auto;
+  padding: 28px 32px;
+
+  &__header {
+    margin-bottom: 22px;
+  }
+
+  &__title {
+    font-size: 20px;
+    font-weight: 700;
+  }
+
+  &__subtitle {
+    color: var(--text-2);
+    font-size: 13px;
+    margin-top: 3px;
+  }
+
+  &__total {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    padding: 18px 20px;
+    margin-bottom: 18px;
+    max-width: 720px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--r);
+    box-shadow: var(--shadow-sm);
+  }
+
+  &__total-value {
+    font-size: 28px;
+    font-weight: 700;
+  }
+
+  &__total-label {
+    color: var(--text-2);
+    font-size: 13px;
+  }
+
+  &__grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+    max-width: 720px;
+
+    @media (max-width: 720px) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 720px) {
+    padding: 20px 16px;
+  }
+}
+
+.report-panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  box-shadow: var(--shadow-sm);
+  padding: 20px;
+
+  &__title {
+    font-size: 13px;
+    font-weight: 700;
+    margin-bottom: 16px;
+  }
+
+  &__bars {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+}
+
+.bar-row {
+  display: grid;
+  grid-template-columns: 88px 1fr 28px;
+  align-items: center;
+  gap: 10px;
+  font-size: 12.5px;
+
+  &__label {
+    color: var(--text-2);
+  }
+
+  &__value {
+    font-weight: 600;
+    text-align: right;
+    font-family: var(--mono);
+  }
+
+  &__track {
+    height: 8px;
+    border-radius: 4px;
+    background: var(--surface-2);
+    overflow: hidden;
+  }
+
+  &__fill {
+    display: block;
+    height: 100%;
+    border-radius: 4px;
+    min-width: 2px;
+
+    &--gray {
+      background: var(--text-3);
+    }
+    &--blue {
+      background: var(--accent);
+    }
+    &--green {
+      background: var(--green);
+    }
+    &--amber {
+      background: var(--amber);
+    }
+    &--red {
+      background: var(--red);
+    }
+  }
+}

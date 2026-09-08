@@ -1,0 +1,48 @@
+.topbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 20px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+  flex-shrink: 0;
+
+  &__title {
+    font-size: 16px;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+
+  &__sep,
+  &__crumb {
+    color: var(--text-3);
+    font-weight: 500;
+  }
+
+  &__spacer {
+    flex: 1;
+  }
+
+  &__burger {
+    display: none;
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    width: 32px;
+    height: 32px;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-2);
+    cursor: pointer;
+  }
+
+  @media (max-width: 860px) {
+    &__burger {
+      display: inline-flex;
+    }
+    &__crumb,
+    &__sep {
+      display: none;
+    }
+  }
+}

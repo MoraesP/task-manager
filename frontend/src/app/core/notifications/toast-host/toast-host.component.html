@@ -1,0 +1,8 @@
+<div class="toast-host">
+  @for (t of toast.toasts(); track t.id) {
+    <div class="toast" [class]="'toast--' + t.kind" (click)="toast.dismiss(t.id)">
+      <span class="toast__dot"></span>
+      <span class="toast__message">{{ t.text }}</span>
+    </div>
+  }
+</div>

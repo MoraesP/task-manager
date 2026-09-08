@@ -1,0 +1,42 @@
+:host {
+  display: inline-flex;
+}
+
+.avatar {
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  flex-shrink: 0;
+  background: var(--surface-2);
+  color: var(--text-2);
+  border: 1px solid var(--border-strong);
+  user-select: none;
+
+  &--blue {
+    background: #e5ecfb;
+    color: #3358a8;
+    border-color: #cfddf7;
+  }
+  &--green {
+    background: #e6f2ea;
+    color: #2f7350;
+    border-color: #d0e6d8;
+  }
+  &--amber {
+    background: #f7efe0;
+    color: #8a5c17;
+    border-color: #ecdcbf;
+  }
+  &--plum {
+    background: #efe7f4;
+    color: #6e4a86;
+    border-color: #e0d0ea;
+  }
+  &--slate {
+    background: #e8e6e2;
+    color: #5b554d;
+    border-color: #dcd8d0;
+  }
+}

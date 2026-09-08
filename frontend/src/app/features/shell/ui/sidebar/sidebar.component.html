@@ -1,0 +1,72 @@
+<aside class="sidebar" [class.sidebar--dim-project]="section() === 'projetos'">
+  <div class="sidebar__brand">
+    <app-icon name="board" [size]="20" [stroke]="1.7" />
+    <span>Task Manager</span>
+  </div>
+
+  <nav class="sidebar__nav">
+    <a
+      class="sidebar__item"
+      routerLink="/projetos"
+      [class.sidebar__item--active]="section() === 'projetos'"
+      (click)="close()"
+    >
+      <app-icon name="folder" [size]="18" [stroke]="1.6" /> Projetos
+    </a>
+  </nav>
+
+  @if (project(); as p) {
+    <div class="sidebar__project">
+      <div class="sidebar__label">Projeto</div>
+      <button class="sidebar__switch" (click)="goProjects()">
+        <span class="sidebar__switch-name">{{ p.name }}</span>
+        <app-role-badge [value]="p.role" />
+        <app-icon name="chevron-down" [size]="14" [stroke]="2" />
+      </button>
+      <nav class="sidebar__nav">
+        <a
+          class="sidebar__item"
+          [routerLink]="['/projetos', p.id, 'quadro']"
+          [class.sidebar__item--active]="section() === 'quadro'"
+          (click)="close()"
+        >
+          <app-icon name="board" [size]="18" [stroke]="1.6" /> Quadro
+        </a>
+        <a
+          class="sidebar__item"
+          [routerLink]="['/projetos', p.id, 'relatorio']"
+          [class.sidebar__item--active]="section() === 'relatorio'"
+          (click)="close()"
+        >
+          <app-icon name="chart" [size]="18" [stroke]="1.6" /> Relatório
+        </a>
+        <a
+          class="sidebar__item"
+          [routerLink]="['/projetos', p.id, 'membros']"
+          [class.sidebar__item--active]="section() === 'membros'"
+          (click)="close()"
+        >
+          <app-icon name="users" [size]="18" [stroke]="1.6" /> Membros
+        </a>
+        @if (p.role === 'ADMIN') {
+          <a
+            class="sidebar__item"
+            [routerLink]="['/projetos', p.id, 'configuracoes']"
+            [class.sidebar__item--active]="section() === 'configuracoes'"
+            (click)="close()"
+          >
+            <app-icon name="settings" [size]="18" [stroke]="1.6" /> Configurações
+          </a>
+        }
+      </nav>
+    </div>
+  }
+
+  <div class="sidebar__spacer"></div>
+
+  <button class="sidebar__user" (click)="logout()">
+    <app-avatar [name]="userName()" [size]="26" />
+    <span class="sidebar__user-name">{{ userName() }}</span>
+    <app-icon name="logout" [size]="15" [stroke]="1.8" />
+  </button>
+</aside>

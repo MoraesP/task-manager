@@ -1,0 +1,39 @@
+.invite {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+
+  &__row {
+    display: flex;
+    gap: 12px;
+  }
+
+  &__email {
+    flex: 1;
+  }
+
+  &__role {
+    width: 140px;
+  }
+
+  &__generated-title {
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+
+  &__link {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+
+    .input {
+      flex: 1;
+      font-size: 11.5px;
+    }
+  }
+
+  &__note {
+    margin-top: 8px;
+    font-size: 11.5px;
+  }
+}

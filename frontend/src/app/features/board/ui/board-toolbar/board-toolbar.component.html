@@ -1,0 +1,40 @@
+<div class="board-toolbar">
+  <label class="board-toolbar__search">
+    <app-icon name="search" [size]="15" [stroke]="1.8" />
+    <input type="search" [formControl]="search" placeholder="Buscar tarefas por título ou descrição…" />
+  </label>
+
+  <form class="board-toolbar__filters" [formGroup]="filters" (change)="apply()">
+    <select class="input input--sm" formControlName="status" aria-label="Status">
+      <option value="">Status: todos</option>
+      @for (s of statuses; track s) {
+        <option [value]="s">{{ statusLabel[s] }}</option>
+      }
+    </select>
+    <select class="input input--sm" formControlName="priority" aria-label="Prioridade">
+      <option value="">Prioridade: todas</option>
+      @for (p of priorities; track p) {
+        <option [value]="p">{{ priorityLabel[p] }}</option>
+      }
+    </select>
+    <select class="input input--sm" formControlName="assigneeId" aria-label="Responsável">
+      <option value="">Responsável: todos</option>
+      @for (m of members(); track m.userId) {
+        <option [value]="m.userId">{{ m.name }}</option>
+      }
+    </select>
+    <input class="input input--sm" type="date" formControlName="deadlineFrom" aria-label="Prazo de" title="Prazo de" />
+    <input class="input input--sm" type="date" formControlName="deadlineTo" aria-label="Prazo até" title="Prazo até" />
+    <select class="input input--sm board-toolbar__sort" formControlName="sort" aria-label="Ordenar">
+      <option value="priority,desc">Ordenar: prioridade</option>
+      <option value="createdAt,desc">Ordenar: mais recentes</option>
+      <option value="createdAt,asc">Ordenar: mais antigas</option>
+      <option value="deadline,asc">Ordenar: prazo</option>
+    </select>
+  </form>
+
+  <span class="board-toolbar__spacer"></span>
+  <button class="btn btn--primary" (click)="newTask.emit()">
+    <app-icon name="plus" [size]="15" [stroke]="2.2" /> Nova tarefa
+  </button>
+</div>

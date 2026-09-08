@@ -1,0 +1,52 @@
+<app-topbar title="Projetos">
+  <button class="btn btn--primary" (click)="create()">
+    <app-icon name="plus" [size]="15" [stroke]="2.2" /> Novo projeto
+  </button>
+</app-topbar>
+
+<div class="projects">
+  @if (loading() && !data()) {
+    <app-page-loader />
+  } @else if (data(); as d) {
+    @if (d.content.length === 0) {
+      <app-empty-state
+        title="Nenhum projeto ainda"
+        message="Crie seu primeiro projeto para organizar tarefas e convidar a equipe."
+      >
+        <button class="btn btn--primary" (click)="create()">
+          <app-icon name="plus" [size]="15" [stroke]="2.2" /> Novo projeto
+        </button>
+      </app-empty-state>
+    } @else {
+      <div class="projects__grid">
+        @for (p of d.content; track p.id) {
+          <a class="project-card" [routerLink]="['/projetos', p.id, 'quadro']">
+            <div class="project-card__top">
+              <h3 class="project-card__name">{{ p.name }}</h3>
+              <app-role-badge [value]="p.role" />
+            </div>
+            <p class="project-card__meta">
+              Dono: {{ isOwner(p) ? 'Você' : '—' }} · {{ p.memberCount }}
+              {{ p.memberCount === 1 ? 'membro' : 'membros' }}
+            </p>
+            @if (p.description) {
+              <p class="project-card__desc">{{ p.description }}</p>
+            }
+            <div class="project-card__foot">
+              <app-avatar [name]="p.name" [size]="22" />
+              <span class="project-card__spacer"></span>
+              <span class="field__hint">atualizado {{ p.updatedAt | date: 'dd/MM/yyyy' }}</span>
+            </div>
+          </a>
+        }
+      </div>
+      <app-paginator
+        [page]="d.page"
+        [size]="d.size"
+        [total]="d.totalElements"
+        [totalPages]="d.totalPages"
+        (go)="fetch($event)"
+      />
+    }
+  }
+</div>

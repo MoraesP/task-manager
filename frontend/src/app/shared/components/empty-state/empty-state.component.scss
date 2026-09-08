@@ -1,0 +1,23 @@
+.empty-state {
+  text-align: center;
+  padding: 44px 24px;
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--r);
+  color: var(--text-2);
+  background: var(--raise);
+
+  &__title {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  &__message {
+    font-size: 13px;
+    margin-top: 4px;
+  }
+
+  &__action:not(:empty) {
+    margin-top: 14px;
+  }
+}

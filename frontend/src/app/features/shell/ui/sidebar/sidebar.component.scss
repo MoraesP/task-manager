@@ -1,0 +1,142 @@
+.sidebar {
+  width: 248px;
+  height: 100%;
+  flex-shrink: 0;
+  border-right: 1px solid var(--border);
+  background: var(--surface);
+  display: flex;
+  flex-direction: column;
+  padding: 16px 12px;
+  gap: 4px;
+  overflow-y: auto;
+
+  &__brand {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 6px 8px 12px;
+    font-weight: 700;
+    font-size: 15px;
+
+    app-icon {
+      color: var(--accent);
+    }
+  }
+
+  &__nav {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  &__label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-3);
+    padding: 14px 10px 6px;
+  }
+
+  &__item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 10px;
+    border-radius: var(--r-sm);
+    color: var(--text-2);
+    font-weight: 500;
+    cursor: pointer;
+
+    app-icon {
+      color: var(--text-3);
+      flex-shrink: 0;
+    }
+
+    &:hover {
+      background: var(--surface-2);
+      color: var(--text);
+    }
+
+    &--active {
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-weight: 600;
+
+      app-icon {
+        color: var(--accent);
+      }
+    }
+  }
+
+  &__project {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  &--dim-project &__project {
+    opacity: 0.45;
+  }
+
+  &__switch {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    padding: 9px 10px;
+    border: 1px solid var(--border);
+    border-radius: var(--r-sm);
+    background: var(--raise);
+    cursor: pointer;
+    text-align: left;
+    margin-bottom: 4px;
+
+    app-icon {
+      color: var(--text-3);
+      flex-shrink: 0;
+    }
+  }
+
+  &__switch-name {
+    font-weight: 600;
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &__spacer {
+    flex: 1;
+  }
+
+  &__user {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    width: 100%;
+    padding: 12px 8px 8px;
+    border: none;
+    background: none;
+    border-top: 1px solid var(--border);
+    cursor: pointer;
+    margin-top: 8px;
+
+    app-icon {
+      color: var(--text-3);
+    }
+
+    &:hover {
+      color: var(--text);
+    }
+  }
+
+  &__user-name {
+    font-weight: 600;
+    flex: 1;
+    text-align: left;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}

@@ -9,13 +9,13 @@ import {
   provideBrowserGlobalErrorListeners,
   provideZoneChangeDetection,
 } from '@angular/core';
+import { provideRouter, withComponentInputBinding, withInMemoryScrolling } from '@angular/router';
+import { AuthService } from '@core/auth/auth.service';
+import { authInterceptor } from '@core/interceptors/auth.interceptor';
+import { errorInterceptor } from '@core/interceptors/error.interceptor';
+import { routes } from './app.routes';
 
 registerLocaleData(localePt, 'pt-BR');
-import { provideRouter, withComponentInputBinding, withInMemoryScrolling } from '@angular/router';
-import { authInterceptor } from './core/auth.interceptor';
-import { AuthService } from './core/auth.service';
-import { errorInterceptor } from './core/error.interceptor';
-import { routes } from './app.routes';
 
 export const appConfig: ApplicationConfig = {
   providers: [
