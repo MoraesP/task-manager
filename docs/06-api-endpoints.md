@@ -30,7 +30,7 @@ Base path: `/api/v1`. Corpo e respostas em JSON. Erros em
 | POST | `/auth/login` _(público)_ | Body: `{ email, password }` | 200 `{ accessToken, refreshToken, tokenType, expiresIn }` |
 | POST | `/auth/refresh` _(público)_ | Body: `{ refreshToken }`. Rotaciona o refresh. | 200 `{ accessToken, refreshToken, tokenType, expiresIn }` |
 | POST | `/auth/logout` | Body: `{ refreshToken }`. Revoga o refresh. | 204 |
-| POST | `/auth/accept-invitation` _(público)_ | Body: `{ token, name?, password? }`. `name`/`password` obrigatórios se o email ainda não tem conta. | 200 `{ projectId, role }` |
+| POST | `/auth/accept-invitation` _(público)_ | Body: `{ token, name?, password? }`. `name`/`password` obrigatórios se o email ainda não tem conta. | 200 `{ accessToken, refreshToken, tokenType, expiresIn }` — a pessoa já entra autenticada |
 
 Erros: 400 (validação), 401 (credenciais inválidas / refresh inválido ou
 revogado), 409 (email já registrado), 422 (convite expirado/revogado).

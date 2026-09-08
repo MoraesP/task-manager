@@ -35,25 +35,46 @@ componentização clara e UX minimamente funcional — não visual elaborado.
 | FE-12 | Responsividade básica (board utilizável em telas estreitas). | OBRIGATÓRIO |
 | FE-13 | Paginação nas listas que consomem endpoints paginados. | OBRIGATÓRIO |
 
-## Estrutura sugerida
+## Estrutura (implementada)
+
+Três camadas, com aliases de path `@core` / `@shared` / `@features`. Regra de
+dependência: `core` ⇐ `shared` ⇐ `features` (nunca o inverso).
 
 ```
 frontend/src/app/
-├── core/          interceptors, guards, auth service (signals), api base
-├── shared/        componentes reutilizáveis (card, badge de prioridade, paginador)
-├── auth/          login, register, accept-invitation
-├── projects/      lista e criação de projetos
-├── board/         board, coluna, card, filtros, busca
-├── members/       gestão de membros e convites
-└── report/        painel de relatório
+├── core/                     infraestrutura, sem UI de domínio
+│   ├── auth/                 AuthService (signals) + guards
+│   ├── http/                 api.config (base + HttpContextTokens), problem-detail
+│   ├── interceptors/         auth (Authorization + refresh em 401) · error (→ toast)
+│   ├── layout/               LayoutService (menu lateral no mobile)
+│   └── notifications/        ToastService + toast-host/
+│
+├── shared/
+│   ├── models/               interfaces da API + enums (1 arquivo por domínio)
+│   └── components/           icon, avatar, badges, paginator, spinner,
+│                             empty-state, page-loader, confirm-dialog, topbar
+│
+└── features/                 uma pasta por feature; dentro de cada:
+    ├── <feature>.routes.ts   rotas (lazy loadComponent / loadChildren)
+    ├── data/                 services HTTP + estado (signals)
+    ├── models/               modelos específicos da feature
+    ├── pages/                componentes roteados (*.page.ts/html/scss)
+    └── ui/                   componentes locais (dialogs, cards…)
+
+    auth · projects · project · board · members · report · shell
 ```
+
+Todo componente tem `.ts` / `.html` / `.scss` separados (sem template inline).
+SCSS em **BEM** (`.bloco__elemento--modificador`); `styles.scss` global só carrega
+tokens e primitivos do design system. Ver `frontend/README.md`.
 
 ## Padrões
 
-- Um **feature service** por área expõe signals de leitura (`readonly`) e métodos
-  de comando; componentes não chamam `HttpClient` direto.
+- Um **feature service** (`data/`) por área expõe signals de leitura (`readonly`)
+  e métodos de comando; componentes não chamam `HttpClient` direto.
 - Estado derivado (tarefas por coluna, contadores) via `computed`.
-- Erros de API são normalizados a partir do `ProblemDetail` em um único ponto
-  (interceptor) e exibidos via snackbar.
-- Sem store global; o estado do board vive no `BoardService`, recriado ao trocar
-  de projeto.
+- Erros de API são normalizados a partir do `ProblemDetail` num único ponto
+  (`errorInterceptor`) e exibidos via toast (`ToastService` + `toast-host`, sem
+  Angular Material).
+- Sem store global; o estado do board vive no `BoardService`, `providedIn` no
+  `BoardPage` — recriado ao trocar de projeto.
