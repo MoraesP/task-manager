@@ -56,7 +56,12 @@
             (cdkDropListDropped)="aoSoltarCard($event, status)"
           >
             @for (tarefa of quadro.colunas()[status]; track tarefa.id) {
-              <div cdkDrag [cdkDragData]="tarefa">
+              <div
+                cdkDrag
+                [cdkDragData]="tarefa"
+                (cdkDragStarted)="aoIniciarArraste(tarefa)"
+                (cdkDragEnded)="aoFinalizarArraste()"
+              >
                 <app-task-card
                   [tarefa]="tarefa"
                   [menuAberto]="idDoMenuAberto() === tarefa.id"
@@ -70,7 +75,7 @@
               <p class="board-column__empty">Sem tarefas.</p>
             }
 
-            @if (status === 'TODO') {
+            @if (status === 'TODO' && !arrastando()) {
               <button class="board-column__add" (click)="novaTarefa()">+ Adicionar tarefa</button>
             }
           </div>

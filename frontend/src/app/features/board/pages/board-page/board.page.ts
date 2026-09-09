@@ -57,6 +57,9 @@ export class BoardPage {
   protected readonly resultadoDaBusca = signal<PageResponse<Task> | null>(null);
   protected readonly mostrarQuadro = computed(() => this.termoDeBusca().length === 0);
 
+  protected readonly tarefaArrastada = signal<Task | null>(null);
+  protected readonly arrastando = computed(() => this.tarefaArrastada() !== null);
+
   constructor() {
     const idDoProjeto = this.projeto()?.id;
     if (idDoProjeto) {
@@ -153,5 +156,13 @@ export class BoardPage {
           this.notificacoes.sucesso(`Tarefa atribuída a você: “${tarefaSalva.title}”.`);
         }
       });
+  }
+
+  protected aoIniciarArraste(tarefa: Task): void {
+    this.tarefaArrastada.set(tarefa);
+  }
+
+  protected aoFinalizarArraste(): void {
+    this.tarefaArrastada.set(null);
   }
 }
