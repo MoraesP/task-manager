@@ -17,6 +17,7 @@ das decisões tomadas na sessão de refinamento.
 | [07-arquitetura.md](07-arquitetura.md) | Estilo arquitetural, camadas e estrutura de pacotes |
 | [08-frontend.md](08-frontend.md) | Requisitos e arquitetura do frontend Angular |
 | [09-estrategia-de-testes.md](09-estrategia-de-testes.md) | O que testar e por quê |
+| [10-checklist-desenvolvimento.md](10-checklist-desenvolvimento.md) | Estado de implementação de cada requisito (RF/RNF/RN/FE) vs. código |
 | [glossario.md](glossario.md) | Vocabulário canônico do domínio |
 | [adr/](adr/) | Architecture Decision Records |
 
