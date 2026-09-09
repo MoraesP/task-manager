@@ -1,18 +1,10 @@
 import { Dialog } from '@angular/cdk/dialog';
-import { HttpClient, HttpParams } from '@angular/common/http';
-import {
-  ChangeDetectionStrategy,
-  Component,
-  computed,
-  effect,
-  inject,
-  signal,
-} from '@angular/core';
-import { API_BASE } from '@core/http/api.config';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
 import { AuthService } from '@core/auth/auth.service';
 import { ToastService } from '@core/notifications/toast.service';
-import { Invitation, PageResponse, ProjectMember, Role, Task } from '@shared/models';
+import { Invitation, ProjectMember, Role, Task } from '@shared/models';
 import { ProjectsService } from '@features/projects/data/projects.service';
+import { TasksApiService } from '@features/board/data/tasks-api.service';
 import { AvatarComponent } from '@shared/components/avatar/avatar.component';
 import { RoleBadgeComponent } from '@shared/components/role-badge/role-badge.component';
 import { ConfirmDialogComponent } from '@shared/components/confirm-dialog/confirm-dialog.component';
@@ -41,10 +33,10 @@ import { MembersService } from '../../data/members.service';
   styleUrl: './members.page.scss',
 })
 export class MembersPage {
-  private readonly http = inject(HttpClient);
   private readonly dialog = inject(Dialog);
   private readonly autenticacao = inject(AuthService);
   private readonly notificacoes = inject(ToastService);
+  private readonly tarefasApi = inject(TasksApiService);
   private readonly servicoDeMembros = inject(MembersService);
   private readonly servicoDeProjetos = inject(ProjectsService);
 
@@ -93,9 +85,8 @@ export class MembersPage {
         .listarConvites(projetoId)
         .subscribe((listaDeConvites) => this.convites.set(listaDeConvites));
     }
-    const parametros = new HttpParams().set('size', 200);
-    this.http
-      .get<PageResponse<Task>>(`${API_BASE}/projects/${projetoId}/tasks`, { params: parametros })
+    this.tarefasApi
+      .listar(projetoId, {}, 0, 200)
       .subscribe((resposta) => this.tarefas.set(resposta.content));
   }
 

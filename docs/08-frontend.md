@@ -72,6 +72,11 @@ tokens e primitivos do design system. Ver `frontend/README.md`.
 
 - Um **feature service** (`data/`) por área expõe signals de leitura (`readonly`)
   e métodos de comando; componentes não chamam `HttpClient` direto.
+- Quando o mesmo endpoint é consumido por mais de uma feature, o acesso HTTP fica
+  num serviço stateless `providedIn: 'root'` e o serviço de estado delega para
+  ele. Ex.: `TasksApiService` (endpoints de `/projects/{id}/tasks`) é usado pelo
+  `BoardService` (estado do quadro) e pela tela de membros (só leitura, para
+  contar tarefas ativas por responsável).
 - Estado derivado (tarefas por coluna, contadores) via `computed`.
 - Erros de API são normalizados a partir do `ProblemDetail` num único ponto
   (`errorInterceptor`) e exibidos via toast (`ToastService` + `toast-host`, sem
