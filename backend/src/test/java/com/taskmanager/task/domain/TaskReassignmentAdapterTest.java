@@ -35,9 +35,9 @@ class TaskReassignmentAdapterTest {
     @Test
     void rejectsWhenAnActiveTaskHasNoReassignment() {
         Task task = new Task(projectId, "t", null, TaskPriority.LOW, member, null);
-        when(taskService.activeTasksOf(projectId, member)).thenReturn(List.of(task));
+        when(taskService.tarefasAtivasDe(projectId, member)).thenReturn(List.of(task));
 
-        assertThatThrownBy(() -> adapter.reassignForMemberRemoval(projectId, member, List.of()))
+        assertThatThrownBy(() -> adapter.realocarNaRemocaoDeMembro(projectId, member, List.of()))
                 .isInstanceOfSatisfying(ApiException.class,
                         ex -> assertThat(ex.getStatus()).isEqualTo(HttpStatus.UNPROCESSABLE_ENTITY));
     }
@@ -46,11 +46,11 @@ class TaskReassignmentAdapterTest {
     void reassignsEveryActiveTask() {
         Task task = new Task(projectId, "t", null, TaskPriority.LOW, member, null);
         UUID newAssignee = UUID.randomUUID();
-        when(taskService.activeTasksOf(projectId, member)).thenReturn(List.of(task));
+        when(taskService.tarefasAtivasDe(projectId, member)).thenReturn(List.of(task));
 
-        assertThatCode(() -> adapter.reassignForMemberRemoval(projectId, member,
+        assertThatCode(() -> adapter.realocarNaRemocaoDeMembro(projectId, member,
                 List.of(new Reassignment(task.getId(), newAssignee)))).doesNotThrowAnyException();
 
-        verify(taskService).reassignForRemoval(eq(projectId), any(Task.class), eq(newAssignee));
+        verify(taskService).realocarNaRemocao(eq(projectId), any(Task.class), eq(newAssignee));
     }
 }

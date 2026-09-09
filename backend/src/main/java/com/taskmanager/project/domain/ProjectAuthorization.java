@@ -26,33 +26,33 @@ public class ProjectAuthorization {
     }
 
     @Transactional(readOnly = true)
-    public Project requireProject(UUID projectId) {
-        return projects.findById(projectId).orElseThrow(() -> Errors.notFound("Projeto", projectId));
+    public Project exigirProjeto(UUID projectId) {
+        return projects.findById(projectId).orElseThrow(() -> Errors.naoEncontrado("Projeto", projectId));
     }
 
     @Transactional(readOnly = true)
-    public ProjectMembership requireMembership(UUID projectId, UUID userId) {
-        requireProject(projectId);
+    public ProjectMembership exigirMembro(UUID projectId, UUID userId) {
+        exigirProjeto(projectId);
         return memberships.findByProjectIdAndUserId(projectId, userId)
-                .orElseThrow(() -> Errors.forbidden("Você não é membro deste projeto."));
+                .orElseThrow(() -> Errors.acessoNegado("Você não é membro deste projeto."));
     }
 
     @Transactional(readOnly = true)
-    public ProjectMembership requireAdmin(UUID projectId, UUID userId) {
-        ProjectMembership membership = requireMembership(projectId, userId);
-        if (!membership.isAdmin()) {
-            throw Errors.forbidden("Esta ação exige o papel ADMIN no projeto.");
+    public ProjectMembership exigirAdmin(UUID projectId, UUID userId) {
+        ProjectMembership vinculo = exigirMembro(projectId, userId);
+        if (!vinculo.ehAdmin()) {
+            throw Errors.acessoNegado("Esta ação exige o papel ADMIN no projeto.");
         }
-        return membership;
+        return vinculo;
     }
 
     @Transactional(readOnly = true)
-    public boolean isMember(UUID projectId, UUID userId) {
+    public boolean ehMembro(UUID projectId, UUID userId) {
         return memberships.existsByProjectIdAndUserId(projectId, userId);
     }
 
     @Transactional(readOnly = true)
-    public Optional<ProjectMembership> membershipOf(UUID projectId, UUID userId) {
+    public Optional<ProjectMembership> membroDe(UUID projectId, UUID userId) {
         return memberships.findByProjectIdAndUserId(projectId, userId);
     }
 }

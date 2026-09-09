@@ -30,12 +30,12 @@ public class Project extends BaseEntity {
         this.ownerId = ownerId;
     }
 
-    public void update(String name, String description) {
+    public void atualizar(String name, String description) {
         this.name = name;
         this.description = description;
     }
 
-    public boolean isOwnedBy(UUID userId) {
+    public boolean pertenceA(UUID userId) {
         return ownerId.equals(userId);
     }
 

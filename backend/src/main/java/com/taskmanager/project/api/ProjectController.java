@@ -41,33 +41,33 @@ public class ProjectController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public ProjectResponse create(@AuthenticationPrincipal AuthenticatedUser user,
+    public ProjectResponse criar(@AuthenticationPrincipal AuthenticatedUser usuario,
             @Valid @RequestBody CreateProjectRequest request) {
-        return ProjectResponse.from(projectService.create(user.id(), request.name(), request.description()));
+        return ProjectResponse.from(projectService.criar(usuario.id(), request.name(), request.description()));
     }
 
     @GetMapping
-    public PageResponse<ProjectResponse> list(@AuthenticationPrincipal AuthenticatedUser user,
+    public PageResponse<ProjectResponse> listar(@AuthenticationPrincipal AuthenticatedUser usuario,
             @PageableDefault(size = 20) Pageable pageable) {
-        return PageResponse.of(projectService.listForUser(user.id(), pageable), ProjectResponse::from);
+        return PageResponse.de(projectService.listarDoUsuario(usuario.id(), pageable), ProjectResponse::from);
     }
 
     @GetMapping("/{projectId}")
-    public ProjectResponse get(@AuthenticationPrincipal AuthenticatedUser user,
+    public ProjectResponse obter(@AuthenticationPrincipal AuthenticatedUser usuario,
             @PathVariable UUID projectId) {
-        return ProjectResponse.from(projectService.getForMember(projectId, user.id()));
+        return ProjectResponse.from(projectService.obterParaMembro(projectId, usuario.id()));
     }
 
     @PutMapping("/{projectId}")
-    public ProjectResponse update(@AuthenticationPrincipal AuthenticatedUser user,
+    public ProjectResponse atualizar(@AuthenticationPrincipal AuthenticatedUser usuario,
             @PathVariable UUID projectId, @Valid @RequestBody UpdateProjectRequest request) {
         return ProjectResponse.from(
-                projectService.update(projectId, user.id(), request.name(), request.description()));
+                projectService.atualizar(projectId, usuario.id(), request.name(), request.description()));
     }
 
     @DeleteMapping("/{projectId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@AuthenticationPrincipal AuthenticatedUser user, @PathVariable UUID projectId) {
-        projectService.delete(projectId, user.id());
+    public void delete(@AuthenticationPrincipal AuthenticatedUser usuario, @PathVariable UUID projectId) {
+        projectService.delete(projectId, usuario.id());
     }
 }

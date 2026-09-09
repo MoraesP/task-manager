@@ -15,7 +15,7 @@ public interface MemberTasksPort {
      * (revertendo a transação corrente) se faltar uma realocação, se o novo
      * responsável não for membro do projeto ou se o WIP limit for estourado.
      */
-    void reassignForMemberRemoval(UUID projectId, UUID memberUserId, List<Reassignment> reassignments);
+    void realocarNaRemocaoDeMembro(UUID projectId, UUID memberUserId, List<Reassignment> reassignments);
 
     record Reassignment(UUID taskId, UUID newAssigneeId) {
     }

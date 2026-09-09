@@ -31,18 +31,18 @@ public class JwtService {
         this.key = Keys.hmacShaKeyFor(config.secret().getBytes(StandardCharsets.UTF_8));
     }
 
-    public String issueAccessToken(UUID userId, String email) {
-        Instant now = Instant.now();
+    public String emitirAccessToken(UUID userId, String email) {
+        Instant agora = Instant.now();
         return Jwts.builder()
                 .subject(userId.toString())
                 .claim("email", email)
-                .issuedAt(Date.from(now))
-                .expiration(Date.from(now.plus(config.accessTokenTtl())))
+                .issuedAt(Date.from(agora))
+                .expiration(Date.from(agora.plus(config.accessTokenTtl())))
                 .signWith(key)
                 .compact();
     }
 
-    public long accessTokenTtlSeconds() {
+    public long ttlDoAccessTokenEmSegundos() {
         return config.accessTokenTtl().toSeconds();
     }
 
@@ -50,16 +50,16 @@ public class JwtService {
      * @return o usuário autenticado, ou {@code null} quando o token está ausente,
      *         malformado, expirado ou com assinatura inválida.
      */
-    public AuthenticatedUser parse(String token) {
+    public AuthenticatedUser analisar(String token) {
         try {
-            Claims claims = Jwts.parser()
+            Claims reivindicacoes = Jwts.parser()
                     .verifyWith(key)
                     .build()
                     .parseSignedClaims(token)
                     .getPayload();
-            return new AuthenticatedUser(UUID.fromString(claims.getSubject()),
-                    claims.get("email", String.class));
-        } catch (JwtException | IllegalArgumentException ex) {
+            return new AuthenticatedUser(UUID.fromString(reivindicacoes.getSubject()),
+                    reivindicacoes.get("email", String.class));
+        } catch (JwtException | IllegalArgumentException excecao) {
             return null;
         }
     }

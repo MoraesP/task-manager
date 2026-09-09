@@ -29,16 +29,16 @@ public class MembershipService {
     }
 
     @Transactional(readOnly = true)
-    public List<ProjectMember> listMembers(UUID projectId, UUID actorId) {
-        authorization.requireMembership(projectId, actorId);
-        List<ProjectMembership> rows = memberships.findByProjectId(projectId);
-        Map<UUID, User> usersById = userDirectory.findAllById(rows.stream().map(ProjectMembership::getUserId).toList());
-        return rows.stream()
+    public List<ProjectMember> listarMembros(UUID projectId, UUID actorId) {
+        authorization.exigirMembro(projectId, actorId);
+        List<ProjectMembership> linhas = memberships.findByProjectId(projectId);
+        Map<UUID, User> usersById = userDirectory.buscarPorIds(linhas.stream().map(ProjectMembership::getUserId).toList());
+        return linhas.stream()
                 .map(m -> {
-                    User user = usersById.get(m.getUserId());
+                    User usuario = usersById.get(m.getUserId());
                     return new ProjectMember(m.getUserId(),
-                            user == null ? "(desconhecido)" : user.getName(),
-                            user == null ? "(desconhecido)" : user.getEmail(),
+                            usuario == null ? "(desconhecido)" : usuario.getName(),
+                            usuario == null ? "(desconhecido)" : usuario.getEmail(),
                             m.getRole());
                 })
                 .sorted(Comparator.comparing(ProjectMember::name, String.CASE_INSENSITIVE_ORDER))
@@ -46,34 +46,34 @@ public class MembershipService {
     }
 
     @Transactional
-    public ProjectMember changeRole(UUID projectId, UUID actorId, UUID targetUserId, Role newRole) {
-        authorization.requireAdmin(projectId, actorId);
-        Project project = authorization.requireProject(projectId);
-        ProjectMembership target = memberships.findByProjectIdAndUserId(projectId, targetUserId)
-                .orElseThrow(() -> Errors.notFound("Membro do projeto", targetUserId));
-        if (project.isOwnedBy(targetUserId)) {
-            throw Errors.unprocessable("owner-role-immutable", "Papel do dono é imutável",
+    public ProjectMember alterarPapel(UUID projectId, UUID actorId, UUID usuarioAlvoId, Role novoPapel) {
+        authorization.exigirAdmin(projectId, actorId);
+        Project projeto = authorization.exigirProjeto(projectId);
+        ProjectMembership alvo = memberships.findByProjectIdAndUserId(projectId, usuarioAlvoId)
+                .orElseThrow(() -> Errors.naoEncontrado("Membro do projeto", usuarioAlvoId));
+        if (projeto.pertenceA(usuarioAlvoId)) {
+            throw Errors.naoProcessavel("owner-role-immutable", "Papel do dono é imutável",
                     "O dono do projeto é sempre ADMIN e não pode ser alterado.");
         }
-        target.changeRole(newRole);
-        User user = userDirectory.findAllById(List.of(targetUserId)).get(targetUserId);
-        return new ProjectMember(targetUserId,
-                user == null ? "(desconhecido)" : user.getName(),
-                user == null ? "(desconhecido)" : user.getEmail(),
-                target.getRole());
+        alvo.alterarPapel(novoPapel);
+        User usuario = userDirectory.buscarPorIds(List.of(usuarioAlvoId)).get(usuarioAlvoId);
+        return new ProjectMember(usuarioAlvoId,
+                usuario == null ? "(desconhecido)" : usuario.getName(),
+                usuario == null ? "(desconhecido)" : usuario.getEmail(),
+                alvo.getRole());
     }
 
     @Transactional
-    public void removeMember(UUID projectId, UUID actorId, UUID targetUserId,
+    public void removerMembro(UUID projectId, UUID actorId, UUID usuarioAlvoId,
             List<MemberTasksPort.Reassignment> reassignments) {
-        authorization.requireAdmin(projectId, actorId);
-        Project project = authorization.requireProject(projectId);
-        ProjectMembership target = memberships.findByProjectIdAndUserId(projectId, targetUserId)
-                .orElseThrow(() -> Errors.notFound("Membro do projeto", targetUserId));
-        if (project.isOwnedBy(targetUserId)) {
-            throw Errors.forbidden("O dono do projeto não pode ser removido.");
+        authorization.exigirAdmin(projectId, actorId);
+        Project projeto = authorization.exigirProjeto(projectId);
+        ProjectMembership alvo = memberships.findByProjectIdAndUserId(projectId, usuarioAlvoId)
+                .orElseThrow(() -> Errors.naoEncontrado("Membro do projeto", usuarioAlvoId));
+        if (projeto.pertenceA(usuarioAlvoId)) {
+            throw Errors.acessoNegado("O dono do projeto não pode ser removido.");
         }
-        memberTasks.reassignForMemberRemoval(projectId, targetUserId, reassignments);
-        memberships.delete(target);
+        memberTasks.realocarNaRemocaoDeMembro(projectId, usuarioAlvoId, reassignments);
+        memberships.delete(alvo);
     }
 }

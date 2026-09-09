@@ -25,21 +25,21 @@ final class TaskSort {
     private TaskSort() {
     }
 
-    static Pageable sanitize(Pageable pageable) {
+    static Pageable sanear(Pageable pageable) {
         if (pageable.getSort().isUnsorted()) {
             return PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), DEFAULT);
         }
-        Sort mapped = Sort.by(pageable.getSort().stream()
-                .map(order -> {
-                    String target = ALLOWED.get(order.getProperty());
-                    if (target == null) {
-                        throw Errors.unprocessable("invalid-sort", "Ordenação inválida",
+        Sort mapeado = Sort.by(pageable.getSort().stream()
+                .map(ordem -> {
+                    String alvo = ALLOWED.get(ordem.getProperty());
+                    if (alvo == null) {
+                        throw Errors.naoProcessavel("invalid-sort", "Ordenação inválida",
                                 "Não é possível ordenar tarefas por '%s'. Permitido: priority, createdAt, deadline."
-                                        .formatted(order.getProperty()));
+                                        .formatted(ordem.getProperty()));
                     }
-                    return new Sort.Order(order.getDirection(), target);
+                    return new Sort.Order(ordem.getDirection(), alvo);
                 })
                 .toList());
-        return PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), mapped);
+        return PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), mapeado);
     }
 }

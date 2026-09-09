@@ -29,27 +29,27 @@ public class TaskResponseAssembler {
         this.userDirectory = userDirectory;
     }
 
-    public TaskResponse toResponse(Task task) {
-        return build(task, resolveNames(List.of(task)));
+    public TaskResponse paraResposta(Task tarefa) {
+        return montar(tarefa, resolverNomes(List.of(tarefa)));
     }
 
-    public PageResponse<TaskResponse> toPage(Page<Task> page) {
-        Map<UUID, String> names = resolveNames(page.getContent());
-        return PageResponse.of(page.map(task -> build(task, names)));
+    public PageResponse<TaskResponse> paraPagina(Page<Task> page) {
+        Map<UUID, String> names = resolverNomes(page.getContent());
+        return PageResponse.de(page.map(tarefa -> montar(tarefa, names)));
     }
 
-    private Map<UUID, String> resolveNames(Collection<Task> tasks) {
-        List<UUID> assigneeIds = tasks.stream().map(Task::getAssigneeId).distinct().toList();
-        return userDirectory.findAllById(assigneeIds).entrySet().stream()
+    private Map<UUID, String> resolverNomes(Collection<Task> tasks) {
+        List<UUID> idsDosResponsaveis = tasks.stream().map(Task::getAssigneeId).distinct().toList();
+        return userDirectory.buscarPorIds(idsDosResponsaveis).entrySet().stream()
                 .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().getName()));
     }
 
-    private TaskResponse build(Task task, Map<UUID, String> names) {
+    private TaskResponse montar(Task tarefa, Map<UUID, String> names) {
         return new TaskResponse(
-                task.getId(), task.getProjectId(), task.getTitle(), task.getDescription(),
-                task.getStatus(), task.getPriority(), task.getAssigneeId(),
-                names.getOrDefault(task.getAssigneeId(), "(desconhecido)"),
-                task.getDeadline(), task.isOverdue(Instant.now()),
-                task.getCreatedAt(), task.getUpdatedAt());
+                tarefa.getId(), tarefa.getProjectId(), tarefa.getTitle(), tarefa.getDescription(),
+                tarefa.getStatus(), tarefa.getPriority(), tarefa.getAssigneeId(),
+                names.getOrDefault(tarefa.getAssigneeId(), "(desconhecido)"),
+                tarefa.getDeadline(), tarefa.estaAtrasada(Instant.now()),
+                tarefa.getCreatedAt(), tarefa.getUpdatedAt());
     }
 }

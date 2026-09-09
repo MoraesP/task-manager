@@ -46,7 +46,7 @@ class RefreshTokenServiceTest {
 
     @Test
     void issue_persistsHashedTokenAndReturnsRawValue() {
-        String raw = service.issue(UUID.randomUUID());
+        String raw = service.emitir(UUID.randomUUID());
 
         ArgumentCaptor<RefreshToken> saved = ArgumentCaptor.forClass(RefreshToken.class);
         verify(tokens).save(saved.capture());
@@ -60,27 +60,27 @@ class RefreshTokenServiceTest {
         RefreshToken active = new RefreshToken(userId, "hash", Instant.now().plusSeconds(3600));
         when(tokens.findByTokenHash(any())).thenReturn(Optional.of(active));
 
-        RefreshToken consumed = service.consume("raw");
+        RefreshToken consumed = service.consumir("raw");
 
         assertThat(consumed.getRevokedAt()).isNotNull();
-        verify(tokens, never()).revokeAllForUser(any());
+        verify(tokens, never()).revogarTodosDoUsuario(any());
     }
 
     @Test
     void consume_revokedTokenRevokesWholeFamily() {
         UUID userId = UUID.randomUUID();
         RefreshToken revoked = new RefreshToken(userId, "hash", Instant.now().plusSeconds(3600));
-        revoked.revoke(Instant.now().minusSeconds(10));
+        revoked.revogar(Instant.now().minusSeconds(10));
         when(tokens.findByTokenHash(any())).thenReturn(Optional.of(revoked));
 
-        assertThatThrownBy(() -> service.consume("raw")).isInstanceOf(ApiException.class);
-        verify(tokens).revokeAllForUser(userId);
+        assertThatThrownBy(() -> service.consumir("raw")).isInstanceOf(ApiException.class);
+        verify(tokens).revogarTodosDoUsuario(userId);
     }
 
     @Test
     void consume_unknownTokenIsUnauthorized() {
         when(tokens.findByTokenHash(any())).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> service.consume("raw")).isInstanceOf(ApiException.class);
+        assertThatThrownBy(() -> service.consumir("raw")).isInstanceOf(ApiException.class);
     }
 }

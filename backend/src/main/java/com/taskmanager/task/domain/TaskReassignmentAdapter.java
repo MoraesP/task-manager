@@ -28,21 +28,21 @@ public class TaskReassignmentAdapter implements MemberTasksPort {
 
     @Override
     @Transactional
-    public void reassignForMemberRemoval(UUID projectId, UUID memberUserId, List<Reassignment> reassignments) {
-        Map<UUID, UUID> newAssigneeByTask = reassignments.stream()
+    public void realocarNaRemocaoDeMembro(UUID projectId, UUID memberUserId, List<Reassignment> reassignments) {
+        Map<UUID, UUID> novoResponsavelPorTarefa = reassignments.stream()
                 .collect(Collectors.toMap(Reassignment::taskId, Reassignment::newAssigneeId,
                         (a, b) -> b));
 
-        List<Task> activeTasks = taskService.activeTasksOf(projectId, memberUserId);
-        for (Task task : activeTasks) {
-            UUID newAssignee = newAssigneeByTask.get(task.getId());
-            if (newAssignee == null) {
-                throw Errors.unprocessable("reassignment-required", "Realocação obrigatória",
+        List<Task> tarefasAtivas = taskService.tarefasAtivasDe(projectId, memberUserId);
+        for (Task tarefa : tarefasAtivas) {
+            UUID novoResponsavel = novoResponsavelPorTarefa.get(tarefa.getId());
+            if (novoResponsavel == null) {
+                throw Errors.naoProcessavel("reassignment-required", "Realocação obrigatória",
                         "A tarefa %s precisa ser realocada antes de o membro poder ser removido."
-                                .formatted(task.getId()));
+                                .formatted(tarefa.getId()));
             }
-            // pertencimento + WIP limit são validados dentro de TaskService.reassignForRemoval
-            taskService.reassignForRemoval(projectId, task, newAssignee);
+            // pertencimento + WIP limit são validados dentro de TaskService.realocarNaRemocao
+            taskService.realocarNaRemocao(projectId, tarefa, novoResponsavel);
         }
     }
 }

@@ -34,9 +34,9 @@ public final class ProjectDtos {
             Role role, long memberCount, Instant createdAt, Instant updatedAt) {
 
         public static ProjectResponse from(ProjectDetail detail) {
-            var p = detail.project();
+            var p = detail.projeto();
             return new ProjectResponse(p.getId(), p.getName(), p.getDescription(), p.getOwnerId(),
-                    detail.callerRole(), detail.memberCount(), p.getCreatedAt(), p.getUpdatedAt());
+                    detail.papelDoChamador(), detail.memberCount(), p.getCreatedAt(), p.getUpdatedAt());
         }
     }
 
@@ -61,9 +61,9 @@ public final class ProjectDtos {
 
     public record InvitationResponse(
             UUID id, String email, Role role, String status, Instant expiresAt) {
-        public static InvitationResponse from(Invitation invitation) {
-            return new InvitationResponse(invitation.getId(), invitation.getEmail(), invitation.getRole(),
-                    invitation.getStatus().name(), invitation.getExpiresAt());
+        public static InvitationResponse from(Invitation convite) {
+            return new InvitationResponse(convite.getId(), convite.getEmail(), convite.getRole(),
+                    convite.getStatus().name(), convite.getExpiresAt());
         }
     }
 

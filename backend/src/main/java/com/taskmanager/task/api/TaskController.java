@@ -54,14 +54,14 @@ public class TaskController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public TaskResponse create(@AuthenticationPrincipal AuthenticatedUser user,
+    public TaskResponse criar(@AuthenticationPrincipal AuthenticatedUser usuario,
             @PathVariable UUID projectId, @Valid @RequestBody CreateTaskRequest request) {
-        return assembler.toResponse(taskService.create(projectId, user.id(), request.title(),
+        return assembler.paraResposta(taskService.criar(projectId, usuario.id(), request.title(),
                 request.description(), request.priority(), request.assigneeId(), request.deadline()));
     }
 
     @GetMapping
-    public PageResponse<TaskResponse> list(@AuthenticationPrincipal AuthenticatedUser user,
+    public PageResponse<TaskResponse> listar(@AuthenticationPrincipal AuthenticatedUser usuario,
             @PathVariable UUID projectId,
             @RequestParam(required = false) TaskStatus status,
             @RequestParam(required = false) TaskPriority priority,
@@ -73,42 +73,42 @@ public class TaskController {
             @PageableDefault(size = 20) Pageable pageable) {
         TaskFilter filter = new TaskFilter(status, priority, assigneeId,
                 createdFrom, createdTo, deadlineFrom, deadlineTo);
-        return assembler.toPage(taskService.list(projectId, user.id(), filter, pageable));
+        return assembler.paraPagina(taskService.listar(projectId, usuario.id(), filter, pageable));
     }
 
     @GetMapping("/search")
-    public PageResponse<TaskResponse> search(@AuthenticationPrincipal AuthenticatedUser user,
+    public PageResponse<TaskResponse> buscar(@AuthenticationPrincipal AuthenticatedUser usuario,
             @PathVariable UUID projectId,
             @RequestParam @Size(min = 2, max = 255) String q,
             @PageableDefault(size = 20) Pageable pageable) {
-        return assembler.toPage(taskService.search(projectId, user.id(), q, pageable));
+        return assembler.paraPagina(taskService.buscar(projectId, usuario.id(), q, pageable));
     }
 
     @GetMapping("/{taskId}")
-    public TaskResponse get(@AuthenticationPrincipal AuthenticatedUser user,
+    public TaskResponse obter(@AuthenticationPrincipal AuthenticatedUser usuario,
             @PathVariable UUID projectId, @PathVariable UUID taskId) {
-        return assembler.toResponse(taskService.getForMember(taskId, user.id()));
+        return assembler.paraResposta(taskService.obterParaMembro(taskId, usuario.id()));
     }
 
     @PutMapping("/{taskId}")
-    public TaskResponse update(@AuthenticationPrincipal AuthenticatedUser user,
+    public TaskResponse atualizar(@AuthenticationPrincipal AuthenticatedUser usuario,
             @PathVariable UUID projectId, @PathVariable UUID taskId,
             @Valid @RequestBody UpdateTaskRequest request) {
-        return assembler.toResponse(taskService.edit(taskId, user.id(), request.title(),
+        return assembler.paraResposta(taskService.editar(taskId, usuario.id(), request.title(),
                 request.description(), request.priority(), request.assigneeId(), request.deadline()));
     }
 
     @PatchMapping("/{taskId}/status")
-    public TaskResponse changeStatus(@AuthenticationPrincipal AuthenticatedUser user,
+    public TaskResponse alterarStatus(@AuthenticationPrincipal AuthenticatedUser usuario,
             @PathVariable UUID projectId, @PathVariable UUID taskId,
             @Valid @RequestBody ChangeStatusRequest request) {
-        return assembler.toResponse(taskService.changeStatus(taskId, user.id(), request.status()));
+        return assembler.paraResposta(taskService.alterarStatus(taskId, usuario.id(), request.status()));
     }
 
     @DeleteMapping("/{taskId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@AuthenticationPrincipal AuthenticatedUser user,
+    public void delete(@AuthenticationPrincipal AuthenticatedUser usuario,
             @PathVariable UUID projectId, @PathVariable UUID taskId) {
-        taskService.delete(taskId, user.id());
+        taskService.delete(taskId, usuario.id());
     }
 }

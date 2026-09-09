@@ -14,23 +14,23 @@ import java.util.HexFormat;
  */
 public final class OpaqueTokens {
 
-    private static final SecureRandom RANDOM = new SecureRandom();
+    private static final SecureRandom ALEATORIO = new SecureRandom();
 
     private OpaqueTokens() {
     }
 
-    public static String generate() {
+    public static String gerar() {
         byte[] bytes = new byte[32];
-        RANDOM.nextBytes(bytes);
+        ALEATORIO.nextBytes(bytes);
         return Base64.getUrlEncoder().withoutPadding().encodeToString(bytes);
     }
 
-    public static String hash(String raw) {
+    public static String gerarHash(String bruto) {
         try {
-            MessageDigest digest = MessageDigest.getInstance("SHA-256");
-            return HexFormat.of().formatHex(digest.digest(raw.getBytes(StandardCharsets.UTF_8)));
+            MessageDigest digestor = MessageDigest.getInstance("SHA-256");
+            return HexFormat.of().formatHex(digestor.digest(bruto.getBytes(StandardCharsets.UTF_8)));
         } catch (NoSuchAlgorithmException e) {
-            throw new IllegalStateException("SHA-256 unavailable", e);
+            throw new IllegalStateException("SHA-256 indisponível", e);
         }
     }
 }

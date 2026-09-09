@@ -8,16 +8,16 @@ class TaskStatusTest {
 
     @Test
     void allowedTransitions() {
-        assertThat(TaskStatus.TODO.canTransitionTo(TaskStatus.IN_PROGRESS)).isTrue();
-        assertThat(TaskStatus.IN_PROGRESS.canTransitionTo(TaskStatus.DONE)).isTrue();
-        assertThat(TaskStatus.IN_PROGRESS.canTransitionTo(TaskStatus.TODO)).isTrue();
-        assertThat(TaskStatus.DONE.canTransitionTo(TaskStatus.IN_PROGRESS)).isTrue();
+        assertThat(TaskStatus.TODO.podeTransicionarPara(TaskStatus.IN_PROGRESS)).isTrue();
+        assertThat(TaskStatus.IN_PROGRESS.podeTransicionarPara(TaskStatus.DONE)).isTrue();
+        assertThat(TaskStatus.IN_PROGRESS.podeTransicionarPara(TaskStatus.TODO)).isTrue();
+        assertThat(TaskStatus.DONE.podeTransicionarPara(TaskStatus.IN_PROGRESS)).isTrue();
     }
 
     @Test
     void blockedTransitions() {
-        assertThat(TaskStatus.DONE.canTransitionTo(TaskStatus.TODO)).isFalse();
-        assertThat(TaskStatus.TODO.canTransitionTo(TaskStatus.DONE)).isFalse();
+        assertThat(TaskStatus.DONE.podeTransicionarPara(TaskStatus.TODO)).isFalse();
+        assertThat(TaskStatus.TODO.podeTransicionarPara(TaskStatus.DONE)).isFalse();
     }
 
     @Test

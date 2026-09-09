@@ -25,10 +25,10 @@ class ProjectReportCacheTest {
     @Test
     void compute_fillsEveryEnumValueDefaultingToZero() {
         UUID projectId = UUID.randomUUID();
-        when(taskStatistics.countByStatus(projectId)).thenReturn(Map.of("DONE", 3L));
-        when(taskStatistics.countByPriority(projectId)).thenReturn(Map.of("HIGH", 2L));
+        when(taskStatistics.contarPorStatus(projectId)).thenReturn(Map.of("DONE", 3L));
+        when(taskStatistics.contarPorPrioridade(projectId)).thenReturn(Map.of("HIGH", 2L));
 
-        ProjectReport report = cache.compute(projectId);
+        ProjectReport report = cache.calcular(projectId);
 
         assertThat(report.byStatus()).containsExactlyInAnyOrderEntriesOf(
                 Map.of("TODO", 0L, "IN_PROGRESS", 0L, "DONE", 3L));

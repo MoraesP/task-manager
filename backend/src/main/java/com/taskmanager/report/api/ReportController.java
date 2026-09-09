@@ -28,9 +28,9 @@ public class ReportController {
     }
 
     @GetMapping
-    public ReportResponse get(@AuthenticationPrincipal AuthenticatedUser user,
+    public ReportResponse obter(@AuthenticationPrincipal AuthenticatedUser usuario,
             @PathVariable UUID projectId) {
-        var report = reportService.forProject(projectId, user.id());
+        var report = reportService.porProjeto(projectId, usuario.id());
         return new ReportResponse(report.byStatus(), report.byPriority());
     }
 

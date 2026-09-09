@@ -36,15 +36,15 @@ class ProjectServiceTest {
     void create_addsOwnerAsAdminMember() {
         when(projects.save(any(Project.class))).thenAnswer(inv -> inv.getArgument(0));
 
-        ProjectDetail detail = service.create(ownerId, "Alpha", "desc");
+        ProjectDetail detail = service.criar(ownerId, "Alpha", "desc");
 
-        assertThat(detail.callerRole()).isEqualTo(Role.ADMIN);
+        assertThat(detail.papelDoChamador()).isEqualTo(Role.ADMIN);
         verify(memberships).save(any(ProjectMembership.class));
     }
 
     @Test
     void delete_nonOwnerIsForbidden() {
-        when(authorization.requireProject(projectId))
+        when(authorization.exigirProjeto(projectId))
                 .thenReturn(new Project("Alpha", null, ownerId));
 
         assertThatThrownBy(() -> service.delete(projectId, UUID.randomUUID()))
@@ -55,7 +55,7 @@ class ProjectServiceTest {
     @Test
     void delete_ownerDeletesProject() {
         Project project = new Project("Alpha", null, ownerId);
-        when(authorization.requireProject(projectId)).thenReturn(project);
+        when(authorization.exigirProjeto(projectId)).thenReturn(project);
 
         service.delete(projectId, ownerId);
 

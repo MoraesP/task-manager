@@ -30,67 +30,67 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     @ExceptionHandler(ApiException.class)
-    public ProblemDetail handleApiException(ApiException ex) {
-        if (ex.getStatus().is5xxServerError()) {
-            log.error("Erro de API", ex);
+    public ProblemDetail tratarApiException(ApiException excecao) {
+        if (excecao.getStatus().is5xxServerError()) {
+            log.error("Erro de API", excecao);
         } else {
-            log.warn("Erro de API: {} - {}", ex.getStatus(), ex.getMessage());
+            log.warn("Erro de API: {} - {}", excecao.getStatus(), excecao.getMessage());
         }
-        ProblemDetail problem = ProblemDetail.forStatusAndDetail(ex.getStatus(), ex.getMessage());
-        problem.setTitle(ex.getTitle());
-        problem.setType(ex.getType());
-        ex.getProperties().forEach(problem::setProperty);
-        return problem;
+        ProblemDetail problema = ProblemDetail.forStatusAndDetail(excecao.getStatus(), excecao.getMessage());
+        problema.setTitle(excecao.getTitle());
+        problema.setType(excecao.getType());
+        excecao.getProperties().forEach(problema::setProperty);
+        return problema;
     }
 
     @ExceptionHandler(AuthenticationException.class)
-    public ProblemDetail handleAuthentication(AuthenticationException ex) {
-        ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.UNAUTHORIZED,
+    public ProblemDetail tratarAutenticacao(AuthenticationException excecao) {
+        ProblemDetail problema = ProblemDetail.forStatusAndDetail(HttpStatus.UNAUTHORIZED,
                 "Autenticação é obrigatória ou falhou.");
-        problem.setTitle("Não autenticado");
-        return problem;
+        problema.setTitle("Não autenticado");
+        return problema;
     }
 
     @ExceptionHandler(AccessDeniedException.class)
-    public ProblemDetail handleAccessDenied(AccessDeniedException ex) {
-        ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.FORBIDDEN,
+    public ProblemDetail tratarAcessoNegado(AccessDeniedException excecao) {
+        ProblemDetail problema = ProblemDetail.forStatusAndDetail(HttpStatus.FORBIDDEN,
                 "Você não tem permissão para executar esta ação.");
-        problem.setTitle("Acesso negado");
-        return problem;
+        problema.setTitle("Acesso negado");
+        return problema;
     }
 
     @ExceptionHandler(ConstraintViolationException.class)
-    public ProblemDetail handleConstraintViolation(ConstraintViolationException ex) {
-        List<Map<String, String>> erros = ex.getConstraintViolations().stream()
-                .map(v -> Map.of("field", v.getPropertyPath().toString(), "message", v.getMessage()))
+    public ProblemDetail tratarViolacaoDeRestricao(ConstraintViolationException excecao) {
+        List<Map<String, String>> erros = excecao.getConstraintViolations().stream()
+                .map(violacao -> Map.of("field", violacao.getPropertyPath().toString(), "message", violacao.getMessage()))
                 .toList();
-        ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST,
+        ProblemDetail problema = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST,
                 "Parâmetros da requisição inválidos.");
-        problem.setTitle("Falha de validação");
-        problem.setProperty("errors", erros);
-        return problem;
+        problema.setTitle("Falha de validação");
+        problema.setProperty("errors", erros);
+        return problema;
     }
 
     @Override
-    protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex,
+    protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException excecao,
             HttpHeaders headers, HttpStatusCode status, WebRequest request) {
-        List<Map<String, String>> erros = ex.getBindingResult().getFieldErrors().stream()
-                .map(fe -> Map.of("field", fe.getField(),
-                        "message", fe.getDefaultMessage() == null ? "inválido" : fe.getDefaultMessage()))
+        List<Map<String, String>> erros = excecao.getBindingResult().getFieldErrors().stream()
+                .map(erroDeCampo -> Map.of("field", erroDeCampo.getField(),
+                        "message", erroDeCampo.getDefaultMessage() == null ? "inválido" : erroDeCampo.getDefaultMessage()))
                 .toList();
-        ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST,
+        ProblemDetail problema = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST,
                 "Corpo da requisição inválido.");
-        problem.setTitle("Falha de validação");
-        problem.setProperty("errors", erros);
-        return ResponseEntity.badRequest().body(problem);
+        problema.setTitle("Falha de validação");
+        problema.setProperty("errors", erros);
+        return ResponseEntity.badRequest().body(problema);
     }
 
     @ExceptionHandler(Exception.class)
-    public ProblemDetail handleUnexpected(Exception ex) {
+    public ProblemDetail tratarInesperado(Exception ex) {
         log.error("Erro inesperado", ex);
-        ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.INTERNAL_SERVER_ERROR,
+        ProblemDetail problema = ProblemDetail.forStatusAndDetail(HttpStatus.INTERNAL_SERVER_ERROR,
                 "Ocorreu um erro inesperado.");
-        problem.setTitle("Erro interno do servidor");
-        return problem;
+        problema.setTitle("Erro interno do servidor");
+        return problema;
     }
 }

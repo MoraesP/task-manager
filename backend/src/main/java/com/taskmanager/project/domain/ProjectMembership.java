@@ -36,11 +36,11 @@ public class ProjectMembership extends BaseEntity {
         this.role = role;
     }
 
-    public void changeRole(Role role) {
+    public void alterarPapel(Role role) {
         this.role = role;
     }
 
-    public boolean isAdmin() {
+    public boolean ehAdmin() {
         return role == Role.ADMIN;
     }
 

@@ -29,7 +29,7 @@ class UserServiceTest {
     void create_rejectsDuplicateEmail() {
         when(users.existsByEmailIgnoreCase("ana@example.com")).thenReturn(true);
 
-        assertThatThrownBy(() -> userService.create("Ana", "ana@example.com", "password1"))
+        assertThatThrownBy(() -> userService.criar("Ana", "ana@example.com", "password1"))
                 .isInstanceOfSatisfying(ApiException.class,
                         ex -> assertThat(ex.getStatus()).isEqualTo(HttpStatus.CONFLICT));
     }
@@ -40,7 +40,7 @@ class UserServiceTest {
         when(passwordEncoder.encode("password1")).thenReturn("hashed");
         when(users.save(any(User.class))).thenAnswer(inv -> inv.getArgument(0));
 
-        User created = userService.create("  Ana  ", "  Ana@Example.com ", "password1");
+        User created = userService.criar("  Ana  ", "  Ana@Example.com ", "password1");
 
         assertThat(created.getEmail()).isEqualTo("ana@example.com");
         assertThat(created.getName()).isEqualTo("Ana");
@@ -52,6 +52,6 @@ class UserServiceTest {
         User user = new User("Ana", "ana@example.com", "hashed");
         when(passwordEncoder.matches("raw", "hashed")).thenReturn(true);
 
-        assertThat(userService.matchesPassword(user, "raw")).isTrue();
+        assertThat(userService.senhaConfere(user, "raw")).isTrue();
     }
 }

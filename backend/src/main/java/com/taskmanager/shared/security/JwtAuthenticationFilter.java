@@ -15,7 +15,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 /**
- * Lê o header {@code Authorization: Bearer} e, quando o access token é válido,
+ * Lê o cabeçalho {@code Authorization: Bearer} e, quando o access token é válido,
  * popula o contexto de segurança. Tokens inválidos são ignorados aqui; o entry
  * point transforma o acesso anônimo resultante em 401.
  */
@@ -31,14 +31,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
             FilterChain filterChain) throws ServletException, IOException {
-        String header = request.getHeader("Authorization");
-        if (header != null && header.startsWith("Bearer ")
+        String cabecalho = request.getHeader("Authorization");
+        if (cabecalho != null && cabecalho.startsWith("Bearer ")
                 && SecurityContextHolder.getContext().getAuthentication() == null) {
-            AuthenticatedUser user = jwtService.parse(header.substring(7));
-            if (user != null) {
-                var authentication = new UsernamePasswordAuthenticationToken(user, null, List.of());
-                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                SecurityContextHolder.getContext().setAuthentication(authentication);
+            AuthenticatedUser usuario = jwtService.analisar(cabecalho.substring(7));
+            if (usuario != null) {
+                var autenticacao = new UsernamePasswordAuthenticationToken(usuario, null, List.of());
+                autenticacao.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                SecurityContextHolder.getContext().setAuthentication(autenticacao);
             }
         }
         filterChain.doFilter(request, response);

@@ -52,23 +52,23 @@ public class Invitation extends BaseEntity {
         this.status = InvitationStatus.PENDING;
     }
 
-    public boolean isPending() {
+    public boolean estaPendente() {
         return status == InvitationStatus.PENDING;
     }
 
-    public boolean isExpired(Instant now) {
-        return expiresAt.isBefore(now);
+    public boolean estaExpirado(Instant agora) {
+        return expiresAt.isBefore(agora);
     }
 
-    public void accept() {
+    public void aceitar() {
         this.status = InvitationStatus.ACCEPTED;
     }
 
-    public void revoke() {
+    public void revogar() {
         this.status = InvitationStatus.REVOKED;
     }
 
-    public void markExpired() {
+    public void marcarExpirado() {
         this.status = InvitationStatus.EXPIRED;
     }
 

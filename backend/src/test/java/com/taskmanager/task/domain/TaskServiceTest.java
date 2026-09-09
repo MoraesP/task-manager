@@ -49,9 +49,9 @@ class TaskServiceTest {
 
     @Test
     void create_rejectsAssigneeThatIsNotAMember() {
-        when(authorization.isMember(projectId, assigneeId)).thenReturn(false);
+        when(authorization.ehMembro(projectId, assigneeId)).thenReturn(false);
 
-        assertThatThrownBy(() -> service.create(projectId, actorId, "t", null,
+        assertThatThrownBy(() -> service.criar(projectId, actorId, "t", null,
                 TaskPriority.LOW, assigneeId, null))
                 .isInstanceOfSatisfying(ApiException.class,
                         ex -> assertThat(ex.getStatus()).isEqualTo(HttpStatus.UNPROCESSABLE_ENTITY));
@@ -59,10 +59,10 @@ class TaskServiceTest {
 
     @Test
     void create_persistsTaskInTodo() {
-        when(authorization.isMember(projectId, assigneeId)).thenReturn(true);
+        when(authorization.ehMembro(projectId, assigneeId)).thenReturn(true);
         when(tasks.save(any(Task.class))).thenAnswer(inv -> inv.getArgument(0));
 
-        Task task = service.create(projectId, actorId, " t ", " d ", TaskPriority.HIGH, assigneeId, null);
+        Task task = service.criar(projectId, actorId, " t ", " d ", TaskPriority.HIGH, assigneeId, null);
 
         assertThat(task.getStatus()).isEqualTo(TaskStatus.TODO);
         assertThat(task.getTitle()).isEqualTo("t");
@@ -74,7 +74,7 @@ class TaskServiceTest {
     void changeStatus_todoToDoneIsBlocked() {
         stubTask(task(TaskPriority.LOW, TaskStatus.TODO), Role.MEMBER);
 
-        assertThatThrownBy(() -> service.changeStatus(taskId, actorId, TaskStatus.DONE))
+        assertThatThrownBy(() -> service.alterarStatus(taskId, actorId, TaskStatus.DONE))
                 .isInstanceOfSatisfying(ApiException.class,
                         ex -> assertThat(ex.getStatus()).isEqualTo(HttpStatus.UNPROCESSABLE_ENTITY));
     }
@@ -83,7 +83,7 @@ class TaskServiceTest {
     void changeStatus_doneToTodoIsBlocked() {
         stubTask(task(TaskPriority.LOW, TaskStatus.DONE), Role.MEMBER);
 
-        assertThatThrownBy(() -> service.changeStatus(taskId, actorId, TaskStatus.TODO))
+        assertThatThrownBy(() -> service.alterarStatus(taskId, actorId, TaskStatus.TODO))
                 .isInstanceOf(ApiException.class);
     }
 
@@ -92,28 +92,28 @@ class TaskServiceTest {
         Task task = task(TaskPriority.LOW, TaskStatus.TODO);
         stubTask(task, Role.MEMBER);
 
-        Task result = service.changeStatus(taskId, actorId, TaskStatus.TODO);
+        Task result = service.alterarStatus(taskId, actorId, TaskStatus.TODO);
 
         assertThat(result.getStatus()).isEqualTo(TaskStatus.TODO);
-        verify(wipLimit, never()).assertCanTakeAnother(any(), any());
+        verify(wipLimit, never()).garantirQuePodeAssumirOutra(any(), any());
     }
 
     @Test
     void changeStatus_toInProgressChecksWipLimit() {
         stubTask(task(TaskPriority.MEDIUM, TaskStatus.TODO), Role.MEMBER);
 
-        service.changeStatus(taskId, actorId, TaskStatus.IN_PROGRESS);
+        service.alterarStatus(taskId, actorId, TaskStatus.IN_PROGRESS);
 
-        verify(wipLimit).assertCanTakeAnother(any(), any());
+        verify(wipLimit).garantirQuePodeAssumirOutra(any(), any());
     }
 
     @Test
     void changeStatus_wipLimitViolationPropagates() {
         stubTask(task(TaskPriority.MEDIUM, TaskStatus.TODO), Role.MEMBER);
         doThrow(new ApiException(HttpStatus.CONFLICT, "wip-limit-exceeded", "x", "y"))
-                .when(wipLimit).assertCanTakeAnother(any(), any());
+                .when(wipLimit).garantirQuePodeAssumirOutra(any(), any());
 
-        assertThatThrownBy(() -> service.changeStatus(taskId, actorId, TaskStatus.IN_PROGRESS))
+        assertThatThrownBy(() -> service.alterarStatus(taskId, actorId, TaskStatus.IN_PROGRESS))
                 .isInstanceOfSatisfying(ApiException.class,
                         ex -> assertThat(ex.getStatus()).isEqualTo(HttpStatus.CONFLICT));
     }
@@ -124,7 +124,7 @@ class TaskServiceTest {
     void changeStatus_memberCannotCloseCriticalTask() {
         stubTask(task(TaskPriority.CRITICAL, TaskStatus.IN_PROGRESS), Role.MEMBER);
 
-        assertThatThrownBy(() -> service.changeStatus(taskId, actorId, TaskStatus.DONE))
+        assertThatThrownBy(() -> service.alterarStatus(taskId, actorId, TaskStatus.DONE))
                 .isInstanceOfSatisfying(ApiException.class,
                         ex -> assertThat(ex.getStatus()).isEqualTo(HttpStatus.FORBIDDEN));
     }
@@ -133,7 +133,7 @@ class TaskServiceTest {
     void changeStatus_adminCanCloseCriticalTask() {
         stubTask(task(TaskPriority.CRITICAL, TaskStatus.IN_PROGRESS), Role.ADMIN);
 
-        Task result = service.changeStatus(taskId, actorId, TaskStatus.DONE);
+        Task result = service.alterarStatus(taskId, actorId, TaskStatus.DONE);
 
         assertThat(result.getStatus()).isEqualTo(TaskStatus.DONE);
     }
@@ -142,7 +142,7 @@ class TaskServiceTest {
     void changeStatus_memberCanReopenCriticalDoneTask() {
         stubTask(task(TaskPriority.CRITICAL, TaskStatus.DONE), Role.MEMBER);
 
-        Task result = service.changeStatus(taskId, actorId, TaskStatus.IN_PROGRESS);
+        Task result = service.alterarStatus(taskId, actorId, TaskStatus.IN_PROGRESS);
 
         assertThat(result.getStatus()).isEqualTo(TaskStatus.IN_PROGRESS);
     }
@@ -153,12 +153,12 @@ class TaskServiceTest {
     void edit_reassignToNonMemberIsRejected() {
         Task task = task(TaskPriority.LOW, TaskStatus.TODO);
         when(tasks.findById(taskId)).thenReturn(Optional.of(task));
-        when(authorization.requireMembership(any(), any()))
+        when(authorization.exigirMembro(any(), any()))
                 .thenReturn(new ProjectMembership(projectId, actorId, Role.MEMBER));
         UUID other = UUID.randomUUID();
-        when(authorization.isMember(task.getProjectId(), other)).thenReturn(false);
+        when(authorization.ehMembro(task.getProjectId(), other)).thenReturn(false);
 
-        assertThatThrownBy(() -> service.edit(taskId, actorId, "t", null, TaskPriority.LOW, other, null))
+        assertThatThrownBy(() -> service.editar(taskId, actorId, "t", null, TaskPriority.LOW, other, null))
                 .isInstanceOf(ApiException.class);
     }
 
@@ -168,7 +168,7 @@ class TaskServiceTest {
     void delete_memberWhoIsNotAssigneeIsForbidden() {
         Task task = task(TaskPriority.LOW, TaskStatus.TODO); // responsável = assigneeId, não actorId
         when(tasks.findById(taskId)).thenReturn(Optional.of(task));
-        when(authorization.requireMembership(any(), any()))
+        when(authorization.exigirMembro(any(), any()))
                 .thenReturn(new ProjectMembership(projectId, actorId, Role.MEMBER));
 
         assertThatThrownBy(() -> service.delete(taskId, actorId))
@@ -180,7 +180,7 @@ class TaskServiceTest {
     void delete_assigneeCanDelete() {
         Task task = task(TaskPriority.LOW, TaskStatus.TODO);
         when(tasks.findById(taskId)).thenReturn(Optional.of(task));
-        when(authorization.requireMembership(any(), any()))
+        when(authorization.exigirMembro(any(), any()))
                 .thenReturn(new ProjectMembership(projectId, assigneeId, Role.MEMBER));
 
         assertThatCode(() -> service.delete(taskId, assigneeId)).doesNotThrowAnyException();
@@ -197,16 +197,16 @@ class TaskServiceTest {
 
     private static void moveTo(Task task, TaskStatus target) {
         if (target == TaskStatus.IN_PROGRESS || target == TaskStatus.DONE) {
-            task.changeStatus(TaskStatus.IN_PROGRESS);
+            task.alterarStatus(TaskStatus.IN_PROGRESS);
         }
         if (target == TaskStatus.DONE) {
-            task.changeStatus(TaskStatus.DONE);
+            task.alterarStatus(TaskStatus.DONE);
         }
     }
 
     private void stubTask(Task task, Role actorRole) {
         when(tasks.findById(taskId)).thenReturn(Optional.of(task));
-        when(authorization.requireMembership(task.getProjectId(), actorId))
+        when(authorization.exigirMembro(task.getProjectId(), actorId))
                 .thenReturn(new ProjectMembership(task.getProjectId(), actorId, actorRole));
     }
 }

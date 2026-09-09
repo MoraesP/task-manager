@@ -16,7 +16,7 @@ import com.taskmanager.auth.api.AuthDtos.TokenResponse;
 import com.taskmanager.auth.api.AuthDtos.UserResponse;
 import com.taskmanager.auth.domain.AuthService;
 import com.taskmanager.project.domain.InvitationService;
-import com.taskmanager.project.domain.InvitationService.AcceptedInvitation;
+import com.taskmanager.project.domain.InvitationService.ConviteAceito;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -36,29 +36,29 @@ public class AuthController {
 
     @PostMapping("/register")
     @ResponseStatus(HttpStatus.CREATED)
-    public UserResponse register(@Valid @RequestBody RegisterRequest request) {
-        return UserResponse.from(authService.register(request.name(), request.email(), request.password()));
+    public UserResponse registrar(@Valid @RequestBody RegisterRequest request) {
+        return UserResponse.from(authService.registrar(request.name(), request.email(), request.password()));
     }
 
     @PostMapping("/login")
-    public TokenResponse login(@Valid @RequestBody LoginRequest request) {
-        return TokenResponse.from(authService.login(request.email(), request.password()));
+    public TokenResponse autenticar(@Valid @RequestBody LoginRequest request) {
+        return TokenResponse.from(authService.autenticar(request.email(), request.password()));
     }
 
     @PostMapping("/refresh")
-    public TokenResponse refresh(@Valid @RequestBody RefreshRequest request) {
-        return TokenResponse.from(authService.refresh(request.refreshToken()));
+    public TokenResponse renovar(@Valid @RequestBody RefreshRequest request) {
+        return TokenResponse.from(authService.renovar(request.refreshToken()));
     }
 
     @PostMapping("/logout")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void logout(@Valid @RequestBody LogoutRequest request) {
-        authService.logout(request.refreshToken());
+    public void sair(@Valid @RequestBody LogoutRequest request) {
+        authService.sair(request.refreshToken());
     }
 
     @PostMapping("/accept-invitation")
     public TokenResponse acceptInvitation(@Valid @RequestBody AcceptInvitationRequest request) {
-        AcceptedInvitation accepted = invitationService.accept(request.token(), request.name(), request.password());
-        return TokenResponse.from(authService.issueForUserId(accepted.userId()));
+        ConviteAceito accepted = invitationService.aceitar(request.token(), request.name(), request.password());
+        return TokenResponse.from(authService.emitirParaUsuario(accepted.userId()));
     }
 }

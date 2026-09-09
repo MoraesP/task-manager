@@ -34,7 +34,7 @@ class ProjectAuthorizationTest {
     void requireProject_missingIsNotFound() {
         when(projects.findById(projectId)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> authorization.requireProject(projectId))
+        assertThatThrownBy(() -> authorization.exigirProjeto(projectId))
                 .isInstanceOfSatisfying(ApiException.class,
                         ex -> assertThat(ex.getStatus()).isEqualTo(HttpStatus.NOT_FOUND));
     }
@@ -44,7 +44,7 @@ class ProjectAuthorizationTest {
         when(projects.findById(projectId)).thenReturn(Optional.of(new Project("P", null, userId)));
         when(memberships.findByProjectIdAndUserId(projectId, userId)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> authorization.requireMembership(projectId, userId))
+        assertThatThrownBy(() -> authorization.exigirMembro(projectId, userId))
                 .isInstanceOfSatisfying(ApiException.class,
                         ex -> assertThat(ex.getStatus()).isEqualTo(HttpStatus.FORBIDDEN));
     }
@@ -55,7 +55,7 @@ class ProjectAuthorizationTest {
         when(memberships.findByProjectIdAndUserId(projectId, userId))
                 .thenReturn(Optional.of(new ProjectMembership(projectId, userId, Role.MEMBER)));
 
-        assertThatThrownBy(() -> authorization.requireAdmin(projectId, userId))
+        assertThatThrownBy(() -> authorization.exigirAdmin(projectId, userId))
                 .isInstanceOfSatisfying(ApiException.class,
                         ex -> assertThat(ex.getStatus()).isEqualTo(HttpStatus.FORBIDDEN));
     }
@@ -66,6 +66,6 @@ class ProjectAuthorizationTest {
         when(memberships.findByProjectIdAndUserId(projectId, userId))
                 .thenReturn(Optional.of(new ProjectMembership(projectId, userId, Role.ADMIN)));
 
-        assertThat(authorization.requireAdmin(projectId, userId).getRole()).isEqualTo(Role.ADMIN);
+        assertThat(authorization.exigirAdmin(projectId, userId).getRole()).isEqualTo(Role.ADMIN);
     }
 }

@@ -44,18 +44,18 @@ class WipLimitPolicyTest {
 
     @Test
     void allowsWhenBelowLimit() {
-        when(tasks.findIdsByAssigneeAndStatus(assignee, TaskStatus.IN_PROGRESS))
+        when(tasks.buscarIdsPorResponsavelEStatus(assignee, TaskStatus.IN_PROGRESS))
                 .thenReturn(ids(4));
 
-        assertThatCode(() -> policy.assertCanTakeAnother(assignee, null)).doesNotThrowAnyException();
+        assertThatCode(() -> policy.garantirQuePodeAssumirOutra(assignee, null)).doesNotThrowAnyException();
     }
 
     @Test
     void rejectsWhenAtLimit() {
-        when(tasks.findIdsByAssigneeAndStatus(assignee, TaskStatus.IN_PROGRESS))
+        when(tasks.buscarIdsPorResponsavelEStatus(assignee, TaskStatus.IN_PROGRESS))
                 .thenReturn(ids(5));
 
-        assertThatThrownBy(() -> policy.assertCanTakeAnother(assignee, null))
+        assertThatThrownBy(() -> policy.garantirQuePodeAssumirOutra(assignee, null))
                 .isInstanceOfSatisfying(ApiException.class, ex -> {
                     assertThat(ex.getStatus()).isEqualTo(HttpStatus.CONFLICT);
                     assertThat(ex.getProperties()).containsKey("tasksInProgress");
@@ -67,9 +67,9 @@ class WipLimitPolicyTest {
         UUID current = UUID.randomUUID();
         List<UUID> five = new java.util.ArrayList<>(ids(4));
         five.add(current);
-        when(tasks.findIdsByAssigneeAndStatus(assignee, TaskStatus.IN_PROGRESS)).thenReturn(five);
+        when(tasks.buscarIdsPorResponsavelEStatus(assignee, TaskStatus.IN_PROGRESS)).thenReturn(five);
 
-        assertThatCode(() -> policy.assertCanTakeAnother(assignee, current)).doesNotThrowAnyException();
+        assertThatCode(() -> policy.garantirQuePodeAssumirOutra(assignee, current)).doesNotThrowAnyException();
     }
 
     private static List<UUID> ids(int n) {

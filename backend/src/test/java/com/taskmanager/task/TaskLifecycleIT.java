@@ -34,12 +34,12 @@ class TaskLifecycleIT extends AbstractIntegrationTest {
                 .andReturn());
         String taskId = task.get("id").asText();
 
-        String member = login("member@example.com", "password1");
+        String member = autenticar("member@example.com", "password1");
 
-        changeStatus(member, projectId, taskId, "IN_PROGRESS", status().isOk());
+        alterarStatus(member, projectId, taskId, "IN_PROGRESS", status().isOk());
         // DONE -> TODO é rejeitado; primeiro concluir a tarefa
-        changeStatus(member, projectId, taskId, "DONE", status().isOk());
-        changeStatus(member, projectId, taskId, "TODO", status().isUnprocessableEntity());
+        alterarStatus(member, projectId, taskId, "DONE", status().isOk());
+        alterarStatus(member, projectId, taskId, "TODO", status().isUnprocessableEntity());
 
         // o relatório reflete uma tarefa DONE
         mvc.perform(get("/api/v1/projects/{p}/report", projectId)
@@ -55,7 +55,7 @@ class TaskLifecycleIT extends AbstractIntegrationTest {
         String admin = registerAndLogin("Admin", "admin2@example.com", "password1");
         String projectId = createProject(admin, "Beta");
         inviteAndAccept(admin, projectId, "m2@example.com");
-        String member = login("m2@example.com", "password1");
+        String member = autenticar("m2@example.com", "password1");
 
         mvc.perform(put("/api/v1/projects/{p}", projectId)
                         .header("Authorization", "Bearer " + member)
@@ -86,7 +86,7 @@ class TaskLifecycleIT extends AbstractIntegrationTest {
 
         for (int i = 0; i < 5; i++) {
             String taskId = createTask(admin, projectId, "Task " + i, adminId);
-            changeStatus(admin, projectId, taskId, "IN_PROGRESS", status().isOk());
+            alterarStatus(admin, projectId, taskId, "IN_PROGRESS", status().isOk());
         }
         String sixth = createTask(admin, projectId, "Task 6", adminId);
         mvc.perform(patch("/api/v1/projects/{p}/tasks/{t}/status", projectId, sixth)
@@ -125,11 +125,11 @@ class TaskLifecycleIT extends AbstractIntegrationTest {
                                 {"token":"%s","name":"Member","password":"password1"}""".formatted(inviteToken)))
                 .andExpect(status().isOk());
 
-        return body(mvc.perform(get("/api/v1/users/me").header("Authorization", "Bearer " + login(email, "password1")))
+        return body(mvc.perform(get("/api/v1/users/me").header("Authorization", "Bearer " + autenticar(email, "password1")))
                 .andReturn()).get("id").asText();
     }
 
-    private String login(String email, String password) throws Exception {
+    private String autenticar(String email, String password) throws Exception {
         return body(mvc.perform(post("/api/v1/auth/login").contentType(MediaType.APPLICATION_JSON)
                 .content("""
                         {"email":"%s","password":"%s"}""".formatted(email, password)))
@@ -146,7 +146,7 @@ class TaskLifecycleIT extends AbstractIntegrationTest {
                 .andReturn()).get("id").asText();
     }
 
-    private void changeStatus(String token, String projectId, String taskId, String newStatus,
+    private void alterarStatus(String token, String projectId, String taskId, String newStatus,
             org.springframework.test.web.servlet.ResultMatcher expected) throws Exception {
         mvc.perform(patch("/api/v1/projects/{p}/tasks/{t}/status", projectId, taskId)
                         .header("Authorization", "Bearer " + token)

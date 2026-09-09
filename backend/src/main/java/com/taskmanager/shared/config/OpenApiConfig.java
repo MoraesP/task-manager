@@ -12,7 +12,7 @@ import io.swagger.v3.oas.annotations.security.SecurityScheme;
         title = "API do Task Manager",
         version = "v1",
         description = "API REST do gerenciador de tarefas para equipes. "
-                + "Todos os erros seguem o formato problem+json (RFC 7807)."))
+                + "Todos os erros seguem o formato problema+json (RFC 7807)."))
 @SecurityScheme(
         name = "bearerAuth",
         type = SecuritySchemeType.HTTP,

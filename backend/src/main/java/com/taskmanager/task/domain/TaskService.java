@@ -32,98 +32,98 @@ public class TaskService {
     }
 
     @Transactional
-    public Task create(UUID projectId, UUID actorId, String title, String description,
+    public Task criar(UUID projectId, UUID actorId, String title, String description,
             TaskPriority priority, UUID assigneeId, Instant deadline) {
-        authorization.requireMembership(projectId, actorId);
-        requireAssigneeIsMember(projectId, assigneeId);
-        Task task = tasks.save(new Task(projectId, title.trim(), trimToNull(description), priority, assigneeId, deadline));
+        authorization.exigirMembro(projectId, actorId);
+        exigirResponsavelMembro(projectId, assigneeId);
+        Task tarefa = tasks.save(new Task(projectId, title.trim(), vazioParaNulo(description), priority, assigneeId, deadline));
         events.publishEvent(new TaskChangedEvent(projectId));
-        return task;
+        return tarefa;
     }
 
     @Transactional(readOnly = true)
-    public Task getForMember(UUID taskId, UUID actorId) {
-        Task task = load(taskId);
-        authorization.requireMembership(task.getProjectId(), actorId);
-        return task;
+    public Task obterParaMembro(UUID taskId, UUID actorId) {
+        Task tarefa = carregar(taskId);
+        authorization.exigirMembro(tarefa.getProjectId(), actorId);
+        return tarefa;
     }
 
     @Transactional(readOnly = true)
-    public Page<Task> list(UUID projectId, UUID actorId, TaskFilter filter, Pageable pageable) {
-        authorization.requireMembership(projectId, actorId);
-        return tasks.findAll(TaskSpecifications.forProject(projectId, filter), TaskSort.sanitize(pageable));
+    public Page<Task> listar(UUID projectId, UUID actorId, TaskFilter filter, Pageable pageable) {
+        authorization.exigirMembro(projectId, actorId);
+        return tasks.findAll(TaskSpecifications.porProjeto(projectId, filter), TaskSort.sanear(pageable));
     }
 
     @Transactional(readOnly = true)
-    public Page<Task> search(UUID projectId, UUID actorId, String term, Pageable pageable) {
-        authorization.requireMembership(projectId, actorId);
-        String pattern = "%" + term.trim() + "%";
-        return tasks.search(projectId, pattern, pageable);
+    public Page<Task> buscar(UUID projectId, UUID actorId, String term, Pageable pageable) {
+        authorization.exigirMembro(projectId, actorId);
+        String padrao = "%" + term.trim() + "%";
+        return tasks.buscar(projectId, padrao, pageable);
     }
 
     @Transactional
-    public Task edit(UUID taskId, UUID actorId, String title, String description,
+    public Task editar(UUID taskId, UUID actorId, String title, String description,
             TaskPriority priority, UUID assigneeId, Instant deadline) {
-        Task task = load(taskId);
-        authorization.requireMembership(task.getProjectId(), actorId);
+        Task tarefa = carregar(taskId);
+        authorization.exigirMembro(tarefa.getProjectId(), actorId);
 
-        if (!task.getAssigneeId().equals(assigneeId)) {
-            requireAssigneeIsMember(task.getProjectId(), assigneeId);
-            if (task.getStatus() == TaskStatus.IN_PROGRESS) {
-                wipLimit.assertCanTakeAnother(assigneeId, task.getId());
+        if (!tarefa.getAssigneeId().equals(assigneeId)) {
+            exigirResponsavelMembro(tarefa.getProjectId(), assigneeId);
+            if (tarefa.getStatus() == TaskStatus.IN_PROGRESS) {
+                wipLimit.garantirQuePodeAssumirOutra(assigneeId, tarefa.getId());
             }
         }
-        task.edit(title.trim(), trimToNull(description), priority, assigneeId, deadline);
-        events.publishEvent(new TaskChangedEvent(task.getProjectId()));
-        return task;
+        tarefa.editar(title.trim(), vazioParaNulo(description), priority, assigneeId, deadline);
+        events.publishEvent(new TaskChangedEvent(tarefa.getProjectId()));
+        return tarefa;
     }
 
     @Transactional
-    public Task changeStatus(UUID taskId, UUID actorId, TaskStatus target) {
-        Task task = load(taskId);
-        ProjectMembership membership = authorization.requireMembership(task.getProjectId(), actorId);
+    public Task alterarStatus(UUID taskId, UUID actorId, TaskStatus alvo) {
+        Task tarefa = carregar(taskId);
+        ProjectMembership vinculo = authorization.exigirMembro(tarefa.getProjectId(), actorId);
 
-        if (task.getStatus() == target) {
-            return task; // RN-04: no-op idempotente
+        if (tarefa.getStatus() == alvo) {
+            return tarefa; // RN-04: no-op idempotente
         }
-        if (!task.getStatus().canTransitionTo(target)) {
-            throw Errors.unprocessable("invalid-status-transition", "Transição de status inválida",
-                    "Uma tarefa não pode ir de %s para %s.".formatted(task.getStatus(), target));
+        if (!tarefa.getStatus().podeTransicionarPara(alvo)) {
+            throw Errors.naoProcessavel("invalid-status-transition", "Transição de status inválida",
+                    "Uma tarefa não pode ir de %s para %s.".formatted(tarefa.getStatus(), alvo));
         }
-        if (task.getPriority() == TaskPriority.CRITICAL && target == TaskStatus.DONE && !membership.isAdmin()) {
-            throw Errors.forbidden("Apenas um ADMIN do projeto pode fechar uma tarefa CRITICAL.");
+        if (tarefa.getPriority() == TaskPriority.CRITICAL && alvo == TaskStatus.DONE && !vinculo.ehAdmin()) {
+            throw Errors.acessoNegado("Apenas um ADMIN do projeto pode fechar uma tarefa CRITICAL.");
         }
-        if (target == TaskStatus.IN_PROGRESS) {
-            wipLimit.assertCanTakeAnother(task.getAssigneeId(), task.getId());
+        if (alvo == TaskStatus.IN_PROGRESS) {
+            wipLimit.garantirQuePodeAssumirOutra(tarefa.getAssigneeId(), tarefa.getId());
         }
-        task.changeStatus(target);
-        events.publishEvent(new TaskChangedEvent(task.getProjectId()));
-        return task;
+        tarefa.alterarStatus(alvo);
+        events.publishEvent(new TaskChangedEvent(tarefa.getProjectId()));
+        return tarefa;
     }
 
     @Transactional
     public void delete(UUID taskId, UUID actorId) {
-        Task task = load(taskId);
-        ProjectMembership membership = authorization.requireMembership(task.getProjectId(), actorId);
-        if (!membership.isAdmin() && !task.isAssignedTo(actorId)) {
-            throw Errors.forbidden("Apenas um ADMIN do projeto ou o responsável pela tarefa pode excluí-la.");
+        Task tarefa = carregar(taskId);
+        ProjectMembership vinculo = authorization.exigirMembro(tarefa.getProjectId(), actorId);
+        if (!vinculo.ehAdmin() && !tarefa.ehResponsavelPor(actorId)) {
+            throw Errors.acessoNegado("Apenas um ADMIN do projeto ou o responsável pela tarefa pode excluí-la.");
         }
-        tasks.delete(task);
-        events.publishEvent(new TaskChangedEvent(task.getProjectId()));
+        tasks.delete(tarefa);
+        events.publishEvent(new TaskChangedEvent(tarefa.getProjectId()));
     }
 
-    private Task load(UUID taskId) {
-        return tasks.findById(taskId).orElseThrow(() -> Errors.notFound("Tarefa", taskId));
+    private Task carregar(UUID taskId) {
+        return tasks.findById(taskId).orElseThrow(() -> Errors.naoEncontrado("Tarefa", taskId));
     }
 
-    private void requireAssigneeIsMember(UUID projectId, UUID assigneeId) {
-        if (!authorization.isMember(projectId, assigneeId)) {
-            throw Errors.unprocessable("assignee-not-member", "Responsável não é membro do projeto",
+    private void exigirResponsavelMembro(UUID projectId, UUID assigneeId) {
+        if (!authorization.ehMembro(projectId, assigneeId)) {
+            throw Errors.naoProcessavel("assignee-not-member", "Responsável não é membro do projeto",
                     "O responsável precisa ser membro do projeto.");
         }
     }
 
-    private static String trimToNull(String value) {
+    private static String vazioParaNulo(String value) {
         if (value == null) {
             return null;
         }
@@ -133,18 +133,18 @@ public class TaskService {
 
     // --- usado pelo adapter de realocação na remoção de membro ---
 
-    public List<Task> activeTasksOf(UUID projectId, UUID assigneeId) {
+    public List<Task> tarefasAtivasDe(UUID projectId, UUID assigneeId) {
         return tasks.findByProjectIdAndAssigneeIdAndStatusIn(projectId, assigneeId,
                 List.of(TaskStatus.TODO, TaskStatus.IN_PROGRESS));
     }
 
     /** Realoca uma tarefa durante a remoção de um membro: valida pertencimento (RN-62) e o WIP limit (RN-10). */
-    public void reassignForRemoval(UUID projectId, Task task, UUID newAssigneeId) {
-        requireAssigneeIsMember(projectId, newAssigneeId);
-        if (task.getStatus() == TaskStatus.IN_PROGRESS) {
-            wipLimit.assertCanTakeAnother(newAssigneeId, task.getId());
+    public void realocarNaRemocao(UUID projectId, Task tarefa, UUID newAssigneeId) {
+        exigirResponsavelMembro(projectId, newAssigneeId);
+        if (tarefa.getStatus() == TaskStatus.IN_PROGRESS) {
+            wipLimit.garantirQuePodeAssumirOutra(newAssigneeId, tarefa.getId());
         }
-        task.reassign(newAssigneeId);
+        tarefa.realocar(newAssigneeId);
         events.publishEvent(new TaskChangedEvent(projectId));
     }
 }

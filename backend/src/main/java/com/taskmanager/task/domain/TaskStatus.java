@@ -18,7 +18,7 @@ public enum TaskStatus {
             IN_PROGRESS, Set.of(TODO, DONE),
             DONE, Set.of(IN_PROGRESS));
 
-    public boolean canTransitionTo(TaskStatus target) {
-        return ALLOWED.getOrDefault(this, Set.of()).contains(target);
+    public boolean podeTransicionarPara(TaskStatus alvo) {
+        return ALLOWED.getOrDefault(this, Set.of()).contains(alvo);
     }
 }

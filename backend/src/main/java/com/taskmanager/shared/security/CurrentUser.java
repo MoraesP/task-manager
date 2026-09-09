@@ -16,15 +16,15 @@ public final class CurrentUser {
     private CurrentUser() {
     }
 
-    public static AuthenticatedUser get() {
-        var authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication != null && authentication.getPrincipal() instanceof AuthenticatedUser user) {
-            return user;
+    public static AuthenticatedUser obter() {
+        var autenticacao = SecurityContextHolder.getContext().getAuthentication();
+        if (autenticacao != null && autenticacao.getPrincipal() instanceof AuthenticatedUser usuario) {
+            return usuario;
         }
-        throw Errors.unauthorized("Nenhum usuário autenticado no contexto.");
+        throw Errors.naoAutenticado("Nenhum usuário autenticado no contexto.");
     }
 
     public static UUID id() {
-        return get().id();
+        return obter().id();
     }
 }

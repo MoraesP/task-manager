@@ -28,12 +28,12 @@ public class WipLimitPolicy {
      * @param excludingTaskId a tarefa prestes a entrar em IN_PROGRESS, para não
      *                        ser contada duas vezes; pode ser {@code null}.
      */
-    public void assertCanTakeAnother(UUID assigneeId, UUID excludingTaskId) {
-        List<UUID> inProgress = tasks.findIdsByAssigneeAndStatus(assigneeId, TaskStatus.IN_PROGRESS).stream()
+    public void garantirQuePodeAssumirOutra(UUID assigneeId, UUID excludingTaskId) {
+        List<UUID> inProgress = tasks.buscarIdsPorResponsavelEStatus(assigneeId, TaskStatus.IN_PROGRESS).stream()
                 .filter(id -> !id.equals(excludingTaskId))
                 .toList();
         if (inProgress.size() >= limit) {
-            throw Errors.conflict("wip-limit-exceeded", "WIP limit excedido",
+            throw Errors.conflito("wip-limit-exceeded", "WIP limit excedido",
                     "O responsável já tem %d tarefas IN_PROGRESS (limite: %d)."
                             .formatted(inProgress.size(), limit),
                     Map.of("limit", limit, "tasksInProgress", inProgress));

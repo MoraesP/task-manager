@@ -25,7 +25,7 @@ public class UserController {
     }
 
     @GetMapping("/me")
-    public UserResponse me(@AuthenticationPrincipal AuthenticatedUser principal) {
-        return UserResponse.from(userService.getById(principal.id()));
+    public UserResponse usuarioAtual(@AuthenticationPrincipal AuthenticatedUser principal) {
+        return UserResponse.from(userService.buscarPorId(principal.id()));
     }
 }

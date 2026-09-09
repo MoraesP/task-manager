@@ -46,8 +46,8 @@ public final class AuthDtos {
     }
 
     public record UserResponse(String id, String name, String email) {
-        public static UserResponse from(User user) {
-            return new UserResponse(user.getId().toString(), user.getName(), user.getEmail());
+        public static UserResponse from(User usuario) {
+            return new UserResponse(usuario.getId().toString(), usuario.getName(), usuario.getEmail());
         }
     }
 }

@@ -14,7 +14,7 @@ import org.springframework.data.repository.query.Param;
 public interface TaskRepository extends JpaRepository<Task, UUID>, JpaSpecificationExecutor<Task> {
 
     @Query("select t.id from Task t where t.assigneeId = :assigneeId and t.status = :status")
-    List<UUID> findIdsByAssigneeAndStatus(@Param("assigneeId") UUID assigneeId,
+    List<UUID> buscarIdsPorResponsavelEStatus(@Param("assigneeId") UUID assigneeId,
             @Param("status") TaskStatus status);
 
     List<Task> findByProjectIdAndAssigneeIdAndStatusIn(UUID projectId, UUID assigneeId,
@@ -27,20 +27,20 @@ public interface TaskRepository extends JpaRepository<Task, UUID>, JpaSpecificat
     @Query(value = """
             SELECT * FROM tasks t
             WHERE t.project_id = :projectId
-              AND (t.title ILIKE :pattern OR t.description ILIKE :pattern)
+              AND (t.title ILIKE :padrao OR t.description ILIKE :padrao)
             ORDER BY t.created_at DESC
             """,
             countQuery = """
             SELECT count(*) FROM tasks t
             WHERE t.project_id = :projectId
-              AND (t.title ILIKE :pattern OR t.description ILIKE :pattern)
+              AND (t.title ILIKE :padrao OR t.description ILIKE :padrao)
             """,
             nativeQuery = true)
-    Page<Task> search(@Param("projectId") UUID projectId, @Param("pattern") String pattern, Pageable pageable);
+    Page<Task> buscar(@Param("projectId") UUID projectId, @Param("padrao") String padrao, Pageable pageable);
 
     @Query("select t.status, count(t) from Task t where t.projectId = :projectId group by t.status")
-    List<Object[]> countGroupedByStatus(@Param("projectId") UUID projectId);
+    List<Object[]> contarAgrupadasPorStatus(@Param("projectId") UUID projectId);
 
     @Query("select t.priority, count(t) from Task t where t.projectId = :projectId group by t.priority")
-    List<Object[]> countGroupedByPriority(@Param("projectId") UUID projectId);
+    List<Object[]> contarAgrupadasPorPrioridade(@Param("projectId") UUID projectId);
 }

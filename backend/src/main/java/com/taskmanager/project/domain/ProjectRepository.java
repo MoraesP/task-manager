@@ -11,5 +11,5 @@ public interface ProjectRepository extends JpaRepository<Project, UUID> {
 
     @Query("select p from Project p where p.id in "
             + "(select m.projectId from ProjectMembership m where m.userId = :userId)")
-    Page<Project> findAllForMember(UUID userId, Pageable pageable);
+    Page<Project> buscarTodosDoMembro(UUID userId, Pageable pageable);
 }

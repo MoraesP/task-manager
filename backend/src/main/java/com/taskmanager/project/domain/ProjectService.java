@@ -24,49 +24,49 @@ public class ProjectService {
     }
 
     @Transactional
-    public ProjectDetail create(UUID ownerId, String name, String description) {
-        Project project = projects.save(new Project(name.trim(), trimToNull(description), ownerId));
-        memberships.save(new ProjectMembership(project.getId(), ownerId, Role.ADMIN));
-        return new ProjectDetail(project, Role.ADMIN, 1);
+    public ProjectDetail criar(UUID ownerId, String name, String description) {
+        Project projeto = projects.save(new Project(name.trim(), vazioParaNulo(description), ownerId));
+        memberships.save(new ProjectMembership(projeto.getId(), ownerId, Role.ADMIN));
+        return new ProjectDetail(projeto, Role.ADMIN, 1);
     }
 
     @Transactional(readOnly = true)
-    public Page<ProjectDetail> listForUser(UUID userId, Pageable pageable) {
+    public Page<ProjectDetail> listarDoUsuario(UUID userId, Pageable pageable) {
         // N+1 na contagem de membros é aceitável: um usuário pertence a poucos projetos.
-        return projects.findAllForMember(userId, pageable).map(project -> toDetail(project, userId));
+        return projects.buscarTodosDoMembro(userId, pageable).map(projeto -> paraDetalhe(projeto, userId));
     }
 
     @Transactional(readOnly = true)
-    public ProjectDetail getForMember(UUID projectId, UUID userId) {
-        authorization.requireMembership(projectId, userId);
-        return toDetail(authorization.requireProject(projectId), userId);
+    public ProjectDetail obterParaMembro(UUID projectId, UUID userId) {
+        authorization.exigirMembro(projectId, userId);
+        return paraDetalhe(authorization.exigirProjeto(projectId), userId);
     }
 
-    private ProjectDetail toDetail(Project project, UUID userId) {
-        Role callerRole = authorization.membershipOf(project.getId(), userId)
+    private ProjectDetail paraDetalhe(Project projeto, UUID userId) {
+        Role papelDoChamador = authorization.membroDe(projeto.getId(), userId)
                 .map(ProjectMembership::getRole)
                 .orElse(null);
-        return new ProjectDetail(project, callerRole, memberships.countByProjectId(project.getId()));
+        return new ProjectDetail(projeto, papelDoChamador, memberships.countByProjectId(projeto.getId()));
     }
 
     @Transactional
-    public ProjectDetail update(UUID projectId, UUID actorId, String name, String description) {
-        authorization.requireAdmin(projectId, actorId);
-        Project project = authorization.requireProject(projectId);
-        project.update(name.trim(), trimToNull(description));
-        return toDetail(project, actorId);
+    public ProjectDetail atualizar(UUID projectId, UUID actorId, String name, String description) {
+        authorization.exigirAdmin(projectId, actorId);
+        Project projeto = authorization.exigirProjeto(projectId);
+        projeto.atualizar(name.trim(), vazioParaNulo(description));
+        return paraDetalhe(projeto, actorId);
     }
 
     @Transactional
     public void delete(UUID projectId, UUID actorId) {
-        Project project = authorization.requireProject(projectId);
-        if (!project.isOwnedBy(actorId)) {
-            throw Errors.forbidden("Apenas o dono do projeto pode excluí-lo.");
+        Project projeto = authorization.exigirProjeto(projectId);
+        if (!projeto.pertenceA(actorId)) {
+            throw Errors.acessoNegado("Apenas o dono do projeto pode excluí-lo.");
         }
-        projects.delete(project); // o banco faz cascade em memberships, convites e tarefas
+        projects.delete(projeto); // o banco faz cascade em memberships, convites e tarefas
     }
 
-    private static String trimToNull(String value) {
+    private static String vazioParaNulo(String value) {
         if (value == null) {
             return null;
         }

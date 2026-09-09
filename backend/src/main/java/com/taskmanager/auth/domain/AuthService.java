@@ -20,40 +20,40 @@ public class AuthService {
     }
 
     @Transactional
-    public User register(String name, String email, String rawPassword) {
-        return users.create(name, email, rawPassword);
+    public User registrar(String name, String email, String senhaBruta) {
+        return users.criar(name, email, senhaBruta);
     }
 
     @Transactional
-    public AuthTokens login(String email, String rawPassword) {
-        User user = users.findByEmail(email)
-                .filter(u -> users.matchesPassword(u, rawPassword))
-                .orElseThrow(() -> Errors.unauthorized("E-mail ou senha inválidos."));
-        return issueFor(user);
+    public AuthTokens autenticar(String email, String senhaBruta) {
+        User usuario = users.procurarPorEmail(email)
+                .filter(candidato -> users.senhaConfere(candidato, senhaBruta))
+                .orElseThrow(() -> Errors.naoAutenticado("E-mail ou senha inválidos."));
+        return emitirPara(usuario);
     }
 
     @Transactional
-    public AuthTokens refresh(String rawRefreshToken) {
-        RefreshToken consumed = refreshTokens.consume(rawRefreshToken);
-        User user = users.getById(consumed.getUserId());
-        return issueFor(user);
+    public AuthTokens renovar(String refreshTokenBruto) {
+        RefreshToken consumido = refreshTokens.consumir(refreshTokenBruto);
+        User usuario = users.buscarPorId(consumido.getUserId());
+        return emitirPara(usuario);
     }
 
     @Transactional
-    public void logout(String rawRefreshToken) {
-        refreshTokens.revoke(rawRefreshToken);
+    public void sair(String refreshTokenBruto) {
+        refreshTokens.revogar(refreshTokenBruto);
     }
 
     /** Usado logo após um usuário aceitar um convite, para que ele já fique autenticado. */
     @Transactional
-    public AuthTokens issueForUserId(java.util.UUID userId) {
-        return issueFor(users.getById(userId));
+    public AuthTokens emitirParaUsuario(java.util.UUID userId) {
+        return emitirPara(users.buscarPorId(userId));
     }
 
     @Transactional
-    public AuthTokens issueFor(User user) {
-        String access = jwtService.issueAccessToken(user.getId(), user.getEmail());
-        String refresh = refreshTokens.issue(user.getId());
-        return new AuthTokens(access, refresh, jwtService.accessTokenTtlSeconds());
+    public AuthTokens emitirPara(User usuario) {
+        String accessToken = jwtService.emitirAccessToken(usuario.getId(), usuario.getEmail());
+        String refreshToken = refreshTokens.emitir(usuario.getId());
+        return new AuthTokens(accessToken, refreshToken, jwtService.ttlDoAccessTokenEmSegundos());
     }
 }

@@ -38,23 +38,23 @@ public class MembershipController {
     }
 
     @GetMapping
-    public List<MemberResponse> list(@AuthenticationPrincipal AuthenticatedUser user,
+    public List<MemberResponse> listar(@AuthenticationPrincipal AuthenticatedUser usuario,
             @PathVariable UUID projectId) {
-        return membershipService.listMembers(projectId, user.id()).stream()
+        return membershipService.listarMembros(projectId, usuario.id()).stream()
                 .map(MemberResponse::from)
                 .toList();
     }
 
     @PatchMapping("/{userId}")
-    public MemberResponse changeRole(@AuthenticationPrincipal AuthenticatedUser user,
+    public MemberResponse alterarPapel(@AuthenticationPrincipal AuthenticatedUser usuario,
             @PathVariable UUID projectId, @PathVariable UUID userId,
             @Valid @RequestBody ChangeRoleRequest request) {
-        return MemberResponse.from(membershipService.changeRole(projectId, user.id(), userId, request.role()));
+        return MemberResponse.from(membershipService.alterarPapel(projectId, usuario.id(), userId, request.role()));
     }
 
     @DeleteMapping("/{userId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void remove(@AuthenticationPrincipal AuthenticatedUser user,
+    public void remover(@AuthenticationPrincipal AuthenticatedUser usuario,
             @PathVariable UUID projectId, @PathVariable UUID userId,
             @RequestBody(required = false) RemoveMemberRequest request) {
         List<MemberTasksPort.Reassignment> reassignments = request == null || request.reassignments() == null
@@ -62,6 +62,6 @@ public class MembershipController {
                 : request.reassignments().stream()
                         .map(r -> new MemberTasksPort.Reassignment(r.taskId(), r.newAssigneeId()))
                         .toList();
-        membershipService.removeMember(projectId, user.id(), userId, reassignments);
+        membershipService.removerMembro(projectId, usuario.id(), userId, reassignments);
     }
 }

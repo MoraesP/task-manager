@@ -32,24 +32,24 @@ public class ProjectReportCache {
 
     @Cacheable(cacheNames = CacheConfig.PROJECT_REPORT_CACHE, key = "#projectId")
     @Transactional(readOnly = true)
-    public ProjectReport compute(UUID projectId) {
+    public ProjectReport calcular(UUID projectId) {
         return new ProjectReport(
-                fill(taskStatistics.countByStatus(projectId), names(TaskStatus.values())),
-                fill(taskStatistics.countByPriority(projectId), names(TaskPriority.values())));
+                fill(taskStatistics.contarPorStatus(projectId), names(TaskStatus.values())),
+                fill(taskStatistics.contarPorPrioridade(projectId), names(TaskPriority.values())));
     }
 
     @CacheEvict(cacheNames = CacheConfig.PROJECT_REPORT_CACHE, key = "#event.projectId()")
     @EventListener
-    public void onTaskChanged(TaskChangedEvent event) {
+    public void aoMudarTarefa(TaskChangedEvent event) {
         // a anotação faz a evicção
     }
 
     private static Map<String, Long> fill(Map<String, Long> counts, String[] allKeys) {
-        Map<String, Long> result = new LinkedHashMap<>();
+        Map<String, Long> resultado = new LinkedHashMap<>();
         for (String key : allKeys) {
-            result.put(key, counts.getOrDefault(key, 0L));
+            resultado.put(key, counts.getOrDefault(key, 0L));
         }
-        return result;
+        return resultado;
     }
 
     private static String[] names(Enum<?>[] values) {

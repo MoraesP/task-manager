@@ -38,13 +38,13 @@ public class RefreshToken extends BaseEntity {
         this.expiresAt = expiresAt;
     }
 
-    public boolean isActive(Instant now) {
-        return revokedAt == null && expiresAt.isAfter(now);
+    public boolean estaAtivo(Instant agora) {
+        return revokedAt == null && expiresAt.isAfter(agora);
     }
 
-    public void revoke(Instant when) {
+    public void revogar(Instant quando) {
         if (revokedAt == null) {
-            this.revokedAt = when;
+            this.revokedAt = quando;
         }
     }
 

@@ -57,63 +57,63 @@ class InvitationServiceTest {
     @Test
     void create_rejectsWhenEmailAlreadyMember() {
         User existing = new User("Bob", "bob@example.com", "h");
-        when(users.findByEmail("bob@example.com")).thenReturn(Optional.of(existing));
+        when(users.procurarPorEmail("bob@example.com")).thenReturn(Optional.of(existing));
         when(memberships.existsByProjectIdAndUserId(any(), any())).thenReturn(true);
 
-        assertThatThrownBy(() -> service.create(projectId, actorId, "bob@example.com", Role.MEMBER))
+        assertThatThrownBy(() -> service.criar(projectId, actorId, "bob@example.com", Role.MEMBER))
                 .isInstanceOfSatisfying(ApiException.class,
                         ex -> assertThat(ex.getStatus()).isEqualTo(HttpStatus.CONFLICT));
     }
 
     @Test
     void create_rejectsDuplicatePendingInvitation() {
-        when(users.findByEmail(any())).thenReturn(Optional.empty());
+        when(users.procurarPorEmail(any())).thenReturn(Optional.empty());
         when(invitations.existsByProjectIdAndEmailIgnoreCaseAndStatus(projectId, "new@example.com",
                 InvitationStatus.PENDING)).thenReturn(true);
 
-        assertThatThrownBy(() -> service.create(projectId, actorId, "new@example.com", Role.MEMBER))
+        assertThatThrownBy(() -> service.criar(projectId, actorId, "new@example.com", Role.MEMBER))
                 .isInstanceOfSatisfying(ApiException.class,
                         ex -> assertThat(ex.getStatus()).isEqualTo(HttpStatus.CONFLICT));
     }
 
     @Test
-    void accept_unknownTokenIsUnprocessable() {
+    void aceitar_unknownTokenIsUnprocessable() {
         when(invitations.findByTokenHash(any())).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> service.accept("raw", null, null))
+        assertThatThrownBy(() -> service.aceitar("raw", null, null))
                 .isInstanceOfSatisfying(ApiException.class,
                         ex -> assertThat(ex.getStatus()).isEqualTo(HttpStatus.UNPROCESSABLE_ENTITY));
     }
 
     @Test
-    void accept_expiredInvitationIsMarkedExpiredAndRejected() {
+    void aceitar_expiredInvitationIsMarkedExpiredAndRejected() {
         Invitation invitation = invitation(Instant.now().minusSeconds(60));
         when(invitations.findByTokenHash(any())).thenReturn(Optional.of(invitation));
 
-        assertThatThrownBy(() -> service.accept("raw", null, null)).isInstanceOf(ApiException.class);
+        assertThatThrownBy(() -> service.aceitar("raw", null, null)).isInstanceOf(ApiException.class);
         assertThat(invitation.getStatus()).isEqualTo(InvitationStatus.EXPIRED);
     }
 
     @Test
-    void accept_absentUserWithoutCredentialsIsRejected() {
+    void aceitar_absentUserWithoutCredentialsIsRejected() {
         Invitation invitation = invitation(Instant.now().plusSeconds(3600));
         when(invitations.findByTokenHash(any())).thenReturn(Optional.of(invitation));
-        when(users.findByEmail(invitation.getEmail())).thenReturn(Optional.empty());
+        when(users.procurarPorEmail(invitation.getEmail())).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> service.accept("raw", null, null)).isInstanceOf(ApiException.class);
-        verify(users, never()).create(any(), any(), any());
+        assertThatThrownBy(() -> service.aceitar("raw", null, null)).isInstanceOf(ApiException.class);
+        verify(users, never()).criar(any(), any(), any());
     }
 
     @Test
-    void accept_absentUserWithCredentialsCreatesAccountAndMembership() {
+    void aceitar_absentUserWithCredentialsCreatesAccountAndMembership() {
         Invitation invitation = invitation(Instant.now().plusSeconds(3600));
         User created = new User("Carol", "carol@example.com", "h");
         when(invitations.findByTokenHash(any())).thenReturn(Optional.of(invitation));
-        when(users.findByEmail(invitation.getEmail())).thenReturn(Optional.empty());
-        when(users.create("Carol", "carol@example.com", "password1")).thenReturn(created);
+        when(users.procurarPorEmail(invitation.getEmail())).thenReturn(Optional.empty());
+        when(users.criar("Carol", "carol@example.com", "password1")).thenReturn(created);
         when(memberships.existsByProjectIdAndUserId(any(), any())).thenReturn(false);
 
-        InvitationService.AcceptedInvitation result = service.accept("raw", "Carol", "password1");
+        InvitationService.ConviteAceito result = service.aceitar("raw", "Carol", "password1");
 
         assertThat(result.projectId()).isEqualTo(projectId);
         verify(memberships).save(any(ProjectMembership.class));
@@ -121,21 +121,21 @@ class InvitationServiceTest {
     }
 
     @Test
-    void accept_existingUserJustGainsMembership() {
+    void aceitar_existingUserJustGainsMembership() {
         Invitation invitation = invitation(Instant.now().plusSeconds(3600));
         User existing = new User("Carol", "carol@example.com", "h");
         when(invitations.findByTokenHash(any())).thenReturn(Optional.of(invitation));
-        when(users.findByEmail(invitation.getEmail())).thenReturn(Optional.of(existing));
+        when(users.procurarPorEmail(invitation.getEmail())).thenReturn(Optional.of(existing));
         when(memberships.existsByProjectIdAndUserId(any(), any())).thenReturn(false);
 
-        service.accept("raw", null, null);
+        service.aceitar("raw", null, null);
 
-        verify(users, never()).create(any(), any(), any());
+        verify(users, never()).criar(any(), any(), any());
         verify(memberships).save(any(ProjectMembership.class));
     }
 
     private Invitation invitation(Instant expiresAt) {
         return new Invitation(projectId, "carol@example.com", Role.MEMBER,
-                OpaqueTokens.hash("raw"), actorId, expiresAt);
+                OpaqueTokens.gerarHash("raw"), actorId, expiresAt);
     }
 }

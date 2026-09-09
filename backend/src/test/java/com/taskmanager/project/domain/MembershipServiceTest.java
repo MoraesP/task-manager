@@ -43,22 +43,22 @@ class MembershipServiceTest {
 
     @Test
     void changeRole_ownerRoleIsImmutable() {
-        when(authorization.requireProject(projectId)).thenReturn(new Project("P", null, ownerId));
+        when(authorization.exigirProjeto(projectId)).thenReturn(new Project("P", null, ownerId));
         when(memberships.findByProjectIdAndUserId(projectId, ownerId))
                 .thenReturn(Optional.of(new ProjectMembership(projectId, ownerId, Role.ADMIN)));
 
-        assertThatThrownBy(() -> service.changeRole(projectId, actorId, ownerId, Role.MEMBER))
+        assertThatThrownBy(() -> service.alterarPapel(projectId, actorId, ownerId, Role.MEMBER))
                 .isInstanceOfSatisfying(ApiException.class,
                         ex -> assertThat(ex.getStatus()).isEqualTo(HttpStatus.UNPROCESSABLE_ENTITY));
     }
 
     @Test
     void removeMember_ownerCannotBeRemoved() {
-        when(authorization.requireProject(projectId)).thenReturn(new Project("P", null, ownerId));
+        when(authorization.exigirProjeto(projectId)).thenReturn(new Project("P", null, ownerId));
         when(memberships.findByProjectIdAndUserId(projectId, ownerId))
                 .thenReturn(Optional.of(new ProjectMembership(projectId, ownerId, Role.ADMIN)));
 
-        assertThatThrownBy(() -> service.removeMember(projectId, actorId, ownerId, List.of()))
+        assertThatThrownBy(() -> service.removerMembro(projectId, actorId, ownerId, List.of()))
                 .isInstanceOfSatisfying(ApiException.class,
                         ex -> assertThat(ex.getStatus()).isEqualTo(HttpStatus.FORBIDDEN));
         verifyNoInteractions(memberTasks);
@@ -68,21 +68,21 @@ class MembershipServiceTest {
     void removeMember_reassignsTasksThenDeletesMembership() {
         Project project = new Project("P", null, ownerId);
         ProjectMembership target = new ProjectMembership(projectId, targetId, Role.MEMBER);
-        when(authorization.requireProject(projectId)).thenReturn(project);
+        when(authorization.exigirProjeto(projectId)).thenReturn(project);
         when(memberships.findByProjectIdAndUserId(projectId, targetId)).thenReturn(Optional.of(target));
 
-        service.removeMember(projectId, actorId, targetId, List.of());
+        service.removerMembro(projectId, actorId, targetId, List.of());
 
-        verify(memberTasks).reassignForMemberRemoval(eq(projectId), eq(targetId), any());
+        verify(memberTasks).realocarNaRemocaoDeMembro(eq(projectId), eq(targetId), any());
         verify(memberships).delete(target);
     }
 
     @Test
     void removeMember_requiresActorToBeAdmin() {
-        when(authorization.requireAdmin(projectId, actorId))
+        when(authorization.exigirAdmin(projectId, actorId))
                 .thenThrow(new ApiException(HttpStatus.FORBIDDEN, "forbidden", "x", "y"));
 
-        assertThatThrownBy(() -> service.removeMember(projectId, actorId, targetId, List.of()))
+        assertThatThrownBy(() -> service.removerMembro(projectId, actorId, targetId, List.of()))
                 .isInstanceOf(ApiException.class);
     }
 }

@@ -33,31 +33,31 @@ class AuthServiceTest {
     @Test
     void login_withWrongPasswordIsUnauthorized() {
         User user = new User("Ana", "ana@example.com", "hash");
-        when(users.findByEmail("ana@example.com")).thenReturn(Optional.of(user));
-        when(users.matchesPassword(user, "wrong")).thenReturn(false);
+        when(users.procurarPorEmail("ana@example.com")).thenReturn(Optional.of(user));
+        when(users.senhaConfere(user, "wrong")).thenReturn(false);
 
-        assertThatThrownBy(() -> authService.login("ana@example.com", "wrong"))
+        assertThatThrownBy(() -> authService.autenticar("ana@example.com", "wrong"))
                 .isInstanceOf(ApiException.class);
     }
 
     @Test
     void login_withUnknownEmailIsUnauthorized() {
-        when(users.findByEmail(any())).thenReturn(Optional.empty());
+        when(users.procurarPorEmail(any())).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> authService.login("nobody@example.com", "x"))
+        assertThatThrownBy(() -> authService.autenticar("nobody@example.com", "x"))
                 .isInstanceOf(ApiException.class);
     }
 
     @Test
     void login_successIssuesAccessAndRefreshTokens() {
         User user = new User("Ana", "ana@example.com", "hash");
-        when(users.findByEmail("ana@example.com")).thenReturn(Optional.of(user));
-        when(users.matchesPassword(user, "right")).thenReturn(true);
-        when(jwtService.issueAccessToken(any(), eq("ana@example.com"))).thenReturn("access");
-        when(jwtService.accessTokenTtlSeconds()).thenReturn(900L);
-        when(refreshTokens.issue(any())).thenReturn("refresh");
+        when(users.procurarPorEmail("ana@example.com")).thenReturn(Optional.of(user));
+        when(users.senhaConfere(user, "right")).thenReturn(true);
+        when(jwtService.emitirAccessToken(any(), eq("ana@example.com"))).thenReturn("access");
+        when(jwtService.ttlDoAccessTokenEmSegundos()).thenReturn(900L);
+        when(refreshTokens.emitir(any())).thenReturn("refresh");
 
-        AuthTokens tokens = authService.login("ana@example.com", "right");
+        AuthTokens tokens = authService.autenticar("ana@example.com", "right");
 
         assertThat(tokens.accessToken()).isEqualTo("access");
         assertThat(tokens.refreshToken()).isEqualTo("refresh");
@@ -69,12 +69,12 @@ class AuthServiceTest {
         UUID userId = UUID.randomUUID();
         RefreshToken consumed = new RefreshToken(userId, "hash", java.time.Instant.now().plusSeconds(60));
         User user = new User("Ana", "ana@example.com", "hash");
-        when(refreshTokens.consume("old")).thenReturn(consumed);
-        when(users.getById(userId)).thenReturn(user);
-        when(jwtService.issueAccessToken(any(), any())).thenReturn("access2");
-        when(refreshTokens.issue(any())).thenReturn("refresh2");
+        when(refreshTokens.consumir("old")).thenReturn(consumed);
+        when(users.buscarPorId(userId)).thenReturn(user);
+        when(jwtService.emitirAccessToken(any(), any())).thenReturn("access2");
+        when(refreshTokens.emitir(any())).thenReturn("refresh2");
 
-        AuthTokens tokens = authService.refresh("old");
+        AuthTokens tokens = authService.renovar("old");
 
         assertThat(tokens.refreshToken()).isEqualTo("refresh2");
     }

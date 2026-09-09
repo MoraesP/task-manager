@@ -18,7 +18,7 @@ import com.taskmanager.project.api.ProjectDtos.CreateInvitationRequest;
 import com.taskmanager.project.api.ProjectDtos.CreatedInvitationResponse;
 import com.taskmanager.project.api.ProjectDtos.InvitationResponse;
 import com.taskmanager.project.domain.InvitationService;
-import com.taskmanager.project.domain.InvitationService.CreatedInvitation;
+import com.taskmanager.project.domain.InvitationService.ConviteCriado;
 import com.taskmanager.shared.security.AuthenticatedUser;
 
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -39,26 +39,26 @@ public class InvitationController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public CreatedInvitationResponse create(@AuthenticationPrincipal AuthenticatedUser user,
+    public CreatedInvitationResponse criar(@AuthenticationPrincipal AuthenticatedUser usuario,
             @PathVariable UUID projectId, @Valid @RequestBody CreateInvitationRequest request) {
-        CreatedInvitation created = invitationService.create(projectId, user.id(), request.email(), request.role());
-        var invitation = created.invitation();
-        return new CreatedInvitationResponse(invitation.getId(), invitation.getEmail(), invitation.getRole(),
-                created.rawToken(), invitation.getExpiresAt());
+        ConviteCriado created = invitationService.criar(projectId, usuario.id(), request.email(), request.role());
+        var convite = created.convite();
+        return new CreatedInvitationResponse(convite.getId(), convite.getEmail(), convite.getRole(),
+                created.tokenBruto(), convite.getExpiresAt());
     }
 
     @GetMapping
-    public List<InvitationResponse> listPending(@AuthenticationPrincipal AuthenticatedUser user,
+    public List<InvitationResponse> listarPendentes(@AuthenticationPrincipal AuthenticatedUser usuario,
             @PathVariable UUID projectId) {
-        return invitationService.listPending(projectId, user.id()).stream()
+        return invitationService.listarPendentes(projectId, usuario.id()).stream()
                 .map(InvitationResponse::from)
                 .toList();
     }
 
     @DeleteMapping("/{invitationId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void revoke(@AuthenticationPrincipal AuthenticatedUser user,
+    public void revogar(@AuthenticationPrincipal AuthenticatedUser usuario,
             @PathVariable UUID projectId, @PathVariable UUID invitationId) {
-        invitationService.revoke(projectId, user.id(), invitationId);
+        invitationService.revogar(projectId, usuario.id(), invitationId);
     }
 }

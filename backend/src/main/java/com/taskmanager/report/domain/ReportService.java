@@ -17,8 +17,8 @@ public class ReportService {
         this.cache = cache;
     }
 
-    public ProjectReport forProject(UUID projectId, UUID actorId) {
-        authorization.requireMembership(projectId, actorId);
-        return cache.compute(projectId);
+    public ProjectReport porProjeto(UUID projectId, UUID actorId) {
+        authorization.exigirMembro(projectId, actorId);
+        return cache.calcular(projectId);
     }
 }

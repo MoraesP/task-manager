@@ -51,42 +51,42 @@ public class Task extends BaseEntity {
         this.title = title;
         this.description = description;
         this.status = TaskStatus.TODO;
-        setPriority(priority);
+        definirPrioridade(priority);
         this.assigneeId = assigneeId;
         this.deadline = deadline;
     }
 
-    public void edit(String title, String description, TaskPriority priority, UUID assigneeId, Instant deadline) {
+    public void editar(String title, String description, TaskPriority priority, UUID assigneeId, Instant deadline) {
         this.title = title;
         this.description = description;
-        setPriority(priority);
+        definirPrioridade(priority);
         this.assigneeId = assigneeId;
         this.deadline = deadline;
     }
 
-    public void changeStatus(TaskStatus status) {
+    public void alterarStatus(TaskStatus status) {
         this.status = status;
     }
 
-    public void reassign(UUID assigneeId) {
+    public void realocar(UUID assigneeId) {
         this.assigneeId = assigneeId;
     }
 
-    private void setPriority(TaskPriority priority) {
+    private void definirPrioridade(TaskPriority priority) {
         this.priority = priority;
         this.priorityRank = (short) priority.ordinal();
     }
 
-    public boolean isActive() {
+    public boolean estaAtivo() {
         return status != TaskStatus.DONE;
     }
 
-    public boolean isAssignedTo(UUID userId) {
+    public boolean ehResponsavelPor(UUID userId) {
         return assigneeId.equals(userId);
     }
 
-    public boolean isOverdue(Instant now) {
-        return deadline != null && status != TaskStatus.DONE && deadline.isBefore(now);
+    public boolean estaAtrasada(Instant agora) {
+        return deadline != null && status != TaskStatus.DONE && deadline.isBefore(agora);
     }
 
     public UUID getProjectId() {

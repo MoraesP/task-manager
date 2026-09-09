@@ -23,7 +23,7 @@ public class UserDirectory {
     }
 
     @Transactional(readOnly = true)
-    public Map<UUID, User> findAllById(Collection<UUID> ids) {
+    public Map<UUID, User> buscarPorIds(Collection<UUID> ids) {
         return users.findAllById(ids).stream()
                 .collect(Collectors.toMap(User::getId, Function.identity()));
     }

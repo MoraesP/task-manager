@@ -20,20 +20,20 @@ public class TaskStatistics {
     }
 
     @Transactional(readOnly = true)
-    public Map<String, Long> countByStatus(UUID projectId) {
-        return toMap(tasks.countGroupedByStatus(projectId));
+    public Map<String, Long> contarPorStatus(UUID projectId) {
+        return toMap(tasks.contarAgrupadasPorStatus(projectId));
     }
 
     @Transactional(readOnly = true)
-    public Map<String, Long> countByPriority(UUID projectId) {
-        return toMap(tasks.countGroupedByPriority(projectId));
+    public Map<String, Long> contarPorPrioridade(UUID projectId) {
+        return toMap(tasks.contarAgrupadasPorPrioridade(projectId));
     }
 
-    private static Map<String, Long> toMap(java.util.List<Object[]> rows) {
-        Map<String, Long> result = new HashMap<>();
-        for (Object[] row : rows) {
-            result.put(((Enum<?>) row[0]).name(), (Long) row[1]);
+    private static Map<String, Long> toMap(java.util.List<Object[]> linhas) {
+        Map<String, Long> resultado = new HashMap<>();
+        for (Object[] linha : linhas) {
+            resultado.put(((Enum<?>) linha[0]).name(), (Long) linha[1]);
         }
-        return result;
+        return resultado;
     }
 }

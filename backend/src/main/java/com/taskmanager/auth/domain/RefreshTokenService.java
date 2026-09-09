@@ -26,28 +26,28 @@ public class RefreshTokenService {
 
     /** @return o token bruto para entregar ao cliente (nunca persistido). */
     @Transactional
-    public String issue(java.util.UUID userId) {
-        String raw = OpaqueTokens.generate();
-        Instant expiresAt = Instant.now().plus(properties.security().jwt().refreshTokenTtl());
-        tokens.save(new RefreshToken(userId, OpaqueTokens.hash(raw), expiresAt));
-        return raw;
+    public String emitir(java.util.UUID userId) {
+        String bruto = OpaqueTokens.gerar();
+        Instant expiraEm = Instant.now().plus(properties.security().jwt().refreshTokenTtl());
+        tokens.save(new RefreshToken(userId, OpaqueTokens.gerarHash(bruto), expiraEm));
+        return bruto;
     }
 
     @Transactional
-    public RefreshToken consume(String rawToken) {
-        RefreshToken token = tokens.findByTokenHash(OpaqueTokens.hash(rawToken))
-                .orElseThrow(() -> Errors.unauthorized("Refresh token inválido."));
-        if (!token.isActive(Instant.now())) {
-            tokens.revokeAllForUser(token.getUserId());
-            throw Errors.unauthorized("O refresh token está expirado ou foi revogado.");
+    public RefreshToken consumir(String tokenBruto) {
+        RefreshToken token = tokens.findByTokenHash(OpaqueTokens.gerarHash(tokenBruto))
+                .orElseThrow(() -> Errors.naoAutenticado("Refresh token inválido."));
+        if (!token.estaAtivo(Instant.now())) {
+            tokens.revogarTodosDoUsuario(token.getUserId());
+            throw Errors.naoAutenticado("O refresh token está expirado ou foi revogado.");
         }
-        token.revoke(Instant.now());
+        token.revogar(Instant.now());
         return token;
     }
 
     @Transactional
-    public void revoke(String rawToken) {
-        tokens.findByTokenHash(OpaqueTokens.hash(rawToken))
-                .ifPresent(token -> token.revoke(Instant.now()));
+    public void revogar(String tokenBruto) {
+        tokens.findByTokenHash(OpaqueTokens.gerarHash(tokenBruto))
+                .ifPresent(token -> token.revogar(Instant.now()));
     }
 }
