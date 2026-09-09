@@ -16,14 +16,12 @@ import { AuthService } from '@core/auth/auth.service';
 let renovacaoEmAndamento: Observable<TokenResponse> | null = null;
 
 export const authInterceptor: HttpInterceptorFn = (requisicao, proximo) => {
-  const autenticacao = inject(AuthService);
   const roteador = inject(Router);
+  const autenticacao = inject(AuthService);
 
   const comToken = (original: HttpRequest<unknown>): HttpRequest<unknown> => {
     const token = autenticacao.tokenDeAcesso;
-    return token
-      ? original.clone({ setHeaders: { Authorization: `Bearer ${token}` } })
-      : original;
+    return token ? original.clone({ setHeaders: { Authorization: `Bearer ${token}` } }) : original;
   };
 
   const ehRequisicaoDeAutenticacao = requisicao.context.get(IS_AUTH_REQUEST);

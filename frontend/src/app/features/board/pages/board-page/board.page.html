@@ -16,13 +16,20 @@
     <app-page-loader />
   } @else {
     <div class="board-strip">
-      <span><b>{{ quadro.colunas()['TODO'].length }}</b> a fazer</span>
-      <span><b>{{ quadro.colunas()['IN_PROGRESS'].length }}</b> em progresso</span>
-      <span><b>{{ quadro.colunas()['DONE'].length }}</b> concluídas</span>
+      <span
+        ><b>{{ quadro.colunas()['TODO'].length }}</b> a fazer</span
+      >
+      <span
+        ><b>{{ quadro.colunas()['IN_PROGRESS'].length }}</b> em progresso</span
+      >
+      <span
+        ><b>{{ quadro.colunas()['DONE'].length }}</b> concluídas</span
+      >
       @if (quadro.truncado()) {
         <span class="board-strip__spacer"></span>
         <span class="field__hint">
-          mostrando as primeiras {{ quadro.tarefas().length }} de {{ quadro.total() }} — refine os filtros
+          mostrando as primeiras {{ quadro.tarefas().length }} de {{ quadro.total() }} — refine os
+          filtros
         </span>
       }
     </div>
@@ -31,7 +38,10 @@
       @for (status of quadro.statusDisponiveis; track status) {
         <section class="board-column">
           <header class="board-column__head">
-            <span class="board-column__dot" [class]="'board-column__dot--' + status.toLowerCase()"></span>
+            <span
+              class="board-column__dot"
+              [class]="'board-column__dot--' + status.toLowerCase()"
+            ></span>
             {{ rotuloDeStatus[status] }}
             <span class="board-column__count">{{ quadro.colunas()[status].length }}</span>
           </header>
@@ -79,7 +89,10 @@
     </div>
     @if (resultadoDaBusca(); as resultado) {
       @if (resultado.content.length === 0 && !buscando()) {
-        <app-empty-state titulo="Nada encontrado" mensagem="Nenhuma tarefa combina com o texto buscado." />
+        <app-empty-state
+          titulo="Nada encontrado"
+          mensagem="Nenhuma tarefa combina com o texto buscado."
+        />
       } @else {
         <div class="search-results__list">
           @for (tarefa of resultado.content; track tarefa.id) {

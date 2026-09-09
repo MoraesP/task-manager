@@ -1,13 +1,7 @@
 import { CdkDrag, CdkDragDrop, CdkDropList } from '@angular/cdk/drag-drop';
 import { Dialog } from '@angular/cdk/dialog';
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
-import {
-  PageResponse,
-  STATUS_LABEL,
-  Task,
-  TaskStatus,
-  canTransition,
-} from '@shared/models';
+import { PageResponse, STATUS_LABEL, Task, TaskStatus, canTransition } from '@shared/models';
 import { AuthService } from '@core/auth/auth.service';
 import { mensagemDeErro } from '@core/http/problem-detail';
 import { ToastService } from '@core/notifications/toast.service';
@@ -43,14 +37,16 @@ import { TaskFilter } from '../../models/task-filter.model';
   styleUrl: './board.page.scss',
 })
 export class BoardPage {
-  protected readonly quadro = inject(BoardService);
-  private readonly servicoDeProjetos = inject(ProjectsService);
   private readonly dialog = inject(Dialog);
-  private readonly notificacoes = inject(ToastService);
+  protected readonly quadro = inject(BoardService);
   private readonly autenticacao = inject(AuthService);
+  private readonly notificacoes = inject(ToastService);
+  private readonly servicoDeProjetos = inject(ProjectsService);
 
   protected readonly projeto = this.servicoDeProjetos.projetoAtual;
+
   protected readonly rotuloDeStatus = STATUS_LABEL;
+
   protected readonly idsDasColunas = ['col-TODO', 'col-IN_PROGRESS', 'col-DONE'];
 
   protected readonly idDoMenuAberto = signal<string | null>(null);

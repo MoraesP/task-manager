@@ -7,9 +7,7 @@ import { AuthService } from '@core/auth/auth.service';
 import { ToastService } from '@core/notifications/toast.service';
 import { ProjectsService } from '@features/projects/data/projects.service';
 import { RoleBadgeComponent } from '@shared/components/role-badge/role-badge.component';
-import {
-  ConfirmDialogComponent,
-} from '@shared/components/confirm-dialog/confirm-dialog.component';
+import { ConfirmDialogComponent } from '@shared/components/confirm-dialog/confirm-dialog.component';
 import { SpinnerComponent } from '@shared/components/spinner/spinner.component';
 import { TopbarComponent } from '@shared/components/topbar/topbar.component';
 

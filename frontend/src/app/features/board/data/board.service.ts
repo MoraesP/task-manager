@@ -24,16 +24,21 @@ export class BoardService {
 
   private readonly _tarefas = signal<Task[]>([]);
   private readonly _membros = signal<ProjectMember[]>([]);
+
   private readonly _carregando = signal(true);
+
   private readonly _total = signal(0);
   private readonly _filtro = signal<TaskFilter>({ sort: 'priority,desc' });
 
   readonly tarefas = this._tarefas.asReadonly();
   readonly membros = this._membros.asReadonly();
   readonly carregando = this._carregando.asReadonly();
+
   readonly total = this._total.asReadonly();
   readonly filtro = this._filtro.asReadonly();
+
   readonly truncado = computed(() => this._total() > this._tarefas().length);
+
   readonly statusDisponiveis = TASK_STATUSES;
 
   readonly colunas = computed<Record<TaskStatus, Task[]>>(() => {
@@ -59,6 +64,7 @@ export class BoardService {
     this._carregando.set(true);
     let parametros = new HttpParams().set('page', 0).set('size', TAMANHO_DA_PAGINA_DO_QUADRO);
     const filtro = this._filtro();
+
     if (filtro.status) {
       parametros = parametros.set('status', filtro.status);
     }
@@ -79,7 +85,9 @@ export class BoardService {
     }
 
     this.http
-      .get<PageResponse<Task>>(`${API_BASE}/projects/${this.projetoId}/tasks`, { params: parametros })
+      .get<
+        PageResponse<Task>
+      >(`${API_BASE}/projects/${this.projetoId}/tasks`, { params: parametros })
       .subscribe({
         next: (resposta) => {
           this._tarefas.set(resposta.content);

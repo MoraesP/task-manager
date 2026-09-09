@@ -14,10 +14,10 @@ import { AuthCardComponent } from '../../ui/auth-card/auth-card.component';
   styleUrl: './register.page.scss',
 })
 export class RegisterPage {
-  private readonly formBuilder = inject(NonNullableFormBuilder);
-  private readonly autenticacao = inject(AuthService);
   private readonly roteador = inject(Router);
+  private readonly autenticacao = inject(AuthService);
   private readonly notificacoes = inject(ToastService);
+  private readonly formBuilder = inject(NonNullableFormBuilder);
 
   protected readonly carregando = signal(false);
 

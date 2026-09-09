@@ -1,6 +1,13 @@
 import { Dialog } from '@angular/cdk/dialog';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  effect,
+  inject,
+  signal,
+} from '@angular/core';
 import { API_BASE } from '@core/http/api.config';
 import { AuthService } from '@core/auth/auth.service';
 import { ToastService } from '@core/notifications/toast.service';
@@ -34,12 +41,12 @@ import { MembersService } from '../../data/members.service';
   styleUrl: './members.page.scss',
 })
 export class MembersPage {
+  private readonly http = inject(HttpClient);
+  private readonly dialog = inject(Dialog);
+  private readonly autenticacao = inject(AuthService);
+  private readonly notificacoes = inject(ToastService);
   private readonly servicoDeMembros = inject(MembersService);
   private readonly servicoDeProjetos = inject(ProjectsService);
-  private readonly http = inject(HttpClient);
-  private readonly autenticacao = inject(AuthService);
-  private readonly dialog = inject(Dialog);
-  private readonly notificacoes = inject(ToastService);
 
   protected readonly projeto = this.servicoDeProjetos.projetoAtual;
   protected readonly ehAdmin = computed(() => this.projeto()?.role === 'ADMIN');

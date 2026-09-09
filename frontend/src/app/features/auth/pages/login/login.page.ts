@@ -14,9 +14,9 @@ import { AuthCardComponent } from '../../ui/auth-card/auth-card.component';
   styleUrl: './login.page.scss',
 })
 export class LoginPage {
-  private readonly formBuilder = inject(NonNullableFormBuilder);
-  private readonly autenticacao = inject(AuthService);
   private readonly roteador = inject(Router);
+  private readonly autenticacao = inject(AuthService);
+  private readonly formBuilder = inject(NonNullableFormBuilder);
 
   readonly retorno = input<string>();
   readonly email = input<string>();

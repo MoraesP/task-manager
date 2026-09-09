@@ -13,9 +13,10 @@ import { ProjectsService } from '../../data/projects.service';
   templateUrl: './create-project-dialog.component.html',
 })
 export class CreateProjectDialogComponent {
-  protected readonly ref = inject<DialogRef<Project | undefined>>(DialogRef);
-  private readonly formBuilder = inject(NonNullableFormBuilder);
   private readonly servicoDeProjetos = inject(ProjectsService);
+  private readonly formBuilder = inject(NonNullableFormBuilder);
+
+  protected readonly ref = inject<DialogRef<Project | undefined>>(DialogRef);
 
   protected readonly carregando = signal(false);
   protected readonly form = this.formBuilder.group({

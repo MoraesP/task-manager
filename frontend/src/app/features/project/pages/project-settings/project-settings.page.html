@@ -34,7 +34,12 @@
                 Salvar alterações
               }
             </button>
-            <button class="btn btn--ghost" type="button" (click)="descartar()" [disabled]="form.pristine">
+            <button
+              class="btn btn--ghost"
+              type="button"
+              (click)="descartar()"
+              [disabled]="form.pristine"
+            >
               Descartar
             </button>
           </div>
@@ -48,7 +53,8 @@
             <span class="field__hint">Dono</span><strong>{{ ehDono() ? 'Você' : '—' }}</strong>
           </div>
           <div>
-            <span class="field__hint">Criado em</span><strong>{{ projetoAtual.createdAt | date: 'dd MMM yyyy' }}</strong>
+            <span class="field__hint">Criado em</span
+            ><strong>{{ projetoAtual.createdAt | date: 'dd MMM yyyy' }}</strong>
           </div>
           <div>
             <span class="field__hint">Membros</span><strong>{{ projetoAtual.memberCount }}</strong>

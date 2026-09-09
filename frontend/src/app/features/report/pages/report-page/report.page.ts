@@ -1,4 +1,11 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  effect,
+  inject,
+  signal,
+} from '@angular/core';
 import {
   PRIORITY_LABEL,
   ProjectReport,
@@ -32,6 +39,7 @@ export class ReportPage {
   private readonly servicoDeProjetos = inject(ProjectsService);
 
   protected readonly projeto = this.servicoDeProjetos.projetoAtual;
+
   protected readonly carregando = signal(true);
   protected readonly relatorio = signal<ProjectReport | null>(null);
 

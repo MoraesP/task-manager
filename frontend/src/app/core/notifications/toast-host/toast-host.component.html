@@ -1,6 +1,10 @@
 <div class="toast-host">
   @for (mensagem of notificacoes.mensagens(); track mensagem.id) {
-    <div class="toast" [class]="'toast--' + mensagem.tipo" (click)="notificacoes.descartar(mensagem.id)">
+    <div
+      class="toast"
+      [class]="'toast--' + mensagem.tipo"
+      (click)="notificacoes.descartar(mensagem.id)"
+    >
       <span class="toast__dot"></span>
       <span class="toast__message">{{ mensagem.texto }}</span>
     </div>

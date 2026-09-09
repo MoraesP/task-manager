@@ -9,6 +9,7 @@ export const PROJECTS_ROUTES: Routes = [
   },
   {
     path: ':projectId',
-    loadChildren: () => import('@features/project/project.routes').then((modulo) => modulo.PROJECT_ROUTES),
+    loadChildren: () =>
+      import('@features/project/project.routes').then((modulo) => modulo.PROJECT_ROUTES),
   },
 ];

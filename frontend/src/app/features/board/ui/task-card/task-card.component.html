@@ -33,7 +33,11 @@
       <div class="card-menu__header">Mover para</div>
       @for (status of proximosEstados(); track status) {
         <button class="card-menu__item" (click)="escolher(status)">
-          <app-icon [nome]="ehReabertura(status) ? 'reopen' : 'chevron-right'" [tamanho]="14" [traco]="1.8" />
+          <app-icon
+            [nome]="ehReabertura(status) ? 'reopen' : 'chevron-right'"
+            [tamanho]="14"
+            [traco]="1.8"
+          />
           {{ rotulo(status) }}
           @if (ehReabertura(status)) {
             <span class="card-menu__tag">reabrir</span>

@@ -10,11 +10,14 @@ export const AUTH_ROUTES: Routes = [
   {
     path: 'cadastro',
     canActivate: [guardaVisitante],
-    loadComponent: () => import('./pages/register/register.page').then((modulo) => modulo.RegisterPage),
+    loadComponent: () =>
+      import('./pages/register/register.page').then((modulo) => modulo.RegisterPage),
   },
   {
     path: 'convite',
     loadComponent: () =>
-      import('./pages/accept-invitation/accept-invitation.page').then((modulo) => modulo.AcceptInvitationPage),
+      import('./pages/accept-invitation/accept-invitation.page').then(
+        (modulo) => modulo.AcceptInvitationPage,
+      ),
   },
 ];

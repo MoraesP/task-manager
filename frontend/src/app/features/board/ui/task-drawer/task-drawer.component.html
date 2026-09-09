@@ -10,7 +10,12 @@
     <div class="drawer__body">
       <div class="field">
         <label class="field__label" for="td-title">Título</label>
-        <input id="td-title" class="input" formControlName="title" placeholder="O que precisa ser feito?" />
+        <input
+          id="td-title"
+          class="input"
+          formControlName="title"
+          placeholder="O que precisa ser feito?"
+        />
       </div>
 
       <div class="field">
@@ -34,7 +39,9 @@
           </select>
         </div>
         <div class="field">
-          <label class="field__label" for="td-deadline">Prazo <span class="field__hint">(opcional)</span></label>
+          <label class="field__label" for="td-deadline"
+            >Prazo <span class="field__hint">(opcional)</span></label
+          >
           <input id="td-deadline" class="input" type="date" formControlName="deadline" />
         </div>
       </div>
@@ -55,9 +62,11 @@
         <div class="task-drawer__status">
           <app-status-pill [valor]="statusAtual()" />
           <span class="field__hint">
-            {{ editando
-              ? 'O status muda no quadro, seguindo a máquina de estados.'
-              : 'Toda tarefa nova começa em “A fazer”.' }}
+            {{
+              editando
+                ? 'O status muda no quadro, seguindo a máquina de estados.'
+                : 'Toda tarefa nova começa em “A fazer”.'
+            }}
           </span>
         </div>
       </div>

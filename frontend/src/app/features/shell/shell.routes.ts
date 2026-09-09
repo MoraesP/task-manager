@@ -12,7 +12,8 @@ export const SHELL_ROUTES: Routes = [
       { path: '', pathMatch: 'full', redirectTo: 'projetos' },
       {
         path: 'projetos',
-        loadChildren: () => import('@features/projects/projects.routes').then((modulo) => modulo.PROJECTS_ROUTES),
+        loadChildren: () =>
+          import('@features/projects/projects.routes').then((modulo) => modulo.PROJECTS_ROUTES),
       },
     ],
   },

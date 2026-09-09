@@ -32,14 +32,15 @@ import { ProjectsService } from '../../data/projects.service';
   styleUrl: './projects-list.page.scss',
 })
 export class ProjectsListPage {
-  private readonly servicoDeProjetos = inject(ProjectsService);
   private readonly dialog = inject(Dialog);
   private readonly roteador = inject(Router);
   private readonly autenticacao = inject(AuthService);
+  private readonly servicoDeProjetos = inject(ProjectsService);
 
   protected readonly carregando = signal(true);
-  protected readonly pagina = signal<PageResponse<Project> | null>(null);
+
   protected readonly numeroDaPagina = signal(0);
+  protected readonly pagina = signal<PageResponse<Project> | null>(null);
 
   constructor() {
     this.buscar(0);

@@ -50,7 +50,10 @@
                     <app-avatar [nome]="membro.name" [tamanho]="30" />
                     <div>
                       <div class="member-cell__name">
-                        {{ membro.name }} @if (ehVoce(membro)) { <span class="field__hint">(Você)</span> }
+                        {{ membro.name }}
+                        @if (ehVoce(membro)) {
+                          <span class="field__hint">(Você)</span>
+                        }
                       </div>
                       <div class="field__hint">{{ membro.email }}</div>
                     </div>
@@ -80,15 +83,24 @@
                     <div class="row-menu">
                       <button
                         class="row-menu__trigger"
-                        (click)="$event.stopPropagation(); membroComMenuAberto.set(membroComMenuAberto() === membro.userId ? null : membro.userId)"
+                        (click)="
+                          $event.stopPropagation();
+                          membroComMenuAberto.set(
+                            membroComMenuAberto() === membro.userId ? null : membro.userId
+                          )
+                        "
                         aria-label="Ações"
                       >
                         <app-icon nome="dots" [tamanho]="15" [traco]="2" />
                       </button>
                       @if (membroComMenuAberto() === membro.userId) {
                         <div class="row-menu__list" (click)="$event.stopPropagation()">
-                          <button class="row-menu__item row-menu__item--danger" (click)="removerMembro(membro)">
-                            <app-icon nome="trash" [tamanho]="14" [traco]="1.8" /> Remover do projeto
+                          <button
+                            class="row-menu__item row-menu__item--danger"
+                            (click)="removerMembro(membro)"
+                          >
+                            <app-icon nome="trash" [tamanho]="14" [traco]="1.8" /> Remover do
+                            projeto
                           </button>
                         </div>
                       }
@@ -103,8 +115,8 @@
         </table>
       </div>
       <p class="field__hint members__footnote">
-        “Tarefas ativas” conta A fazer + Em progresso neste projeto. O limite de 5 em progresso é por
-        pessoa, somando todos os projetos.
+        “Tarefas ativas” conta A fazer + Em progresso neste projeto. O limite de 5 em progresso é
+        por pessoa, somando todos os projetos.
       </p>
     } @else {
       @if (convites().length === 0) {
@@ -126,10 +138,14 @@
                   <td>{{ convite.email }}</td>
                   <td><app-role-badge [valor]="convite.role" /></td>
                   <td>
-                    <span class="badge" [class]="'badge--' + convite.status.toLowerCase()">{{ convite.status }}</span>
+                    <span class="badge" [class]="'badge--' + convite.status.toLowerCase()">{{
+                      convite.status
+                    }}</span>
                   </td>
                   <td>
-                    <button class="btn btn--ghost btn--sm" (click)="revogar(convite)">Revogar</button>
+                    <button class="btn btn--ghost btn--sm" (click)="revogar(convite)">
+                      Revogar
+                    </button>
                   </td>
                 </tr>
               }

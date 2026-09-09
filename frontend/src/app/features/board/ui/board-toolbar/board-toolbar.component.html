@@ -1,7 +1,11 @@
 <div class="board-toolbar">
   <label class="board-toolbar__search">
     <app-icon nome="search" [tamanho]="15" [traco]="1.8" />
-    <input type="search" [formControl]="campoDeBusca" placeholder="Buscar tarefas por título ou descrição…" />
+    <input
+      type="search"
+      [formControl]="campoDeBusca"
+      placeholder="Buscar tarefas por título ou descrição…"
+    />
   </label>
 
   <form class="board-toolbar__filters" [formGroup]="filtros" (change)="aplicar()">
@@ -23,8 +27,20 @@
         <option [value]="membro.userId">{{ membro.name }}</option>
       }
     </select>
-    <input class="input input--sm" type="date" formControlName="deadlineFrom" aria-label="Prazo de" title="Prazo de" />
-    <input class="input input--sm" type="date" formControlName="deadlineTo" aria-label="Prazo até" title="Prazo até" />
+    <input
+      class="input input--sm"
+      type="date"
+      formControlName="deadlineFrom"
+      aria-label="Prazo de"
+      title="Prazo de"
+    />
+    <input
+      class="input input--sm"
+      type="date"
+      formControlName="deadlineTo"
+      aria-label="Prazo até"
+      title="Prazo até"
+    />
     <select class="input input--sm board-toolbar__sort" formControlName="sort" aria-label="Ordenar">
       <option value="priority,desc">Ordenar: prioridade</option>
       <option value="createdAt,desc">Ordenar: mais recentes</option>

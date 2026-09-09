@@ -21,15 +21,19 @@ export interface TaskDrawerData {
   styleUrl: './task-drawer.component.scss',
 })
 export class TaskDrawerComponent {
-  protected readonly ref = inject<DialogRef<Task | undefined>>(DialogRef);
-  protected readonly dados = inject<TaskDrawerData>(DIALOG_DATA);
-  private readonly formBuilder = inject(NonNullableFormBuilder);
   private readonly quadro = inject(BoardService);
+  private readonly formBuilder = inject(NonNullableFormBuilder);
+
+  protected readonly dados = inject<TaskDrawerData>(DIALOG_DATA);
+  protected readonly ref = inject<DialogRef<Task | undefined>>(DialogRef);
 
   protected readonly editando = !!this.dados.tarefa;
+
   protected readonly carregando = signal(false);
+
   protected readonly prioridades = TASK_PRIORITIES;
   protected readonly rotuloDePrioridade = PRIORITY_LABEL;
+
   protected readonly membros = this.dados.membros;
 
   protected readonly form = this.formBuilder.group({

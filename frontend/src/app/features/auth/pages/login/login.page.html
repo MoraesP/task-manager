@@ -27,7 +27,11 @@
         </button>
       </div>
     </div>
-    <button class="btn btn--primary btn--block btn--lg" type="submit" [disabled]="form.invalid || carregando()">
+    <button
+      class="btn btn--primary btn--block btn--lg"
+      type="submit"
+      [disabled]="form.invalid || carregando()"
+    >
       @if (carregando()) {
         <app-spinner [tamanho]="15" />
       } @else {

@@ -23,9 +23,10 @@ export interface RemoveMemberData {
   styleUrl: './remove-member-dialog.component.scss',
 })
 export class RemoveMemberDialogComponent {
+  private readonly servicoDeMembros = inject(MembersService);
+
   protected readonly ref = inject<DialogRef<boolean>>(DialogRef);
   protected readonly dados = inject<RemoveMemberData>(DIALOG_DATA);
-  private readonly servicoDeMembros = inject(MembersService);
 
   protected readonly carregando = signal(false);
   protected readonly escolhas = signal<Record<string, string | undefined>>({});
@@ -43,10 +44,7 @@ export class RemoveMemberDialogComponent {
   }
 
   protected enviar(): void {
-    if (
-      this.carregando() ||
-      (this.dados.tarefasAtivas.length > 0 && !this.todasAtribuidas())
-    ) {
+    if (this.carregando() || (this.dados.tarefasAtivas.length > 0 && !this.todasAtribuidas())) {
       return;
     }
     this.carregando.set(true);

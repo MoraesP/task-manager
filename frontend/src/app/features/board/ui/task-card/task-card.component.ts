@@ -20,9 +20,8 @@ export class TaskCardComponent {
   readonly excluir = output<void>();
   readonly menuAlternado = output<boolean>();
 
-  protected readonly idCurto = computed(
-    () => 'T-' + this.tarefa().id.slice(0, 4).toUpperCase(),
-  );
+  protected readonly idCurto = computed(() => 'T-' + this.tarefa().id.slice(0, 4).toUpperCase());
+  
   protected readonly proximosEstados = computed<readonly TaskStatus[]>(
     () => ALLOWED_TRANSITIONS[this.tarefa().status],
   );

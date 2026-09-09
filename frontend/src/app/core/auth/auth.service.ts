@@ -2,7 +2,12 @@ import { HttpClient, HttpContext } from '@angular/common/http';
 import { Injectable, computed, inject, signal } from '@angular/core';
 import { Observable, switchMap, tap } from 'rxjs';
 import { AuthUser, TokenResponse } from '@shared/models';
-import { ACCESS_TOKEN_KEY, API_BASE, IS_AUTH_REQUEST, REFRESH_TOKEN_KEY } from '@core/http/api.config';
+import {
+  ACCESS_TOKEN_KEY,
+  API_BASE,
+  IS_AUTH_REQUEST,
+  REFRESH_TOKEN_KEY,
+} from '@core/http/api.config';
 
 const contextoDeAutenticacao = () => new HttpContext().set(IS_AUTH_REQUEST, true);
 

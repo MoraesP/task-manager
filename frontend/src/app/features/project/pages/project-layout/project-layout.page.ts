@@ -21,9 +21,9 @@ import { PageLoaderComponent } from '@shared/components/page-loader/page-loader.
   styleUrl: './project-layout.page.scss',
 })
 export class ProjectLayoutPage implements OnDestroy {
-  private readonly servicoDeProjetos = inject(ProjectsService);
   private readonly roteador = inject(Router);
   private readonly notificacoes = inject(ToastService);
+  private readonly servicoDeProjetos = inject(ProjectsService);
 
   readonly projectId = input.required<string>();
   protected readonly pronto = signal(false);

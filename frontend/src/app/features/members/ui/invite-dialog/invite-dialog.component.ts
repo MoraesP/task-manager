@@ -16,11 +16,12 @@ import { MembersService } from '../../data/members.service';
   styleUrl: './invite-dialog.component.scss',
 })
 export class InviteDialogComponent {
-  protected readonly ref = inject<DialogRef<Invitation | undefined>>(DialogRef);
-  private readonly dados = inject<{ projetoId: string }>(DIALOG_DATA);
-  private readonly formBuilder = inject(NonNullableFormBuilder);
-  private readonly servicoDeMembros = inject(MembersService);
   private readonly notificacoes = inject(ToastService);
+  private readonly servicoDeMembros = inject(MembersService);
+  private readonly formBuilder = inject(NonNullableFormBuilder);
+
+  private readonly dados = inject<{ projetoId: string }>(DIALOG_DATA);
+  protected readonly ref = inject<DialogRef<Invitation | undefined>>(DialogRef);
 
   protected readonly carregando = signal(false);
   protected readonly conviteCriado = signal<CreatedInvitation | null>(null);

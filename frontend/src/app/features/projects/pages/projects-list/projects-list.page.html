@@ -35,7 +35,9 @@
             <div class="project-card__foot">
               <app-avatar [nome]="projeto.name" [tamanho]="22" />
               <span class="project-card__spacer"></span>
-              <span class="field__hint">atualizado {{ projeto.updatedAt | date: 'dd/MM/yyyy' }}</span>
+              <span class="field__hint"
+                >atualizado {{ projeto.updatedAt | date: 'dd/MM/yyyy' }}</span
+              >
             </div>
           </a>
         }

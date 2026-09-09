@@ -14,10 +14,10 @@ import { AuthCardComponent } from '../../ui/auth-card/auth-card.component';
   styleUrl: './accept-invitation.page.scss',
 })
 export class AcceptInvitationPage {
-  private readonly formBuilder = inject(NonNullableFormBuilder);
-  private readonly autenticacao = inject(AuthService);
   private readonly roteador = inject(Router);
+  private readonly autenticacao = inject(AuthService);
   private readonly notificacoes = inject(ToastService);
+  private readonly formBuilder = inject(NonNullableFormBuilder);
 
   readonly token = input<string>();
 

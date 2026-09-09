@@ -9,9 +9,11 @@ export class LayoutService {
   abrirMenuLateral(): void {
     this._menuLateralAberto.set(true);
   }
+
   fecharMenuLateral(): void {
     this._menuLateralAberto.set(false);
   }
+
   alternarMenuLateral(): void {
     this._menuLateralAberto.update((aberto) => !aberto);
   }

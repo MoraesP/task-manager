@@ -20,11 +20,7 @@ export class MembersService {
     );
   }
 
-  remover(
-    projetoId: string,
-    usuarioId: string,
-    reassignments: Reassignment[],
-  ): Observable<void> {
+  remover(projetoId: string, usuarioId: string, reassignments: Reassignment[]): Observable<void> {
     return this.http.request<void>(
       'delete',
       `${API_BASE}/projects/${projetoId}/members/${usuarioId}`,
