@@ -124,8 +124,11 @@ Cruzado com `docs/02` (RF), `docs/04` (RN) e `docs/06` (contrato REST):
 6. **Feedback de validação inline nos formulários.** As classes `.input--invalid`
    e `.field__error` existem no `styles.scss` mas nenhum form as usa (hoje: botão
    desabilitado + toast do 400 do backend).
-7. **Board paginado por coluna.** Hoje carrega as primeiras 100 tarefas com aviso
-   quando há mais. Trocar por paginação/keyset se o volume crescer.
+7. **Board paginado por carregamento.** Hoje carrega as primeiras 100 tarefas do
+   projeto com aviso quando há mais. Trocar por: até 10 por coluna + botão
+   "carregar mais" por coluna (lote pré-definido), respeitando os filtros. O
+   endpoint `GET /tasks?status=&page=&size=&sort=` já suporta — é só no frontend
+   (`BoardService` passa a ter estado por coluna).
 
 ### Baixa — infra e segurança
 

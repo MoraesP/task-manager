@@ -283,7 +283,7 @@ Extras não exigidos, mas presentes: feedback de validação inline nos formulá
 6. `accept-invitation` devolver `projectId` + `role`; front navegar para `/projetos/:id/quadro`.
 7. `remove-member-dialog`: trocar `[value]` por `[selected]` no `<select>`.
 8. Feedback de validação inline nos formulários (classes já existem no `styles.scss`).
-9. Board paginado por coluna (hoje carrega as primeiras 100).
+9. Board paginado por carregamento — até 10 por coluna + botão "carregar mais" por coluna, respeitando os filtros (hoje carrega as primeiras 100).
 
 ### Baixa — infra e segurança (ADIADO / fora de escopo)
 10. ✅ ~~Audit log da tarefa~~ — **implementado**: `task_change` (V6) +

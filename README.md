@@ -142,12 +142,15 @@ Testes de frontend ainda não foram escritos (fora do escopo desta iteração).
 
 - **Refresh token no frontend em cookie httpOnly** em vez de corpo JSON.
 - **Envio real de e-mail** nos convites (hoje o token volta na resposta da API).
-- **Paginação keyset** na busca para datasets muito grandes, no lugar de offset.
-- **Cobrir mais fluxos com testes E2E** e testes de contrato da API (ex.: schemas
-  OpenAPI versionados).
 - **Rate limiting** nos endpoints de autenticação.
-- **Testes de frontend** (componente do card / coluna, 1 fluxo E2E do quadro).
-- **Board paginado por coluna** (hoje carrega as primeiras 100 tarefas e mostra
-  aviso quando há mais — o suficiente para o desafio).
-- **Contagem global de WIP no cliente** exige um endpoint dedicado; hoje o front
-  confia na validação do backend (erro 409 com o detalhe).
+- **Board paginado por carregamento** — mostrar até 10 tarefas por coluna e um
+  botão "carregar mais" abaixo de cada coluna, que traz um lote adicional
+  pré-definido quando houver mais, respeitando os filtros aplicados. Hoje o board
+  carrega as primeiras 100 tarefas do projeto e só avisa quando há mais.
+- **Exportação de relatório de movimentações** (CSV/PDF) com range de data:
+  - **por projeto** — todas as alterações de tarefa do projeto (quem, o quê,
+    quando, valor antigo → novo);
+  - **por usuário** — tudo que a pessoa movimentou, atravessando projetos.
+
+  Hoje o histórico (`TaskChange`) só é consultável tarefa a tarefa via
+  `GET /tasks/{id}/history`; faltam os endpoints agregados e a geração do arquivo.
