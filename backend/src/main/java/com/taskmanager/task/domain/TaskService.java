@@ -21,13 +21,15 @@ public class TaskService {
     private final TaskRepository tasks;
     private final ProjectAuthorization authorization;
     private final WipLimitPolicy wipLimit;
+    private final TaskChangeLog historico;
     private final ApplicationEventPublisher events;
 
     public TaskService(TaskRepository tasks, ProjectAuthorization authorization, WipLimitPolicy wipLimit,
-            ApplicationEventPublisher events) {
+            TaskChangeLog historico, ApplicationEventPublisher events) {
         this.tasks = tasks;
         this.authorization = authorization;
         this.wipLimit = wipLimit;
+        this.historico = historico;
         this.events = events;
     }
 
@@ -36,7 +38,8 @@ public class TaskService {
             TaskPriority priority, UUID assigneeId, Instant deadline) {
         authorization.exigirMembro(projectId, actorId);
         exigirResponsavelMembro(projectId, assigneeId);
-        Task tarefa = tasks.save(new Task(projectId, title.trim(), vazioParaNulo(description), priority, assigneeId, deadline));
+        Task tarefa = tasks.save(new Task(projectId, title.trim(), vazioParaNulo(description),
+                priority, assigneeId, deadline, actorId));
         events.publishEvent(new TaskChangedEvent(projectId));
         return tarefa;
     }
@@ -46,6 +49,13 @@ public class TaskService {
         Task tarefa = carregar(taskId);
         authorization.exigirMembro(tarefa.getProjectId(), actorId);
         return tarefa;
+    }
+
+    @Transactional(readOnly = true)
+    public HistoricoDaTarefa historicoDaTarefa(UUID taskId, UUID actorId) {
+        Task tarefa = carregar(taskId);
+        authorization.exigirMembro(tarefa.getProjectId(), actorId);
+        return new HistoricoDaTarefa(tarefa, historico.historico(taskId));
     }
 
     @Transactional(readOnly = true)
@@ -73,7 +83,10 @@ public class TaskService {
                 wipLimit.garantirQuePodeAssumirOutra(assigneeId, tarefa.getId());
             }
         }
-        tarefa.editar(title.trim(), vazioParaNulo(description), priority, assigneeId, deadline);
+        String tituloNovo = title.trim();
+        String descricaoNova = vazioParaNulo(description);
+        historico.registrarEdicao(tarefa, tituloNovo, descricaoNova, priority, assigneeId, deadline, actorId);
+        tarefa.editar(tituloNovo, descricaoNova, priority, assigneeId, deadline);
         events.publishEvent(new TaskChangedEvent(tarefa.getProjectId()));
         return tarefa;
     }
@@ -96,6 +109,7 @@ public class TaskService {
         if (alvo == TaskStatus.IN_PROGRESS) {
             wipLimit.garantirQuePodeAssumirOutra(tarefa.getAssigneeId(), tarefa.getId());
         }
+        historico.registrarMudancaDeStatus(tarefa.getId(), actorId, tarefa.getStatus(), alvo);
         tarefa.alterarStatus(alvo);
         events.publishEvent(new TaskChangedEvent(tarefa.getProjectId()));
         return tarefa;
@@ -139,12 +153,17 @@ public class TaskService {
     }
 
     /** Realoca uma tarefa durante a remoção de um membro: valida pertencimento (RN-62) e o WIP limit (RN-10). */
-    public void realocarNaRemocao(UUID projectId, Task tarefa, UUID newAssigneeId) {
+    public void realocarNaRemocao(UUID projectId, UUID actorId, Task tarefa, UUID newAssigneeId) {
         exigirResponsavelMembro(projectId, newAssigneeId);
         if (tarefa.getStatus() == TaskStatus.IN_PROGRESS) {
             wipLimit.garantirQuePodeAssumirOutra(newAssigneeId, tarefa.getId());
         }
+        historico.registrarMudancaDeResponsavel(tarefa.getId(), actorId, tarefa.getAssigneeId(), newAssigneeId);
         tarefa.realocar(newAssigneeId);
         events.publishEvent(new TaskChangedEvent(projectId));
+    }
+
+    /** Tarefa + suas alterações, para montar a resposta do histórico. */
+    public record HistoricoDaTarefa(Task tarefa, List<TaskChange> mudancas) {
     }
 }

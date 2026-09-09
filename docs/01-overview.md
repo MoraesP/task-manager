@@ -12,12 +12,13 @@ projetos. Autenticação por email/senha com JWT; autorização por projeto.
 
 - Backend REST completo (todos os requisitos obrigatórios).
 - Diferenciais: paginação com metadata, cache no relatório, frontend Angular
-  (board com drag-and-drop e toast de atribuição), refresh token.
+  (board com drag-and-drop e toast de atribuição), refresh token, **histórico
+  campo a campo da tarefa** (`task_change` + `GET /tasks/{id}/history` + aba no
+  drawer).
 - Documentação da API via OpenAPI/Swagger.
 
 **Não entra (ADIADO — registrar no README final):**
 
-- Audit log com histórico campo a campo da tarefa (`task_change`).
 - Testes E2E além de, no máximo, um fluxo do board.
 - Envio real de email nos convites (o token é retornado na resposta da API).
 

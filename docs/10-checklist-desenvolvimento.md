@@ -64,6 +64,7 @@ código na branch `main`. Cruzado com [02](02-requisitos-funcionais.md),
 | RF-33 Excluir tarefa (ADMIN ou responsável) | ✅ | `TaskService#excluir` | |
 | RF-34 Detalhar tarefa | ✅ | `task/api/TaskController#obter` | |
 | RF-35 createdAt / updatedAt / deadline | ✅ | `shared/domain/BaseEntity`, `Task` | |
+| RF-36 Histórico da tarefa (criação + alterações campo a campo) | ✅ | `task/domain/TaskChange`, `TaskChangeLog`, `task/api/TaskHistoryAssembler`, `TaskController#historico`, migration `V6`, `TaskChangeLogTest` | DIFERENCIAL entregue |
 
 ### Listagem, filtros, ordenação, busca
 
@@ -121,7 +122,7 @@ código na branch `main`. Cruzado com [02](02-requisitos-funcionais.md),
 | RNF-51 Sem over-engineering | ✅ | mapper manual, sem MapStruct, sem store global no front |
 | RNF-52 Nomeação segue o glossário | ✅ | termos de [glossario.md](glossario.md); idioma/nomenclatura em [11-convencoes-de-codigo.md](11-convencoes-de-codigo.md) — código em português (variáveis, métodos), contrato da API em inglês |
 | RNF-53 Timestamps em UTC (`timestamptz`) | ✅ | `hibernate.jdbc.time_zone: UTC`, colunas `TIMESTAMPTZ` |
-| RNF-60 Unitários de service cobrindo as RN | ✅ | 51 testes (ver §5) |
+| RNF-60 Unitários de service cobrindo as RN | ✅ | 55 testes (ver §5) |
 | RNF-61 Integração `@SpringBootTest` + Testcontainers | ✅ | `AuthFlowIT`, `TaskLifecycleIT`, `TaskSearchIT` |
 | RNF-62 Sem meta de cobertura; README explica prioridades | ✅ | `README.md` seção de decisões |
 | RNF-70 Repo Git, branch `main`, Conventional Commits | ⚠️ | commits semânticos OK; **`git push` nunca feito** (HANDOFF §4.12) — o desafio exige repo acessível |
@@ -189,7 +190,7 @@ Observações:
 
 ## 5. Testes
 
-### 5.1 Backend — unitários (`RNF-60`) · 51 testes ✅
+### 5.1 Backend — unitários (`RNF-60`) · 55 testes ✅
 
 | Alvo (spec [09](09-estrategia-de-testes.md) §1) | Arquivo | Status |
 |---|---|---|
@@ -203,13 +204,14 @@ Observações:
 | Auth (refresh rotaciona/revoga, senha errada) | `auth/domain/AuthServiceTest`, `RefreshTokenServiceTest`, `UserServiceTest` | ✅ |
 | Relatório (enums com zero + cache) | `report/domain/ProjectReportCacheTest` | ✅ |
 | Reatribuição (adapter) | `task/domain/TaskReassignmentAdapterTest` | ✅ |
+| Histórico (linha por campo, no-op não registra, status, reassign p/ o mesmo) | `task/domain/TaskChangeLogTest` (4) | ✅ |
 
 ### 5.2 Backend — integração (`RNF-61`) · 8 testes ✅
 
 | Fluxo (spec §2) | Arquivo | Status |
 |---|---|---|
 | Autenticação (register→login→protegido→refresh→logout→revogado falha) | `auth/AuthFlowIT` (3) | ✅ |
-| Ciclo de vida da tarefa (`TODO→IN_PROGRESS→DONE` + relatório) | `task/TaskLifecycleIT` | ✅ |
+| Ciclo de vida da tarefa (`TODO→IN_PROGRESS→DONE` + relatório + histórico) | `task/TaskLifecycleIT` | ✅ |
 | Autorização (MEMBER edita projeto → 403; fora do projeto → 403) | `task/TaskLifecycleIT#memberCannotUpdateProject`, `#nonMemberCannotSeeProject` | ✅ |
 | Busca (trecho parcial em título e descrição) | `task/TaskSearchIT` | ✅ |
 | Contrato de erro (WIP → `problem+json` 409 + `detail`) | `task/TaskLifecycleIT#wipLimitBlocksSixthInProgressTask` | ✅ |
@@ -239,6 +241,7 @@ Observações:
 | FE-04 Board com colunas TODO/IN_PROGRESS/DONE | ✅ | `features/board/pages/board-page`, `ui/task-card` | |
 | FE-05 Drag-and-drop → `PATCH /status`; erro reverte + mostra `detail` | ✅ | `board.page.ts` (revert + toast do `ProblemDetail`) | também barra no cliente via `ALLOWED_TRANSITIONS` |
 | FE-06 Criar/editar tarefa (todos os campos) | ✅ | `features/board/ui/task-drawer` | |
+| FE-06b Aba "Histórico" no drawer | ✅ | `features/board/ui/task-history`, `TasksApiService#historico` | criação + alterações agrupadas por salvamento (campo · antigo → novo) |
 | FE-07 Filtros (status, prioridade, responsável, range de datas) + ordenação | ⚠️ | `features/board/ui/board-toolbar` | **só range de deadline** — falta range de data de criação (RF-40 / HANDOFF §4.1) |
 | FE-08 Busca textual com debounce ~300 ms | ✅ | `board-toolbar.component.ts` (`debounceTime(300)`) | |
 | FE-09 Painel de relatório (contadores) | ✅ | `features/report/pages/report-page` | |
@@ -283,7 +286,9 @@ Extras não exigidos, mas presentes: feedback de validação inline nos formulá
 9. Board paginado por coluna (hoje carrega as primeiras 100).
 
 ### Baixa — infra e segurança (ADIADO / fora de escopo)
-10. ⏸️ Audit log da tarefa (`task_change` + `GET /tasks/{id}/history`).
+10. ✅ ~~Audit log da tarefa~~ — **implementado**: `task_change` (V6) +
+    `TaskChangeLog` + `GET /tasks/{id}/history` + aba "Histórico" no drawer.
+    `TaskChangeLogTest` (4) + `TaskLifecycleIT` cobrem.
 11. Refresh token em cookie httpOnly no frontend.
 12. Rate limiting em `/auth/*`.
 13. Dockerfile de backend e frontend + `docker-compose` completo da aplicação.

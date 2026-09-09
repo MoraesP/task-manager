@@ -27,6 +27,7 @@ componentização clara e UX minimamente funcional — não visual elaborado.
 | FE-04 | Board do projeto: colunas `TODO` / `IN_PROGRESS` / `DONE` com os cards de tarefa. | OBRIGATÓRIO |
 | FE-05 | Drag-and-drop de card entre colunas dispara `PATCH .../status`; erro de regra (WIP, transição inválida, CRITICAL) reverte o card e mostra o `detail` do `ProblemDetail`. | OBRIGATÓRIO |
 | FE-06 | Criar/editar tarefa (título, descrição, prioridade, prazo, responsável dentre os membros). | OBRIGATÓRIO |
+| FE-06b | Aba "Histórico" no drawer de edição: criação (quem/quando) + cada alteração agrupada por salvamento, com campo, valor antigo → novo. Consome `GET /tasks/{id}/history`. | DIFERENCIAL |
 | FE-07 | Filtros do board: status, prioridade, responsável, range de datas; ordenação. | OBRIGATÓRIO |
 | FE-08 | Campo de busca textual (debounce ~300 ms) usando `/tasks/search`. | OBRIGATÓRIO |
 | FE-09 | Painel de relatório: contadores por status e por prioridade. | OBRIGATÓRIO |

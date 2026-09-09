@@ -7,6 +7,7 @@ import { IconComponent } from '@shared/components/icon/icon.component';
 import { SpinnerComponent } from '@shared/components/spinner/spinner.component';
 import { BoardService } from '../../data/board.service';
 import { TaskInput } from '../../models/task-input.model';
+import { TaskHistoryComponent } from '../task-history/task-history.component';
 
 export interface TaskDrawerData {
   tarefa: Task | null;
@@ -16,7 +17,13 @@ export interface TaskDrawerData {
 @Component({
   selector: 'app-task-drawer',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [ReactiveFormsModule, IconComponent, SpinnerComponent, StatusPillComponent],
+  imports: [
+    ReactiveFormsModule,
+    IconComponent,
+    SpinnerComponent,
+    StatusPillComponent,
+    TaskHistoryComponent,
+  ],
   templateUrl: './task-drawer.component.html',
   styleUrl: './task-drawer.component.scss',
 })
@@ -28,6 +35,7 @@ export class TaskDrawerComponent {
   protected readonly ref = inject<DialogRef<Task | undefined>>(DialogRef);
 
   protected readonly editando = !!this.dados.tarefa;
+  protected readonly aba = signal<'detalhes' | 'historico'>('detalhes');
 
   protected readonly carregando = signal(false);
 

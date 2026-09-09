@@ -73,7 +73,7 @@ public class MembershipService {
         if (projeto.pertenceA(usuarioAlvoId)) {
             throw Errors.acessoNegado("O dono do projeto não pode ser removido.");
         }
-        memberTasks.realocarNaRemocaoDeMembro(projectId, usuarioAlvoId, reassignments);
+        memberTasks.realocarNaRemocaoDeMembro(projectId, actorId, usuarioAlvoId, reassignments);
         memberships.delete(alvo);
     }
 }

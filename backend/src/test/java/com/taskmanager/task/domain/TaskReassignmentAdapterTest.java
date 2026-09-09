@@ -30,27 +30,28 @@ class TaskReassignmentAdapterTest {
     TaskReassignmentAdapter adapter;
 
     private final UUID projectId = UUID.randomUUID();
+    private final UUID actorId = UUID.randomUUID();
     private final UUID member = UUID.randomUUID();
 
     @Test
     void rejectsWhenAnActiveTaskHasNoReassignment() {
-        Task task = new Task(projectId, "t", null, TaskPriority.LOW, member, null);
+        Task task = new Task(projectId, "t", null, TaskPriority.LOW, member, null, actorId);
         when(taskService.tarefasAtivasDe(projectId, member)).thenReturn(List.of(task));
 
-        assertThatThrownBy(() -> adapter.realocarNaRemocaoDeMembro(projectId, member, List.of()))
+        assertThatThrownBy(() -> adapter.realocarNaRemocaoDeMembro(projectId, actorId, member, List.of()))
                 .isInstanceOfSatisfying(ApiException.class,
                         ex -> assertThat(ex.getStatus()).isEqualTo(HttpStatus.UNPROCESSABLE_ENTITY));
     }
 
     @Test
     void reassignsEveryActiveTask() {
-        Task task = new Task(projectId, "t", null, TaskPriority.LOW, member, null);
+        Task task = new Task(projectId, "t", null, TaskPriority.LOW, member, null, actorId);
         UUID newAssignee = UUID.randomUUID();
         when(taskService.tarefasAtivasDe(projectId, member)).thenReturn(List.of(task));
 
-        assertThatCode(() -> adapter.realocarNaRemocaoDeMembro(projectId, member,
+        assertThatCode(() -> adapter.realocarNaRemocaoDeMembro(projectId, actorId, member,
                 List.of(new Reassignment(task.getId(), newAssignee)))).doesNotThrowAnyException();
 
-        verify(taskService).realocarNaRemocao(eq(projectId), any(Task.class), eq(newAssignee));
+        verify(taskService).realocarNaRemocao(eq(projectId), eq(actorId), any(Task.class), eq(newAssignee));
     }
 }

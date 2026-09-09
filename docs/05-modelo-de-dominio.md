@@ -11,7 +11,8 @@ User 1───* ProjectMembership *───1 Project
 User 1───* Invitation (createdBy)      Project 1───* Invitation
 User 1───* Task (assignee)             Project 1───* Task
 Project *───1 User (owner)
-Task 1───* TaskChange   (ADIADO — não implementado na v1)
+Task 1───* TaskChange   (histórico / audit log)
+User 1───* TaskChange (author)
 ```
 
 ## Entidades
@@ -81,6 +82,7 @@ Um único convite `PENDING` por (`projectId`, `email`).
 | priority | enum | `LOW` \| `MEDIUM` \| `HIGH` \| `CRITICAL` |
 | assigneeId | UUID | FK → User; **obrigatório**; deve ser membro do projeto |
 | deadline | timestamptz | opcional |
+| createdById | UUID | FK → User; quem criou. Nulo só em tarefas anteriores à `V6` |
 | createdAt | timestamptz | imutável |
 | updatedAt | timestamptz | |
 
@@ -98,10 +100,25 @@ GIN `pg_trgm` em `title` e `description`.
 | revokedAt | timestamptz | null enquanto válido |
 | createdAt | timestamptz | |
 
-### TaskChange — ADIADO (não implementado na v1)
+### TaskChange
 
-Histórico campo a campo (`taskId`, `field`, `oldValue`, `newValue`, `changedById`,
-`changedAt`). Registrado aqui para o README final; fora do escopo da v1.
+Audit log da tarefa: uma linha por campo alterado numa edição ou mudança de
+status. Registro imutável.
+
+| Campo | Tipo | Notas |
+|---|---|---|
+| id | UUID | PK |
+| taskId | UUID | FK → Task (`ON DELETE CASCADE`) |
+| authorId | UUID | FK → User; quem fez a alteração |
+| type | enum | `ALTERACAO_TITULO` \| `ALTERACAO_DESCRICAO` \| `ALTERACAO_PRIORIDADE` \| `ALTERACAO_PRAZO` \| `ALTERACAO_RESPONSAVEL` \| `ALTERACAO_STATUS` |
+| oldValue | text | valor "de wire" (nome do enum, ISO, texto, id do responsável); nullable |
+| newValue | text | idem; nullable |
+| occurredAt | timestamptz | instante do salvamento; compartilhado pelas linhas de uma mesma edição |
+| createdAt / updatedAt | timestamptz | auditoria da linha |
+
+A criação da tarefa **não** gera linha de `TaskChange` — vem de `Task.createdAt` +
+`Task.createdById`. O enum é o único do domínio com valores em português (decisão
+explícita — ver [11-convencoes-de-codigo.md](11-convencoes-de-codigo.md)).
 
 ## Enums
 
@@ -111,6 +128,7 @@ Histórico campo a campo (`taskId`, `field`, `oldValue`, `newValue`, `changedByI
 | `TaskStatus` | TODO, IN_PROGRESS, DONE | TODO < IN_PROGRESS < DONE |
 | `TaskPriority` | LOW, MEDIUM, HIGH, CRITICAL | LOW < MEDIUM < HIGH < CRITICAL |
 | `InvitationStatus` | PENDING, ACCEPTED, EXPIRED, REVOKED | — |
+| `TaskChangeType` | ALTERACAO_TITULO, ALTERACAO_DESCRICAO, ALTERACAO_PRIORIDADE, ALTERACAO_PRAZO, ALTERACAO_RESPONSAVEL, ALTERACAO_STATUS | — |
 
 `priority` e `status` são persistidos como `varchar` (`@Enumerated(STRING)`);
 a ordenação "por prioridade" usa a ordem semântica acima, não a alfabética.
@@ -119,6 +137,7 @@ a ordenação "por prioridade" usa a ordem semântica acima, não a alfabética.
 
 - Excluir `Project` → cascade em `ProjectMembership`, `Invitation`, `Task`
   (hard delete — [ADR 0002](adr/0002-monolito-modular-package-by-feature.md) e decisão Q20).
+- Excluir `Task` → cascade em `TaskChange` (o histórico some junto com a tarefa).
 - Excluir `User` não é exposto na API na v1.
 - `Task.assigneeId` não é anulável; a "remoção de membro" (RN-60..65) garante que
   toda tarefa ativa seja realocada antes de a membership sumir.

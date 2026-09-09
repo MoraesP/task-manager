@@ -83,8 +83,9 @@
   &__body {
     display: flex;
     flex-direction: column;
-    gap: 9px;
-    padding: 0 10px 12px;
+    height: 100%;
+    gap: 10px;
+    padding: 10px;
     min-height: 40px;
 
     &.cdk-drop-list-receiving,

@@ -126,12 +126,15 @@ chamar a API (e revertida com o `detail` do ProblemDetail se o servidor recusar)
 o menu de status de cada card só oferece transições válidas; a remoção de membro
 exige reatribuir as tarefas ativas.
 
+O drawer de edição de tarefa tem uma aba **"Histórico"** (audit log): quem criou e
+cada alteração de campo feita depois — título, descrição, prioridade, prazo,
+responsável, status — com valor antigo → novo, autor e data. Endpoint
+`GET /projects/{id}/tasks/{taskId}/history`; migration `V6` cria `task_change`.
+
 Testes de frontend ainda não foram escritos (fora do escopo desta iteração).
 
 ## O que eu faria diferente com mais tempo
 
-- **Audit log da tarefa** (histórico campo a campo, `who/what/when`) — o
-  `TaskChangedEvent` já existe e seria o ponto de escrita natural.
 - **Refresh token no frontend em cookie httpOnly** em vez de corpo JSON.
 - **Envio real de e-mail** nos convites (hoje o token volta na resposta da API).
 - **Paginação keyset** na busca para datasets muito grandes, no lugar de offset.

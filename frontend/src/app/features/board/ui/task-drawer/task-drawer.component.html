@@ -6,91 +6,118 @@
     </button>
   </div>
 
-  <form class="task-drawer__form" [formGroup]="form" (ngSubmit)="enviar()">
-    <div class="drawer__body">
-      <div class="field">
-        <label class="field__label" for="td-title">Título</label>
-        <input
-          id="td-title"
-          class="input"
-          formControlName="title"
-          placeholder="O que precisa ser feito?"
-        />
-      </div>
+  @if (editando) {
+    <div class="tabs task-drawer__tabs">
+      <button
+        type="button"
+        class="tab"
+        [class.tab--active]="aba() === 'detalhes'"
+        (click)="aba.set('detalhes')"
+      >
+        Detalhes
+      </button>
+      <button
+        type="button"
+        class="tab"
+        [class.tab--active]="aba() === 'historico'"
+        (click)="aba.set('historico')"
+      >
+        Histórico
+      </button>
+    </div>
+  }
 
-      <div class="field">
-        <label class="field__label" for="td-desc">Descrição</label>
-        <textarea
-          id="td-desc"
-          class="input"
-          rows="4"
-          formControlName="description"
-          placeholder="Contexto, critérios de aceite, links…"
-        ></textarea>
-      </div>
-
-      <div class="task-drawer__two">
+  @if (aba() === 'detalhes') {
+    <form class="task-drawer__form" [formGroup]="form" (ngSubmit)="enviar()">
+      <div class="drawer__body">
         <div class="field">
-          <label class="field__label" for="td-prio">Prioridade</label>
-          <select id="td-prio" class="input" formControlName="priority">
-            @for (prioridade of prioridades; track prioridade) {
-              <option [value]="prioridade">{{ rotuloDePrioridade[prioridade] }}</option>
+          <label class="field__label" for="td-title">Título</label>
+          <input
+            id="td-title"
+            class="input"
+            formControlName="title"
+            placeholder="O que precisa ser feito?"
+          />
+        </div>
+
+        <div class="field">
+          <label class="field__label" for="td-desc">Descrição</label>
+          <textarea
+            id="td-desc"
+            class="input"
+            rows="4"
+            formControlName="description"
+            placeholder="Contexto, critérios de aceite, links…"
+          ></textarea>
+        </div>
+
+        <div class="task-drawer__two">
+          <div class="field">
+            <label class="field__label" for="td-prio">Prioridade</label>
+            <select id="td-prio" class="input" formControlName="priority">
+              @for (prioridade of prioridades; track prioridade) {
+                <option [value]="prioridade">{{ rotuloDePrioridade[prioridade] }}</option>
+              }
+            </select>
+          </div>
+          <div class="field">
+            <label class="field__label" for="td-deadline"
+              >Prazo <span class="field__hint">(opcional)</span></label
+            >
+            <input id="td-deadline" class="input" type="date" formControlName="deadline" />
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="field__label" for="td-assignee">Responsável</label>
+          <select id="td-assignee" class="input" formControlName="assigneeId">
+            <option value="" disabled>Selecione um membro</option>
+            @for (membro of membros; track membro.userId) {
+              <option [value]="membro.userId">{{ membro.name }}</option>
             }
           </select>
+          <span class="field__hint">Obrigatório. Apenas membros do projeto aparecem na lista.</span>
         </div>
+
         <div class="field">
-          <label class="field__label" for="td-deadline"
-            >Prazo <span class="field__hint">(opcional)</span></label
-          >
-          <input id="td-deadline" class="input" type="date" formControlName="deadline" />
+          <label class="field__label">Status</label>
+          <div class="task-drawer__status">
+            <app-status-pill [valor]="statusAtual()" />
+            <span class="field__hint">
+              {{
+                editando
+                  ? 'O status muda no quadro, seguindo a máquina de estados.'
+                  : 'Toda tarefa nova começa em “A fazer”.'
+              }}
+            </span>
+          </div>
         </div>
-      </div>
 
-      <div class="field">
-        <label class="field__label" for="td-assignee">Responsável</label>
-        <select id="td-assignee" class="input" formControlName="assigneeId">
-          <option value="" disabled>Selecione um membro</option>
-          @for (membro of membros; track membro.userId) {
-            <option [value]="membro.userId">{{ membro.name }}</option>
-          }
-        </select>
-        <span class="field__hint">Obrigatório. Apenas membros do projeto aparecem na lista.</span>
-      </div>
-
-      <div class="field">
-        <label class="field__label">Status</label>
-        <div class="task-drawer__status">
-          <app-status-pill [valor]="statusAtual()" />
-          <span class="field__hint">
-            {{
-              editando
-                ? 'O status muda no quadro, seguindo a máquina de estados.'
-                : 'Toda tarefa nova começa em “A fazer”.'
-            }}
+        <div class="callout">
+          <b>Transições permitidas</b><br />
+          A fazer → Em progresso · Em progresso ⇄ A fazer · Em progresso → Concluído · Concluído → Em
+          progresso.<br />
+          <span class="task-drawer__hint-muted">
+            Concluído nunca volta direto para “A fazer”; tarefas CRITICAL só são concluídas por um
+            Admin.
           </span>
         </div>
       </div>
 
-      <div class="callout">
-        <b>Transições permitidas</b><br />
-        A fazer → Em progresso · Em progresso ⇄ A fazer · Em progresso → Concluído · Concluído → Em
-        progresso.<br />
-        <span class="task-drawer__hint-muted">
-          Concluído nunca volta direto para “A fazer”; tarefas CRITICAL só são concluídas por um
-          Admin.
-        </span>
+      <div class="drawer__foot">
+        <button type="button" class="btn btn--ghost" (click)="ref.close()">Cancelar</button>
+        <button type="submit" class="btn btn--primary" [disabled]="form.invalid || carregando()">
+          @if (carregando()) {
+            <app-spinner [tamanho]="14" />
+          } @else {
+            {{ editando ? 'Salvar' : 'Criar tarefa' }}
+          }
+        </button>
       </div>
+    </form>
+  } @else if (dados.tarefa; as tarefaAtual) {
+    <div class="drawer__body">
+      <app-task-history [tarefa]="tarefaAtual" />
     </div>
-
-    <div class="drawer__foot">
-      <button type="button" class="btn btn--ghost" (click)="ref.close()">Cancelar</button>
-      <button type="submit" class="btn btn--primary" [disabled]="form.invalid || carregando()">
-        @if (carregando()) {
-          <app-spinner [tamanho]="14" />
-        } @else {
-          {{ editando ? 'Salvar' : 'Criar tarefa' }}
-        }
-      </button>
-    </div>
-  </form>
+  }
 </div>

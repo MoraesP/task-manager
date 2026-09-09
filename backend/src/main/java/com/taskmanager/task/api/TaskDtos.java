@@ -1,8 +1,10 @@
 package com.taskmanager.task.api;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 
+import com.taskmanager.task.domain.TaskChangeType;
 import com.taskmanager.task.domain.TaskPriority;
 import com.taskmanager.task.domain.TaskStatus;
 
@@ -47,5 +49,27 @@ public final class TaskDtos {
             boolean overdue,
             Instant createdAt,
             Instant updatedAt) {
+    }
+
+    /** Referência enxuta a um usuário (id + nome) para o histórico. */
+    public record UserRef(UUID id, String name) {
+    }
+
+    /** Uma alteração no histórico da tarefa. `oldValue`/`newValue` são o valor
+     *  "de wire" (nome do enum, ISO da data, texto); para `ALTERACAO_RESPONSAVEL`
+     *  já vêm resolvidos como nome do usuário. */
+    public record TaskChangeResponse(
+            Instant occurredAt,
+            UserRef author,
+            TaskChangeType type,
+            String oldValue,
+            String newValue) {
+    }
+
+    /** Histórico completo de uma tarefa: criação + alterações em ordem cronológica. */
+    public record TaskHistoryResponse(
+            Instant createdAt,
+            UserRef createdBy,
+            List<TaskChangeResponse> changes) {
     }
 }

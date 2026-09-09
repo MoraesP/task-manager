@@ -15,8 +15,8 @@ pelo framework. Detalhe em [docs/11-convencoes-de-codigo.md](docs/11-convencoes-
 
 | Parte | Estado |
 |---|---|
-| **Backend** (`backend/`) | ✅ Completo — Java 17, Spring Boot 3.3, PostgreSQL, Flyway. Todos os endpoints de [docs/06](docs/06-api-endpoints.md) implementados. |
-| **Testes backend** | ✅ 51 unitários + 8 de integração (Testcontainers). `./mvnw test` e `./mvnw verify` verdes. |
+| **Backend** (`backend/`) | ✅ Completo — Java 17, Spring Boot 3.3, PostgreSQL, Flyway. Todos os endpoints de [docs/06](docs/06-api-endpoints.md) + histórico da tarefa (`GET /tasks/{id}/history`, migration `V6`). |
+| **Testes backend** | ✅ 55 unitários + 8 de integração (Testcontainers). `./mvnw test` e `./mvnw verify` verdes. |
 | **Frontend** (`frontend/`) | ✅ Completo — Angular 20 standalone, signals, CDK. Cobre FE-01…FE-13 (ressalvas em §4). Verificado ponta a ponta no browser. `ng build` limpo. |
 | **Testes frontend** | ❌ Nenhum ainda (adiado a pedido). |
 | **Mockups** (`design/`) | ✅ Publicados como Claude Design canvas. Fontes em `design/*.dc.html`. |

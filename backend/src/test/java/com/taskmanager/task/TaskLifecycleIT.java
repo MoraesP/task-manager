@@ -48,6 +48,19 @@ class TaskLifecycleIT extends AbstractIntegrationTest {
                 .andExpect(jsonPath("$.byStatus.DONE").value(1))
                 .andExpect(jsonPath("$.byStatus.TODO").value(0))
                 .andExpect(jsonPath("$.byPriority.HIGH").value(1));
+
+        // o histórico registra quem criou e as duas mudanças de status, mais recente primeiro
+        mvc.perform(get("/api/v1/projects/{p}/tasks/{t}/history", projectId, taskId)
+                        .header("Authorization", "Bearer " + admin))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.createdBy.name").value("Admin"))
+                .andExpect(jsonPath("$.changes.length()").value(2))
+                .andExpect(jsonPath("$.changes[0].type").value("ALTERACAO_STATUS"))
+                .andExpect(jsonPath("$.changes[0].author.name").value("Member"))
+                .andExpect(jsonPath("$.changes[0].oldValue").value("IN_PROGRESS"))
+                .andExpect(jsonPath("$.changes[0].newValue").value("DONE"))
+                .andExpect(jsonPath("$.changes[1].oldValue").value("TODO"))
+                .andExpect(jsonPath("$.changes[1].newValue").value("IN_PROGRESS"));
     }
 
     @Test

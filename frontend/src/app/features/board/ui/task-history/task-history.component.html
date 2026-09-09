@@ -1,0 +1,34 @@
+@if (carregando()) {
+  <div class="task-history__loading"><app-spinner [tamanho]="18" /></div>
+} @else if (erro()) {
+  <app-empty-state titulo="Não foi possível carregar o histórico" />
+} @else if (historico(); as dados) {
+  <ol class="task-history">
+    @for (grupo of grupos(); track grupo.occurredAt) {
+      <li class="task-history__entry">
+        <div class="task-history__when">
+          {{ grupo.occurredAt | date: 'dd/MM/yyyy, HH:mm' }} — <b>{{ grupo.autor }}</b>
+        </div>
+        <ul class="task-history__changes">
+          @for (item of grupo.itens; track $index) {
+            <li class="task-history__change">
+              <span class="task-history__field">{{ item.rotulo }}</span>
+              <span class="task-history__from">{{ item.de }}</span>
+              <span class="task-history__arrow">→</span>
+              <span class="task-history__to">{{ item.para }}</span>
+            </li>
+          }
+        </ul>
+      </li>
+    }
+
+    <li class="task-history__entry task-history__entry--creation">
+      <div class="task-history__when">
+        {{ dados.createdAt | date: 'dd/MM/yyyy, HH:mm' }}
+      </div>
+      <div class="task-history__what">
+        Tarefa criada@if (dados.createdBy) { por <b>{{ dados.createdBy.name }}</b> }
+      </div>
+    </li>
+  </ol>
+}

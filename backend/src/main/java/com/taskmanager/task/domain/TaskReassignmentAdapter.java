@@ -28,7 +28,8 @@ public class TaskReassignmentAdapter implements MemberTasksPort {
 
     @Override
     @Transactional
-    public void realocarNaRemocaoDeMembro(UUID projectId, UUID memberUserId, List<Reassignment> reassignments) {
+    public void realocarNaRemocaoDeMembro(UUID projectId, UUID actorId, UUID memberUserId,
+            List<Reassignment> reassignments) {
         Map<UUID, UUID> novoResponsavelPorTarefa = reassignments.stream()
                 .collect(Collectors.toMap(Reassignment::taskId, Reassignment::newAssigneeId,
                         (a, b) -> b));
@@ -42,7 +43,7 @@ public class TaskReassignmentAdapter implements MemberTasksPort {
                                 .formatted(tarefa.getId()));
             }
             // pertencimento + WIP limit são validados dentro de TaskService.realocarNaRemocao
-            taskService.realocarNaRemocao(projectId, tarefa, novoResponsavel);
+            taskService.realocarNaRemocao(projectId, actorId, tarefa, novoResponsavel);
         }
     }
 }

@@ -42,6 +42,13 @@ Regra de bolso: **se o dado serializa direto para a API (ou é a chave que o
 Spring/Angular resolve), o nome fica em inglês, ponta a ponta.** Todo o resto é
 português.
 
+### Exceção pontual
+
+`TaskChangeType` (`ALTERACAO_TITULO`, `ALTERACAO_STATUS`…) é um enum do domínio
+com valores **em português**, definidos assim a pedido. É o vocabulário do
+histórico exibido ao usuário e não faz parte de nenhum contrato pré-existente.
+É a única exceção à regra "valores de enum em inglês".
+
 ## Exemplos
 
 ```ts

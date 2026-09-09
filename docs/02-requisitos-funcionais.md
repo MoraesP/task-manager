@@ -48,6 +48,7 @@ Identificadores: `RF-xx`. Regras de negócio detalhadas em
 | RF-33 | Excluir tarefa (somente `ADMIN` do projeto ou o responsável atual). | OBRIGATÓRIO |
 | RF-34 | Detalhar uma tarefa. | OBRIGATÓRIO |
 | RF-35 | A tarefa mantém data de criação, data de última atualização e prazo. | OBRIGATÓRIO |
+| RF-36 | Histórico da tarefa: quem criou e cada alteração de campo feita depois (título, descrição, prioridade, prazo, responsável, status), com valor antigo e novo, autor e instante. Endpoint `GET /tasks/{id}/history`. | DIFERENCIAL |
 
 ## Listagem, filtros e ordenação
 

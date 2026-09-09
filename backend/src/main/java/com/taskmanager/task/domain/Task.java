@@ -42,11 +42,15 @@ public class Task extends BaseEntity {
     @Column
     private Instant deadline;
 
+    /** Quem criou a tarefa. Nulo apenas em tarefas anteriores ao histórico (V6). */
+    @Column(name = "created_by_id", updatable = false)
+    private UUID createdById;
+
     protected Task() {
     }
 
     public Task(UUID projectId, String title, String description, TaskPriority priority,
-            UUID assigneeId, Instant deadline) {
+            UUID assigneeId, Instant deadline, UUID createdById) {
         this.projectId = projectId;
         this.title = title;
         this.description = description;
@@ -54,6 +58,7 @@ public class Task extends BaseEntity {
         definirPrioridade(priority);
         this.assigneeId = assigneeId;
         this.deadline = deadline;
+        this.createdById = createdById;
     }
 
     public void editar(String title, String description, TaskPriority priority, UUID assigneeId, Instant deadline) {
@@ -115,5 +120,9 @@ public class Task extends BaseEntity {
 
     public Instant getDeadline() {
         return deadline;
+    }
+
+    public UUID getCreatedById() {
+        return createdById;
     }
 }

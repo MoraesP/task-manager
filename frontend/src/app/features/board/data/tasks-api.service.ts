@@ -2,7 +2,7 @@ import { HttpClient, HttpContext, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { API_BASE, SKIP_ERROR_TOAST } from '@core/http/api.config';
-import { PageResponse, Task, TaskStatus } from '@shared/models';
+import { PageResponse, Task, TaskHistory, TaskStatus } from '@shared/models';
 import { TaskFilter } from '../models/task-filter.model';
 import { TaskInput } from '../models/task-input.model';
 
@@ -81,5 +81,11 @@ export class TasksApiService {
 
   excluir(projetoId: string, tarefaId: string): Observable<void> {
     return this.http.delete<void>(`${API_BASE}/projects/${projetoId}/tasks/${tarefaId}`);
+  }
+
+  historico(projetoId: string, tarefaId: string): Observable<TaskHistory> {
+    return this.http.get<TaskHistory>(
+      `${API_BASE}/projects/${projetoId}/tasks/${tarefaId}/history`,
+    );
   }
 }

@@ -36,6 +36,8 @@ class TaskServiceTest {
     @Mock
     WipLimitPolicy wipLimit;
     @Mock
+    TaskChangeLog historico;
+    @Mock
     ApplicationEventPublisher events;
     @InjectMocks
     TaskService service;
@@ -190,7 +192,7 @@ class TaskServiceTest {
     // --- auxiliares ---
 
     private Task task(TaskPriority priority, TaskStatus status) {
-        Task task = new Task(projectId, "t", "d", priority, assigneeId, null);
+        Task task = new Task(projectId, "t", "d", priority, assigneeId, null, actorId);
         moveTo(task, status);
         return task;
     }

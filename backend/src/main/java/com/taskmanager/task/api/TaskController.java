@@ -25,6 +25,7 @@ import com.taskmanager.shared.security.AuthenticatedUser;
 import com.taskmanager.shared.web.PageResponse;
 import com.taskmanager.task.api.TaskDtos.ChangeStatusRequest;
 import com.taskmanager.task.api.TaskDtos.CreateTaskRequest;
+import com.taskmanager.task.api.TaskDtos.TaskHistoryResponse;
 import com.taskmanager.task.api.TaskDtos.TaskResponse;
 import com.taskmanager.task.api.TaskDtos.UpdateTaskRequest;
 import com.taskmanager.task.domain.TaskFilter;
@@ -46,10 +47,13 @@ public class TaskController {
 
     private final TaskService taskService;
     private final TaskResponseAssembler assembler;
+    private final TaskHistoryAssembler historyAssembler;
 
-    public TaskController(TaskService taskService, TaskResponseAssembler assembler) {
+    public TaskController(TaskService taskService, TaskResponseAssembler assembler,
+            TaskHistoryAssembler historyAssembler) {
         this.taskService = taskService;
         this.assembler = assembler;
+        this.historyAssembler = historyAssembler;
     }
 
     @PostMapping
@@ -88,6 +92,12 @@ public class TaskController {
     public TaskResponse obter(@AuthenticationPrincipal AuthenticatedUser usuario,
             @PathVariable UUID projectId, @PathVariable UUID taskId) {
         return assembler.paraResposta(taskService.obterParaMembro(taskId, usuario.id()));
+    }
+
+    @GetMapping("/{taskId}/history")
+    public TaskHistoryResponse historico(@AuthenticationPrincipal AuthenticatedUser usuario,
+            @PathVariable UUID projectId, @PathVariable UUID taskId) {
+        return historyAssembler.montar(taskService.historicoDaTarefa(taskId, usuario.id()));
     }
 
     @PutMapping("/{taskId}")

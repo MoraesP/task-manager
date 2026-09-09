@@ -77,6 +77,7 @@ reassignment para não-membro, faltou reatribuir alguma tarefa ativa).
 | GET | `/projects/{projectId}/tasks` | membro | 200 página de `TaskResponse` |
 | GET | `/projects/{projectId}/tasks/search` | membro | 200 página de `TaskResponse` |
 | GET | `/projects/{projectId}/tasks/{taskId}` | membro | 200 `TaskResponse` |
+| GET | `/projects/{projectId}/tasks/{taskId}/history` | membro | 200 `TaskHistoryResponse` |
 | PUT | `/projects/{projectId}/tasks/{taskId}` | membro | 200 `TaskResponse` |
 | PATCH | `/projects/{projectId}/tasks/{taskId}/status` | membro (ADMIN se fechar CRITICAL) | 200 `TaskResponse` |
 | DELETE | `/projects/{projectId}/tasks/{taskId}` | ADMIN ou responsável | 204 |
@@ -118,6 +119,34 @@ reassignment para não-membro, faltou reatribuir alguma tarefa ativa).
 | `page`, `size` | paginação |
 
 `TaskResponse`: `{ id, projectId, title, description, status, priority, assigneeId, assigneeName, deadline, overdue, createdAt, updatedAt }`.
+
+### Histórico da tarefa — `GET /tasks/{taskId}/history`
+
+Audit log: a criação e cada alteração de campo feita depois. `changes` vem em ordem cronológica **inversa** (mais recente primeiro); a criação é a última entrada.
+Uma entrada de `changes` por campo alterado; alterações de um mesmo salvamento
+compartilham o `occurredAt`.
+
+```json
+{
+  "createdAt": "2026-09-12T14:30:00Z",
+  "createdBy": { "id": "uuid", "name": "Alice" },
+  "changes": [
+    {
+      "occurredAt": "2026-09-12T15:10:00Z",
+      "author": { "id": "uuid", "name": "Bob" },
+      "type": "ALTERACAO_STATUS",
+      "oldValue": "TODO",
+      "newValue": "IN_PROGRESS"
+    }
+  ]
+}
+```
+
+`type` ∈ `ALTERACAO_TITULO`, `ALTERACAO_DESCRICAO`, `ALTERACAO_PRIORIDADE`,
+`ALTERACAO_PRAZO`, `ALTERACAO_RESPONSAVEL`, `ALTERACAO_STATUS`. `oldValue`/`newValue`
+são o valor "de wire" (nome do enum, ISO da data, texto); para
+`ALTERACAO_RESPONSAVEL` já vêm resolvidos como nome do usuário. `createdBy` é
+`null` em tarefas anteriores à migration `V6`.
 
 Erros: 403 (não-membro; fechar CRITICAL sem ser ADMIN), 404 (tarefa/projeto),
 409 (WIP limit), 422 (transição inválida, responsável não é membro).

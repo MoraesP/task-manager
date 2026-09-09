@@ -4,6 +4,7 @@ export * from './project.model';
 export * from './member.model';
 export * from './invitation.model';
 export * from './task.model';
+export * from './task-history.model';
 export * from './report.model';
 export * from './page.model';
 export * from './problem-detail.model';

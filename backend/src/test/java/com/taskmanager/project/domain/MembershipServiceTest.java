@@ -73,7 +73,7 @@ class MembershipServiceTest {
 
         service.removerMembro(projectId, actorId, targetId, List.of());
 
-        verify(memberTasks).realocarNaRemocaoDeMembro(eq(projectId), eq(targetId), any());
+        verify(memberTasks).realocarNaRemocaoDeMembro(eq(projectId), eq(actorId), eq(targetId), any());
         verify(memberships).delete(target);
     }
 
