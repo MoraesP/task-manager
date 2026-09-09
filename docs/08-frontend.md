@@ -14,7 +14,7 @@ componentização clara e UX minimamente funcional — não visual elaborado.
 | Drag-and-drop | Angular CDK (`@angular/cdk/drag-drop`) |
 | UI | Angular Material (rápido, acessível) — ou CSS simples; sem exigência de tema |
 | Notificação | `MatSnackBar` (toast) |
-| Testes | Jasmine/Karma ou Vitest; ≥ 1 teste de componente |
+| Testes | Jest + `jest-preset-angular`; regras essenciais (ver [09](09-estrategia-de-testes.md) §3) |
 | Build | Angular CLI (`ng build`) |
 
 ## Requisitos funcionais do frontend

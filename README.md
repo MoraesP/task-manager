@@ -56,9 +56,14 @@ curl -s http://localhost:8080/api/v1/auth/login \
 ## Testes
 
 ```bash
+# Backend
 cd backend
 ./mvnw test      # unitários (services) — não exige Docker
 ./mvnw verify    # + testes de integração (Testcontainers) — exige Docker rodando
+
+# Frontend (Jest)
+cd frontend
+npm test
 ```
 
 Com Colima, exporte o socket antes do `verify`:
@@ -136,7 +141,10 @@ mais recente primeiro. Backend: `GET /projects/{id}/tasks/{taskId}/history`,
 `task_change` (migration `V6`). Detalhes em
 [backend/README.md](backend/README.md#histórico-da-tarefa-audit-log).
 
-Testes de frontend ainda não foram escritos (fora do escopo desta iteração).
+Testes do frontend com **Jest** (`jest-preset-angular`), cobrindo as regras
+essenciais: máquina de estados no cliente, o `TaskCardComponent` (render + menu de
+status + eventos), normalização de erro da API e o estado do `BoardService`. Sem
+E2E. Detalhes em [frontend/README.md](frontend/README.md#testes).
 
 ## O que eu faria diferente com mais tempo
 

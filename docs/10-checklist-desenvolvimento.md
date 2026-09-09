@@ -5,7 +5,7 @@ código na branch `main`. Cruzado com [02](02-requisitos-funcionais.md),
 [03](03-requisitos-nao-funcionais.md), [04](04-regras-de-negocio.md),
 [06](06-api-endpoints.md), [08](08-frontend.md) e [09](09-estrategia-de-testes.md).
 
-Última verificação: **2026-09-08** · complementa o [HANDOFF.md](../HANDOFF.md).
+Última verificação: **2026-09-08**. Pendências consolidadas em §8.
 
 ## Legenda
 
@@ -70,7 +70,7 @@ código na branch `main`. Cruzado com [02](02-requisitos-funcionais.md),
 
 | ID | Status | Evidência | Observação |
 |---|---|---|---|
-| RF-40 Filtros combináveis (status, prioridade, responsável, range criação, range deadline) | ⚠️ | Backend: `task/domain/TaskSpecifications` + `TaskFilter` cobre `createdFrom/To` e `deadlineFrom/To`. Frontend: `board-toolbar` **só tem range de deadline** | Falta 2 `input[type=date]` de criação na toolbar (HANDOFF §4.1) |
+| RF-40 Filtros combináveis (status, prioridade, responsável, range criação, range deadline) | ⚠️ | Backend: `task/domain/TaskSpecifications` + `TaskFilter` cobre `createdFrom/To` e `deadlineFrom/To`. Frontend: `board-toolbar` **só tem range de deadline** | Falta 2 `input[type=date]` de criação na toolbar (§8) |
 | RF-41 Ordenação por prioridade/criação/deadline (asc/desc) | ✅ | `task/domain/TaskSort` | |
 | RF-42 Paginação com metadata | ✅ | `shared/web/PageResponse` (`page/size/totalElements/totalPages`) | DIFERENCIAL entregue |
 | RF-50 Busca textual pg_trgm GIN, case-insensitive, parcial, paginada | ✅ | `V1__extensions.sql` (pg_trgm), `V4` índices GIN, `TaskRepository`, `TaskSearchIT` | |
@@ -81,7 +81,7 @@ código na branch `main`. Cruzado com [02](02-requisitos-funcionais.md),
 |---|---|---|---|
 | RF-60 Relatório por status e prioridade, todos os enums (zero incluso) | ✅ | `report/domain/ReportService`, `ProjectReport` | |
 | RF-61 Relatório cacheado por projeto | ✅ | `report/domain/ProjectReportCache`, `shared/config/CacheConfig`, evicção via `shared/event/TaskChangedEvent` | DIFERENCIAL entregue |
-| RF-70 OpenAPI + Swagger UI + **exemplos de payload de erro** | ⚠️ | `shared/config/OpenApiConfig` (info + bearerAuth), Swagger em `/swagger-ui.html` | **Faltam exemplos de `ProblemDetail`** (409 WIP, 422 transição/assignee, 400 validação) — HANDOFF §4.2 |
+| RF-70 OpenAPI + Swagger UI + **exemplos de payload de erro** | ⚠️ | `shared/config/OpenApiConfig` (info + bearerAuth), Swagger em `/swagger-ui.html` | **Faltam exemplos de `ProblemDetail`** (409 WIP, 422 transição/assignee, 400 validação) — §8 |
 
 ### Notificação (frontend)
 
@@ -125,7 +125,7 @@ código na branch `main`. Cruzado com [02](02-requisitos-funcionais.md),
 | RNF-60 Unitários de service cobrindo as RN | ✅ | 55 testes (ver §5) |
 | RNF-61 Integração `@SpringBootTest` + Testcontainers | ✅ | `AuthFlowIT`, `TaskLifecycleIT`, `TaskSearchIT` |
 | RNF-62 Sem meta de cobertura; README explica prioridades | ✅ | `README.md` seção de decisões |
-| RNF-70 Repo Git, branch `main`, Conventional Commits | ⚠️ | commits semânticos OK; **`git push` nunca feito** (HANDOFF §4.12) — o desafio exige repo acessível |
+| RNF-70 Repo Git, branch `main`, Conventional Commits | ⚠️ | commits semânticos OK; **`git push` nunca feito** (§8) — o desafio exige repo acessível |
 | RNF-71 README (rodar / decisões / o que faria diferente) | ✅ | `README.md` com as 3 seções |
 
 ---
@@ -150,7 +150,7 @@ código na branch `main`. Cruzado com [02](02-requisitos-funcionais.md),
 | RN-40 Só membro acessa projeto/tarefa/relatório/busca | ✅ | `ProjectAuthorization#exigirMembro` | 403 |
 | RN-41 MEMBER só gerencia tarefas | ✅ | `ProjectAuthorization`, `ProjectServiceTest` | 403 |
 | RN-42 ADMIN edita projeto/convites/papéis/remoção/fecha CRITICAL | ✅ | `exigirAdmin` nos pontos correspondentes | |
-| RN-43 owner sempre ADMIN, não rebaixável nem removível | ⚠️ | `MembershipService` bloqueia; `owner-role-immutable` | **Inconsistência doc:** RN-43 diz 403 para rebaixar; implementação e [06](06-api-endpoints.md) usam **422**. Decidir redação (HANDOFF §3) |
+| RN-43 owner sempre ADMIN, não rebaixável nem removível | ⚠️ | `MembershipService` bloqueia; `owner-role-immutable` | **Inconsistência doc:** RN-43 diz 403 para rebaixar; implementação e [06](06-api-endpoints.md) usam **422**. Decidir redação (§8) |
 | RN-44 Excluir tarefa: ADMIN ou responsável | ✅ | `TaskService#excluir` | 403 |
 | RN-50 Convite expirado não aceita (`EXPIRED`) | ✅ | `InvitationService#aceitar`, `InvitationServiceTest` | 422 |
 | RN-51 Sem convite `PENDING` duplicado | ✅ | `InvitationService#criar`, `InvitationServiceTest` | 409 |
@@ -183,7 +183,7 @@ Observações:
 - `POST /auth/accept-invitation` devolve `TokenResponse` (pessoa já entra
   autenticada). Doc [06](06-api-endpoints.md) já corrigido. Melhoria pendente:
   devolver também `projectId` + `role` para o front navegar direto ao quadro
-  (HANDOFF §4.4).
+  (§8).
 - Erros em `application/problem+json` (RFC 7807) via `GlobalExceptionHandler`. ✅
 
 ---
@@ -216,12 +216,16 @@ Observações:
 | Busca (trecho parcial em título e descrição) | `task/TaskSearchIT` | ✅ |
 | Contrato de erro (WIP → `problem+json` 409 + `detail`) | `task/TaskLifecycleIT#wipLimitBlocksSixthInProgressTask` | ✅ |
 
-### 5.3 Frontend (`RNF` spec [08](08-frontend.md), ≥1 teste de componente) · ❌
+### 5.3 Frontend (`RNF` spec [08](08-frontend.md), ≥1 teste de componente) · ✅
 
-| Item | Status | Observação |
+Runner: **Jest** + `jest-preset-angular` (`npm test` em `frontend/`). 4 suites / 22 testes.
+
+| Item | Status | Evidência |
 |---|---|---|
-| Karma/Jasmine configurado | ✅ | `frontend/package.json` (`ng test`), `tsconfig.spec.json` |
-| Teste de componente (card ou coluna do board) | ❌ | **0 arquivos `*.spec.ts`** — pendência da spec (HANDOFF §4.3) |
+| Teste de componente do board (spec §3) | ✅ | `features/board/ui/task-card/task-card.component.spec.ts` — render + menu de status só com transições válidas + emissão de eventos |
+| Máquina de estados no cliente (RN-01..04) | ✅ | `shared/models/enums.spec.ts` |
+| Normalização de erro da API | ✅ | `core/http/problem-detail.spec.ts` |
+| Estado do quadro (agrupamento, move otimista + revert, CRUD) | ✅ | `features/board/data/board.service.spec.ts` |
 
 ### 5.4 E2E (opcional, spec §4) · ❌
 
@@ -235,23 +239,23 @@ Observações:
 
 | ID | Status | Evidência | Observação |
 |---|---|---|---|
-| FE-01 Login e registro; guarda tokens; refresh automático | ✅ | `features/auth/pages/*`, `core/auth/auth.service`, `core/interceptors/auth.interceptor` | tokens em `localStorage` (endurecer → cookie httpOnly, HANDOFF §4.9) |
-| FE-02 Aceite de convite via link com token | ✅ | `features/auth/pages/accept-invitation` | navega para `/projetos` genérico; poderia ir ao quadro (HANDOFF §4.4) |
+| FE-01 Login e registro; guarda tokens; refresh automático | ✅ | `features/auth/pages/*`, `core/auth/auth.service`, `core/interceptors/auth.interceptor` | tokens em `localStorage` (endurecer → cookie httpOnly, §8) |
+| FE-02 Aceite de convite via link com token | ✅ | `features/auth/pages/accept-invitation` | navega para `/projetos` genérico; poderia ir ao quadro (§8) |
 | FE-03 Lista de projetos + criar | ✅ | `features/projects/pages/projects-list`, `ui/create-project-dialog` | |
 | FE-04 Board com colunas TODO/IN_PROGRESS/DONE | ✅ | `features/board/pages/board-page`, `ui/task-card` | |
 | FE-05 Drag-and-drop → `PATCH /status`; erro reverte + mostra `detail` | ✅ | `board.page.ts` (revert + toast do `ProblemDetail`) | também barra no cliente via `ALLOWED_TRANSITIONS` |
 | FE-06 Criar/editar tarefa (todos os campos) | ✅ | `features/board/ui/task-drawer` | |
 | FE-06b Aba "Histórico" no drawer | ✅ | `features/board/ui/task-history`, `TasksApiService#historico` | criação + alterações agrupadas por salvamento (campo · antigo → novo) |
-| FE-07 Filtros (status, prioridade, responsável, range de datas) + ordenação | ⚠️ | `features/board/ui/board-toolbar` | **só range de deadline** — falta range de data de criação (RF-40 / HANDOFF §4.1) |
+| FE-07 Filtros (status, prioridade, responsável, range de datas) + ordenação | ⚠️ | `features/board/ui/board-toolbar` | **só range de deadline** — falta range de data de criação (RF-40 / §8) |
 | FE-08 Busca textual com debounce ~300 ms | ✅ | `board-toolbar.component.ts` (`debounceTime(300)`) | |
 | FE-09 Painel de relatório (contadores) | ✅ | `features/report/pages/report-page` | |
-| FE-10 Tela de membros (ADMIN): listar/convidar/papel/remover c/ realocação | ✅ | `features/members/pages/members-page`, `ui/invite-dialog`, `ui/remove-member-dialog` | `remove-member-dialog` usa `[value]` no `<select>` — endurecer p/ `[selected]` (HANDOFF §4.5) |
+| FE-10 Tela de membros (ADMIN): listar/convidar/papel/remover c/ realocação | ✅ | `features/members/pages/members-page`, `ui/invite-dialog`, `ui/remove-member-dialog` | `remove-member-dialog` usa `[value]` no `<select>` — endurecer p/ `[selected]` (§8) |
 | FE-11 Toast quando tarefa é atribuída ao usuário logado | ✅ | `board.page.ts:143-153` | DIFERENCIAL entregue |
 | FE-12 Responsividade básica do board | ✅ | `core/layout/layout.service`, SCSS BEM responsivo | verificado no browser |
 | FE-13 Paginação nas listas paginadas | ✅ | `shared/components/paginator` | |
 
 Extras não exigidos, mas presentes: feedback de validação inline nos formulários
-(classes `.input--invalid`/`.field__error` existem mas **nenhum form usa** — HANDOFF §4.6).
+(classes `.input--invalid`/`.field__error` existem mas **nenhum form usa** — §8).
 
 ---
 
@@ -261,9 +265,9 @@ Extras não exigidos, mas presentes: feedback de validação inline nos formulá
 |---|---|---|
 | README com 3 seções (rodar / decisões / o que faria diferente) | ✅ | `README.md` |
 | `docker-compose.yml` (Postgres) | ✅ | RNF-06 satisfeito |
-| Dockerfile do backend/frontend + compose completo | ⏸️ | fora de escopo da spec; facilita entrega (HANDOFF §4.11) |
+| Dockerfile do backend/frontend + compose completo | ⏸️ | fora de escopo da spec; facilita entrega (§8) |
 | Commits Conventional + incrementais | ✅ | histórico da `main` |
-| **`git push` para repo acessível** | ❌ | **bloqueante do desafio** — `origin = github.com/MoraesP/task-manager`, nunca publicado (HANDOFF §4.12) |
+| **`git push` para repo acessível** | ❌ | **bloqueante do desafio** — `origin = github.com/MoraesP/task-manager`, nunca publicado (§8) |
 | Mockups das telas (`design/`) | ✅ | publicados como Claude Design canvas |
 
 ---
@@ -276,7 +280,7 @@ Extras não exigidos, mas presentes: feedback de validação inline nos formulá
 ### Alta — fecha requisito obrigatório
 2. **RF-40 / FE-07** — range de data de criação na `board-toolbar` (2 `input[type=date]`; backend já aceita `createdFrom`/`createdTo`).
 3. **RF-70** — exemplos de `ProblemDetail` no Swagger (409 WIP, 422 transição/assignee, 400 validação) via `OpenApiConfig`/`@ApiResponse`.
-4. **Testes de frontend** — ≥1 teste de componente (`TaskCardComponent`); opcional 1 E2E do board.
+4. ✅ ~~Testes de frontend~~ — **feito**: Jest + `jest-preset-angular`, 4 suites (§5.3). E2E do board segue opcional.
 
 ### Média — polimento
 5. Inconsistência **RN-43** (403 vs 422 no rebaixamento do owner) — ajustar redação da doc para 422.

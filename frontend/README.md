@@ -8,6 +8,7 @@ Angular 20 (standalone, sem NgModules). Consome a API REST do backend.
 npm install
 npm start          # dev server em http://localhost:4200
 npm run build      # build de produção em dist/
+npm test           # testes unitários (Jest)
 ```
 
 O dev server faz proxy de `/api` para `http://localhost:8080` (`proxy.conf.json`),
@@ -57,4 +58,18 @@ Regras: `core` não importa de `features`; `features` importam de `core` e
 Rotas em português: `/entrar`, `/cadastro`, `/convite`, `/projetos`,
 `/projetos/:id/{quadro|relatorio|membros|configuracoes}`.
 
-Testes de frontend ainda não foram escritos (fora do escopo desta iteração).
+## Testes
+
+**Jest** + `jest-preset-angular` (`jest.config.js`, `setup-jest.ts`). Sem meta de
+cobertura — só as regras essenciais:
+
+- `shared/models/enums.spec.ts` — máquina de estados da tarefa no cliente (RN-01..04).
+- `features/board/ui/task-card/task-card.component.spec.ts` — o teste de componente
+  do board: render dos dados, o menu "mover para" só com transições válidas, e a
+  emissão dos eventos (`mover`, `abrir`, `excluir`).
+- `core/http/problem-detail.spec.ts` — `mensagemDeErro` (ponto único de
+  normalização do `ProblemDetail`).
+- `features/board/data/board.service.spec.ts` — estado do quadro: agrupamento por
+  coluna, move otimista + revert, `criar` / `atualizar` / `excluir`.
+
+E2E (Playwright) não foi feito — opcional pela spec.

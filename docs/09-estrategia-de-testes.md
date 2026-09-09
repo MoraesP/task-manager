@@ -37,10 +37,16 @@ Repositórios e serviços de outras features são mockados.
 | Busca | criar tarefas → `search?q=` casa trecho parcial no título e na descrição |
 | Contrato de erro | disparar WIP limit → resposta `application/problem+json` com `status` 409 e `detail` |
 
-## 3. Frontend (Jasmine/Karma ou Vitest)
+## 3. Frontend (Jest + jest-preset-angular)
 
-- 1 teste de componente do card ou da coluna do board: renderiza os dados e
-  emite o evento de mudança de status no drag-and-drop (mock do service).
+Sem meta de cobertura — só as regras essenciais (`npm test` na pasta `frontend/`).
+
+| Alvo | Casos |
+|---|---|
+| Máquina de estados no cliente (`canTransition`) | transições válidas (RN-01); `TODO→DONE` e `DONE→TODO` barrados (RN-02/03); mesmo estado é no-op (RN-04) |
+| `TaskCardComponent` | renderiza título/id/responsável; o menu "mover para" só oferece as transições válidas; escolher um destino emite `mover` e fecha o menu; clique no card emite `abrir`; "Excluir" emite `excluir` |
+| Normalização de erro (`mensagemDeErro`) | prioriza `detail` do ProblemDetail; junta `errors[]` na validação; cai para `title`; reconhece falha de rede; fallback |
+| `BoardService` | agrupa tarefas por coluna; `moverOtimista` move o card entre colunas sem chamar a API e reverte; `criar`/`atualizar`/`excluir` refletem no estado |
 
 ## 4. E2E (opcional)
 
