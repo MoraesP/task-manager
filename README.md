@@ -92,14 +92,17 @@ Ver [`docs/adr/`](docs/adr/). Resumo:
 - JWT access curto + refresh token rotativo (ADR 0004)
 - Busca textual com `pg_trgm` + índice GIN (ADR 0005)
 - Cache Caffeine só no relatório, invalidação por evicção (ADR 0006)
+- Estado do frontend com signals + services, sem NgRx (ADR 0007)
+- Histórico da tarefa (audit log): `task_change` (migration `V6`) + `TaskChangeLog`
+  na transação da alteração + `GET /tasks/{id}/history`
 
 ## Estrutura do backend
 
 Monólito modular *package-by-feature* (`auth`, `project`, `task`, `report`,
 `shared`), módulo Maven único. Cada feature tem camadas internas `api` / `domain`
-/ `infra` e conversa com as outras apenas pelos serviços públicos
-(`ProjectAuthorization`, `UserDirectory`, `TaskStatistics`, `MemberTasksPort`).
-Detalhes em [docs/07-arquitetura.md](docs/07-arquitetura.md).
+e conversa com as outras apenas pelos serviços públicos (`ProjectAuthorization`,
+`UserDirectory`, `TaskStatistics`, `MemberTasksPort`). Detalhes em
+[backend/README.md](backend/README.md) e [docs/07-arquitetura.md](docs/07-arquitetura.md).
 
 ## Estrutura do frontend
 
@@ -126,10 +129,12 @@ chamar a API (e revertida com o `detail` do ProblemDetail se o servidor recusar)
 o menu de status de cada card só oferece transições válidas; a remoção de membro
 exige reatribuir as tarefas ativas.
 
-O drawer de edição de tarefa tem uma aba **"Histórico"** (audit log): quem criou e
-cada alteração de campo feita depois — título, descrição, prioridade, prazo,
-responsável, status — com valor antigo → novo, autor e data. Endpoint
-`GET /projects/{id}/tasks/{taskId}/history`; migration `V6` cria `task_change`.
+O drawer de edição de tarefa tem uma aba **"Histórico"** (audit log): a criação
+(quem/quando) e cada alteração de campo feita depois — título, descrição,
+prioridade, prazo, responsável, status — com valor antigo → novo, autor e data,
+mais recente primeiro. Backend: `GET /projects/{id}/tasks/{taskId}/history`,
+`task_change` (migration `V6`). Detalhes em
+[backend/README.md](backend/README.md#histórico-da-tarefa-audit-log).
 
 Testes de frontend ainda não foram escritos (fora do escopo desta iteração).
 
