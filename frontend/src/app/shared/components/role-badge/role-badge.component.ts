@@ -8,6 +8,6 @@ import { ROLE_LABEL, Role } from '@shared/models';
   styleUrl: './role-badge.component.scss',
 })
 export class RoleBadgeComponent {
-  readonly value = input.required<Role>();
-  protected readonly label = computed(() => ROLE_LABEL[this.value()]);
+  readonly valor = input.required<Role>();
+  protected readonly rotulo = computed(() => ROLE_LABEL[this.valor()]);
 }

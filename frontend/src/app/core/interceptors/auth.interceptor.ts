@@ -13,54 +13,58 @@ import { TokenResponse } from '@shared/models';
 import { IS_AUTH_REQUEST } from '@core/http/api.config';
 import { AuthService } from '@core/auth/auth.service';
 
-let refreshInFlight: Observable<TokenResponse> | null = null;
+let renovacaoEmAndamento: Observable<TokenResponse> | null = null;
 
-export const authInterceptor: HttpInterceptorFn = (req, next) => {
-  const auth = inject(AuthService);
-  const router = inject(Router);
+export const authInterceptor: HttpInterceptorFn = (requisicao, proximo) => {
+  const autenticacao = inject(AuthService);
+  const roteador = inject(Router);
 
-  const withToken = (request: HttpRequest<unknown>): HttpRequest<unknown> => {
-    const token = auth.accessToken;
-    return token ? request.clone({ setHeaders: { Authorization: `Bearer ${token}` } }) : request;
+  const comToken = (original: HttpRequest<unknown>): HttpRequest<unknown> => {
+    const token = autenticacao.tokenDeAcesso;
+    return token
+      ? original.clone({ setHeaders: { Authorization: `Bearer ${token}` } })
+      : original;
   };
 
-  const isAuthRequest = req.context.get(IS_AUTH_REQUEST);
+  const ehRequisicaoDeAutenticacao = requisicao.context.get(IS_AUTH_REQUEST);
 
-  return next(withToken(req)).pipe(
-    catchError((err: unknown) => {
+  return proximo(comToken(requisicao)).pipe(
+    catchError((erro: unknown) => {
       if (
-        !(err instanceof HttpErrorResponse) ||
-        err.status !== 401 ||
-        isAuthRequest ||
-        !auth.accessToken
+        !(erro instanceof HttpErrorResponse) ||
+        erro.status !== 401 ||
+        ehRequisicaoDeAutenticacao ||
+        !autenticacao.tokenDeAcesso
       ) {
-        return throwError(() => err);
+        return throwError(() => erro);
       }
-      return refreshAndRetry(auth, next, req, withToken, router);
+      return renovarERepetir(autenticacao, proximo, requisicao, comToken, roteador);
     }),
   );
 };
 
-function refreshAndRetry(
-  auth: AuthService,
-  next: HttpHandlerFn,
+function renovarERepetir(
+  autenticacao: AuthService,
+  proximo: HttpHandlerFn,
   original: HttpRequest<unknown>,
-  withToken: (r: HttpRequest<unknown>) => HttpRequest<unknown>,
-  router: Router,
+  comToken: (requisicao: HttpRequest<unknown>) => HttpRequest<unknown>,
+  roteador: Router,
 ): Observable<HttpEvent<unknown>> {
-  if (!refreshInFlight) {
-    refreshInFlight = auth.refreshToken().pipe(shareReplay({ bufferSize: 1, refCount: false }));
+  if (!renovacaoEmAndamento) {
+    renovacaoEmAndamento = autenticacao
+      .renovarToken()
+      .pipe(shareReplay({ bufferSize: 1, refCount: false }));
   }
-  return refreshInFlight.pipe(
+  return renovacaoEmAndamento.pipe(
     switchMap(() => {
-      refreshInFlight = null;
-      return next(withToken(original));
+      renovacaoEmAndamento = null;
+      return proximo(comToken(original));
     }),
-    catchError((err: unknown) => {
-      refreshInFlight = null;
-      auth.logout();
-      router.navigate(['/entrar']);
-      return throwError(() => err);
+    catchError((erro: unknown) => {
+      renovacaoEmAndamento = null;
+      autenticacao.sair();
+      roteador.navigate(['/entrar']);
+      return throwError(() => erro);
     }),
   );
 }

@@ -14,31 +14,31 @@ import { AuthCardComponent } from '../../ui/auth-card/auth-card.component';
   styleUrl: './register.page.scss',
 })
 export class RegisterPage {
-  private readonly fb = inject(NonNullableFormBuilder);
-  private readonly auth = inject(AuthService);
-  private readonly router = inject(Router);
-  private readonly toast = inject(ToastService);
+  private readonly formBuilder = inject(NonNullableFormBuilder);
+  private readonly autenticacao = inject(AuthService);
+  private readonly roteador = inject(Router);
+  private readonly notificacoes = inject(ToastService);
 
-  protected readonly loading = signal(false);
+  protected readonly carregando = signal(false);
 
-  protected readonly form = this.fb.group({
+  protected readonly form = this.formBuilder.group({
     name: ['', [Validators.required, Validators.maxLength(255)]],
     email: ['', [Validators.required, Validators.email]],
     password: ['', [Validators.required, Validators.minLength(8)]],
   });
 
-  protected submit(): void {
-    if (this.form.invalid || this.loading()) {
+  protected enviar(): void {
+    if (this.form.invalid || this.carregando()) {
       return;
     }
-    this.loading.set(true);
+    this.carregando.set(true);
     const { name, email, password } = this.form.getRawValue();
-    this.auth.register(name, email, password).subscribe({
+    this.autenticacao.registrar(name, email, password).subscribe({
       next: () => {
-        this.toast.success('Conta criada. Faça login para continuar.');
-        this.router.navigate(['/entrar'], { queryParams: { email } });
+        this.notificacoes.sucesso('Conta criada. Faça login para continuar.');
+        this.roteador.navigate(['/entrar'], { queryParams: { email } });
       },
-      error: () => this.loading.set(false),
+      error: () => this.carregando.set(false),
     });
   }
 }

@@ -11,6 +11,6 @@ import { IconComponent } from '../icon/icon.component';
 })
 export class TopbarComponent {
   protected readonly layout = inject(LayoutService);
-  readonly title = input.required<string>();
-  readonly crumb = input<string>();
+  readonly titulo = input.required<string>();
+  readonly trilha = input<string>();
 }

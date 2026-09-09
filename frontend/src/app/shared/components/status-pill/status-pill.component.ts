@@ -8,7 +8,7 @@ import { STATUS_LABEL, TaskStatus } from '@shared/models';
   styleUrl: './status-pill.component.scss',
 })
 export class StatusPillComponent {
-  readonly value = input.required<TaskStatus>();
-  protected readonly label = computed(() => STATUS_LABEL[this.value()]);
-  protected readonly modifier = computed(() => this.value().toLowerCase().replace('_', '-'));
+  readonly valor = input.required<TaskStatus>();
+  protected readonly rotulo = computed(() => STATUS_LABEL[this.valor()]);
+  protected readonly modificador = computed(() => this.valor().toLowerCase().replace('_', '-'));
 }

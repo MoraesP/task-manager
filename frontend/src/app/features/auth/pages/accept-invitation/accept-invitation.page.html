@@ -2,7 +2,7 @@
   <h1 class="accept__title">Aceitar convite</h1>
   <p class="accept__lead">Entre no projeto para o qual você foi convidado.</p>
 
-  <form class="accept__form" [formGroup]="form" (ngSubmit)="submit()">
+  <form class="accept__form" [formGroup]="form" (ngSubmit)="enviar()">
     <div class="field">
       <label class="field__label" for="token">Token do convite</label>
       <input
@@ -10,9 +10,9 @@
         class="input mono"
         type="text"
         formControlName="token"
-        [readonly]="hasLinkToken()"
+        [readonly]="temTokenNoLink()"
       />
-      @if (!hasLinkToken()) {
+      @if (!temTokenNoLink()) {
         <span class="field__hint">Cole aqui o token que você recebeu.</span>
       }
     </div>
@@ -35,10 +35,10 @@
     <button
       class="btn btn--primary btn--block btn--lg"
       type="submit"
-      [disabled]="form.controls.token.invalid || loading()"
+      [disabled]="form.controls.token.invalid || carregando()"
     >
-      @if (loading()) {
-        <app-spinner [size]="15" />
+      @if (carregando()) {
+        <app-spinner [tamanho]="15" />
       } @else {
         Aceitar convite e entrar
       }

@@ -1,12 +1,12 @@
 <div class="drawer task-drawer">
   <div class="drawer__head">
-    <h3 class="drawer__title">{{ editing ? 'Editar tarefa' : 'Nova tarefa' }}</h3>
+    <h3 class="drawer__title">{{ editando ? 'Editar tarefa' : 'Nova tarefa' }}</h3>
     <button class="modal__close" (click)="ref.close()" aria-label="Fechar">
-      <app-icon name="x" [size]="18" />
+      <app-icon nome="x" [tamanho]="18" />
     </button>
   </div>
 
-  <form class="task-drawer__form" [formGroup]="form" (ngSubmit)="submit()">
+  <form class="task-drawer__form" [formGroup]="form" (ngSubmit)="enviar()">
     <div class="drawer__body">
       <div class="field">
         <label class="field__label" for="td-title">Título</label>
@@ -28,8 +28,8 @@
         <div class="field">
           <label class="field__label" for="td-prio">Prioridade</label>
           <select id="td-prio" class="input" formControlName="priority">
-            @for (p of priorities; track p) {
-              <option [value]="p">{{ priorityLabel[p] }}</option>
+            @for (prioridade of prioridades; track prioridade) {
+              <option [value]="prioridade">{{ rotuloDePrioridade[prioridade] }}</option>
             }
           </select>
         </div>
@@ -43,8 +43,8 @@
         <label class="field__label" for="td-assignee">Responsável</label>
         <select id="td-assignee" class="input" formControlName="assigneeId">
           <option value="" disabled>Selecione um membro</option>
-          @for (m of members; track m.userId) {
-            <option [value]="m.userId">{{ m.name }}</option>
+          @for (membro of membros; track membro.userId) {
+            <option [value]="membro.userId">{{ membro.name }}</option>
           }
         </select>
         <span class="field__hint">Obrigatório. Apenas membros do projeto aparecem na lista.</span>
@@ -53,9 +53,9 @@
       <div class="field">
         <label class="field__label">Status</label>
         <div class="task-drawer__status">
-          <app-status-pill [value]="currentStatus()" />
+          <app-status-pill [valor]="statusAtual()" />
           <span class="field__hint">
-            {{ editing
+            {{ editando
               ? 'O status muda no quadro, seguindo a máquina de estados.'
               : 'Toda tarefa nova começa em “A fazer”.' }}
           </span>
@@ -75,11 +75,11 @@
 
     <div class="drawer__foot">
       <button type="button" class="btn btn--ghost" (click)="ref.close()">Cancelar</button>
-      <button type="submit" class="btn btn--primary" [disabled]="form.invalid || loading()">
-        @if (loading()) {
-          <app-spinner [size]="14" />
+      <button type="submit" class="btn btn--primary" [disabled]="form.invalid || carregando()">
+        @if (carregando()) {
+          <app-spinner [tamanho]="14" />
         } @else {
-          {{ editing ? 'Salvar' : 'Criar tarefa' }}
+          {{ editando ? 'Salvar' : 'Criar tarefa' }}
         }
       </button>
     </div>

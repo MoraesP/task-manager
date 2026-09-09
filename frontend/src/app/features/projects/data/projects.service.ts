@@ -8,57 +8,64 @@ import { API_BASE } from '@core/http/api.config';
 export class ProjectsService {
   private readonly http = inject(HttpClient);
 
-  private readonly _current = signal<Project | null>(null);
-  private readonly _mine = signal<Project[]>([]);
+  private readonly _projetoAtual = signal<Project | null>(null);
+  private readonly _meusProjetos = signal<Project[]>([]);
 
   /** Projeto aberto no momento (para a sidebar e breadcrumbs). */
-  readonly current = this._current.asReadonly();
+  readonly projetoAtual = this._projetoAtual.asReadonly();
   /** Cache leve da lista de projetos do usuário. */
-  readonly mine = this._mine.asReadonly();
+  readonly meusProjetos = this._meusProjetos.asReadonly();
 
-  page(page: number, size = 12): Observable<PageResponse<Project>> {
-    const params = new HttpParams().set('page', page).set('size', size).set('sort', 'updatedAt,desc');
+  pagina(pagina: number, tamanho = 12): Observable<PageResponse<Project>> {
+    const parametros = new HttpParams()
+      .set('page', pagina)
+      .set('size', tamanho)
+      .set('sort', 'updatedAt,desc');
     return this.http
-      .get<PageResponse<Project>>(`${API_BASE}/projects`, { params })
-      .pipe(tap((res) => this._mine.set(res.content)));
+      .get<PageResponse<Project>>(`${API_BASE}/projects`, { params: parametros })
+      .pipe(tap((resposta) => this._meusProjetos.set(resposta.content)));
   }
 
-  load(id: string): Observable<Project> {
-    if (this._current()?.id === id) {
-      return of(this._current()!);
+  carregar(id: string): Observable<Project> {
+    if (this._projetoAtual()?.id === id) {
+      return of(this._projetoAtual()!);
     }
-    return this.http.get<Project>(`${API_BASE}/projects/${id}`).pipe(tap((p) => this._current.set(p)));
+    return this.http
+      .get<Project>(`${API_BASE}/projects/${id}`)
+      .pipe(tap((projeto) => this._projetoAtual.set(projeto)));
   }
 
-  refreshCurrent(id: string): Observable<Project> {
-    return this.http.get<Project>(`${API_BASE}/projects/${id}`).pipe(tap((p) => this._current.set(p)));
+  recarregarAtual(id: string): Observable<Project> {
+    return this.http
+      .get<Project>(`${API_BASE}/projects/${id}`)
+      .pipe(tap((projeto) => this._projetoAtual.set(projeto)));
   }
 
-  create(name: string, description: string): Observable<Project> {
+  criar(name: string, description: string): Observable<Project> {
     return this.http.post<Project>(`${API_BASE}/projects`, {
       name,
       description: description || null,
     });
   }
 
-  update(id: string, name: string, description: string): Observable<Project> {
+  atualizar(id: string, name: string, description: string): Observable<Project> {
     return this.http
       .put<Project>(`${API_BASE}/projects/${id}`, { name, description: description || null })
-      .pipe(tap((p) => this._current.set(p)));
+      .pipe(tap((projeto) => this._projetoAtual.set(projeto)));
   }
 
-  remove(id: string): Observable<void> {
+  excluir(id: string): Observable<void> {
     return this.http.delete<void>(`${API_BASE}/projects/${id}`).pipe(
       tap(() => {
-        if (this._current()?.id === id) {
-          this._current.set(null);
+        if (this._projetoAtual()?.id === id) {
+          this._projetoAtual.set(null);
         }
-        this._mine.update((list) => list.filter((p) => p.id !== id));
+        this._meusProjetos.update((lista) => lista.filter((projeto) => projeto.id !== id));
       }),
     );
   }
 
-  clearCurrent(): void {
-    this._current.set(null);
+  limparAtual(): void {
+    this._projetoAtual.set(null);
   }
 }

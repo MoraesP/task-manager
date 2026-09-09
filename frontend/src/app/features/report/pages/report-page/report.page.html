@@ -1,6 +1,6 @@
-@if (project(); as p) {
-  <app-topbar [title]="p.name" crumb="Relatório">
-    <app-role-badge badge [value]="p.role" />
+@if (projeto(); as projetoAtual) {
+  <app-topbar [titulo]="projetoAtual.name" trilha="Relatório">
+    <app-role-badge badge [valor]="projetoAtual.role" />
   </app-topbar>
 
   <div class="report">
@@ -9,9 +9,9 @@
       <p class="report__subtitle">Contadores de tarefas por status e por prioridade.</p>
     </header>
 
-    @if (loading() && !report()) {
+    @if (carregando() && !relatorio()) {
       <app-page-loader />
-    } @else if (report()) {
+    } @else if (relatorio()) {
       <div class="report__total">
         <span class="report__total-value">{{ total() }}</span>
         <span class="report__total-label">
@@ -23,13 +23,13 @@
         <section class="report-panel">
           <div class="report-panel__title">Por status</div>
           <div class="report-panel__bars">
-            @for (row of statusRows(); track row.key) {
+            @for (linha of linhasDeStatus(); track linha.chave) {
               <div class="bar-row">
-                <span class="bar-row__label">{{ row.label }}</span>
+                <span class="bar-row__label">{{ linha.rotulo }}</span>
                 <div class="bar-row__track">
-                  <i class="bar-row__fill" [class]="'bar-row__fill--' + row.tone" [style.width.%]="row.pct"></i>
+                  <i class="bar-row__fill" [class]="'bar-row__fill--' + linha.tom" [style.width.%]="linha.percentual"></i>
                 </div>
-                <span class="bar-row__value">{{ row.value }}</span>
+                <span class="bar-row__value">{{ linha.valor }}</span>
               </div>
             }
           </div>
@@ -38,13 +38,13 @@
         <section class="report-panel">
           <div class="report-panel__title">Por prioridade</div>
           <div class="report-panel__bars">
-            @for (row of priorityRows(); track row.key) {
+            @for (linha of linhasDePrioridade(); track linha.chave) {
               <div class="bar-row">
-                <span class="bar-row__label">{{ row.label }}</span>
+                <span class="bar-row__label">{{ linha.rotulo }}</span>
                 <div class="bar-row__track">
-                  <i class="bar-row__fill" [class]="'bar-row__fill--' + row.tone" [style.width.%]="row.pct"></i>
+                  <i class="bar-row__fill" [class]="'bar-row__fill--' + linha.tom" [style.width.%]="linha.percentual"></i>
                 </div>
-                <span class="bar-row__value">{{ row.value }}</span>
+                <span class="bar-row__value">{{ linha.valor }}</span>
               </div>
             }
           </div>

@@ -22,7 +22,7 @@ import { MembersService } from '../../data/members.service';
 @Component({
   selector: 'app-members-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  host: { '(document:click)': 'menuFor.set(null)' },
+  host: { '(document:click)': 'membroComMenuAberto.set(null)' },
   imports: [
     TopbarComponent,
     IconComponent,
@@ -34,146 +34,152 @@ import { MembersService } from '../../data/members.service';
   styleUrl: './members.page.scss',
 })
 export class MembersPage {
-  private readonly service = inject(MembersService);
-  private readonly projects = inject(ProjectsService);
+  private readonly servicoDeMembros = inject(MembersService);
+  private readonly servicoDeProjetos = inject(ProjectsService);
   private readonly http = inject(HttpClient);
-  private readonly auth = inject(AuthService);
+  private readonly autenticacao = inject(AuthService);
   private readonly dialog = inject(Dialog);
-  private readonly toast = inject(ToastService);
+  private readonly notificacoes = inject(ToastService);
 
-  protected readonly project = this.projects.current;
-  protected readonly isAdmin = computed(() => this.project()?.role === 'ADMIN');
-  protected readonly tab = signal<'members' | 'invitations'>('members');
+  protected readonly projeto = this.servicoDeProjetos.projetoAtual;
+  protected readonly ehAdmin = computed(() => this.projeto()?.role === 'ADMIN');
+  protected readonly aba = signal<'members' | 'invitations'>('members');
 
-  protected readonly loading = signal(true);
-  protected readonly members = signal<ProjectMember[]>([]);
-  protected readonly invitations = signal<Invitation[]>([]);
-  protected readonly tasks = signal<Task[]>([]);
-  protected readonly menuFor = signal<string | null>(null);
+  protected readonly carregando = signal(true);
+  protected readonly membros = signal<ProjectMember[]>([]);
+  protected readonly convites = signal<Invitation[]>([]);
+  protected readonly tarefas = signal<Task[]>([]);
+  protected readonly membroComMenuAberto = signal<string | null>(null);
 
-  protected readonly activeByAssignee = computed<Record<string, number | undefined>>(() => {
-    const map: Record<string, number | undefined> = {};
-    for (const t of this.tasks()) {
-      if (t.status !== 'DONE') {
-        map[t.assigneeId] = (map[t.assigneeId] ?? 0) + 1;
+  protected readonly ativasPorResponsavel = computed<Record<string, number | undefined>>(() => {
+    const contagem: Record<string, number | undefined> = {};
+    for (const tarefa of this.tarefas()) {
+      if (tarefa.status !== 'DONE') {
+        contagem[tarefa.assigneeId] = (contagem[tarefa.assigneeId] ?? 0) + 1;
       }
     }
-    return map;
+    return contagem;
   });
 
-  protected readonly roles: Role[] = ['ADMIN', 'MEMBER'];
+  protected readonly papeis: Role[] = ['ADMIN', 'MEMBER'];
 
   constructor() {
     effect(() => {
-      const p = this.project();
-      if (p) {
-        this.load(p.id);
+      const projeto = this.projeto();
+      if (projeto) {
+        this.carregar(projeto.id);
       }
     });
   }
 
-  private load(projectId: string): void {
-    this.loading.set(true);
-    this.service.list(projectId).subscribe({
-      next: (m) => {
-        this.members.set(m);
-        this.loading.set(false);
+  private carregar(projetoId: string): void {
+    this.carregando.set(true);
+    this.servicoDeMembros.listar(projetoId).subscribe({
+      next: (membros) => {
+        this.membros.set(membros);
+        this.carregando.set(false);
       },
-      error: () => this.loading.set(false),
+      error: () => this.carregando.set(false),
     });
-    if (this.isAdmin()) {
-      this.service.listInvitations(projectId).subscribe((i) => this.invitations.set(i));
+    if (this.ehAdmin()) {
+      this.servicoDeMembros
+        .listarConvites(projetoId)
+        .subscribe((listaDeConvites) => this.convites.set(listaDeConvites));
     }
-    const params = new HttpParams().set('size', 200);
+    const parametros = new HttpParams().set('size', 200);
     this.http
-      .get<PageResponse<Task>>(`${API_BASE}/projects/${projectId}/tasks`, { params })
-      .subscribe((res) => this.tasks.set(res.content));
+      .get<PageResponse<Task>>(`${API_BASE}/projects/${projetoId}/tasks`, { params: parametros })
+      .subscribe((resposta) => this.tarefas.set(resposta.content));
   }
 
-  protected isOwner(m: ProjectMember): boolean {
-    return m.userId === this.project()?.ownerId;
+  protected ehDono(membro: ProjectMember): boolean {
+    return membro.userId === this.projeto()?.ownerId;
   }
-  protected isYou(m: ProjectMember): boolean {
-    return m.userId === this.auth.user()?.id;
+  protected ehVoce(membro: ProjectMember): boolean {
+    return membro.userId === this.autenticacao.usuario()?.id;
   }
 
-  protected changeRole(m: ProjectMember, role: string): void {
-    const p = this.project();
-    if (!p || role === m.role) {
+  protected mudarPapel(membro: ProjectMember, role: string): void {
+    const projeto = this.projeto();
+    if (!projeto || role === membro.role) {
       return;
     }
-    this.service.changeRole(p.id, m.userId, role as Role).subscribe({
-      next: (updated) => {
-        this.members.update((list) => list.map((x) => (x.userId === m.userId ? updated : x)));
-        this.toast.success('Papel atualizado.');
+    this.servicoDeMembros.mudarPapel(projeto.id, membro.userId, role as Role).subscribe({
+      next: (atualizado) => {
+        this.membros.update((lista) =>
+          lista.map((item) => (item.userId === membro.userId ? atualizado : item)),
+        );
+        this.notificacoes.sucesso('Papel atualizado.');
       },
     });
   }
 
-  protected invite(): void {
-    const p = this.project();
-    if (!p) {
+  protected convidar(): void {
+    const projeto = this.projeto();
+    if (!projeto) {
       return;
     }
     this.dialog
       .open<Invitation | undefined>(InviteDialogComponent, {
         hasBackdrop: true,
-        data: { projectId: p.id },
+        data: { projetoId: projeto.id },
       })
-      .closed.subscribe((inv) => {
-        if (inv) {
-          this.invitations.update((list) => [inv, ...list]);
+      .closed.subscribe((convite) => {
+        if (convite) {
+          this.convites.update((lista) => [convite, ...lista]);
         }
       });
   }
 
-  protected revoke(inv: Invitation): void {
-    const p = this.project();
-    if (!p) {
+  protected revogar(convite: Invitation): void {
+    const projeto = this.projeto();
+    if (!projeto) {
       return;
     }
     this.dialog
       .open<boolean>(ConfirmDialogComponent, {
         hasBackdrop: true,
         data: {
-          title: 'Revogar convite?',
-          message: `O link enviado para ${inv.email} deixa de funcionar.`,
-          confirmLabel: 'Revogar',
-          danger: true,
+          titulo: 'Revogar convite?',
+          mensagem: `O link enviado para ${convite.email} deixa de funcionar.`,
+          rotuloConfirmar: 'Revogar',
+          perigo: true,
         },
       })
-      .closed.subscribe((ok) => {
-        if (ok) {
-          this.service.revokeInvitation(p.id, inv.id).subscribe({
+      .closed.subscribe((confirmado) => {
+        if (confirmado) {
+          this.servicoDeMembros.revogarConvite(projeto.id, convite.id).subscribe({
             next: () => {
-              this.invitations.update((list) => list.filter((i) => i.id !== inv.id));
-              this.toast.success('Convite revogado.');
+              this.convites.update((lista) => lista.filter((item) => item.id !== convite.id));
+              this.notificacoes.sucesso('Convite revogado.');
             },
           });
         }
       });
   }
 
-  protected removeMember(m: ProjectMember): void {
-    const p = this.project();
-    if (!p) {
+  protected removerMembro(membro: ProjectMember): void {
+    const projeto = this.projeto();
+    if (!projeto) {
       return;
     }
-    this.menuFor.set(null);
-    const active = this.tasks().filter((t) => t.assigneeId === m.userId && t.status !== 'DONE');
-    const data: RemoveMemberData = {
-      projectId: p.id,
-      member: m,
-      activeTasks: active,
-      candidates: this.members().filter((x) => x.userId !== m.userId),
+    this.membroComMenuAberto.set(null);
+    const tarefasAtivas = this.tarefas().filter(
+      (tarefa) => tarefa.assigneeId === membro.userId && tarefa.status !== 'DONE',
+    );
+    const dados: RemoveMemberData = {
+      projetoId: projeto.id,
+      membro,
+      tarefasAtivas,
+      candidatos: this.membros().filter((outro) => outro.userId !== membro.userId),
     };
     this.dialog
-      .open<boolean>(RemoveMemberDialogComponent, { hasBackdrop: true, data })
-      .closed.subscribe((done) => {
-        if (done) {
-          this.members.update((list) => list.filter((x) => x.userId !== m.userId));
-          this.load(p.id);
-          this.toast.success(`${m.name} removido do projeto.`);
+      .open<boolean>(RemoveMemberDialogComponent, { hasBackdrop: true, data: dados })
+      .closed.subscribe((removido) => {
+        if (removido) {
+          this.membros.update((lista) => lista.filter((item) => item.userId !== membro.userId));
+          this.carregar(projeto.id);
+          this.notificacoes.sucesso(`${membro.name} removido do projeto.`);
         }
       });
   }

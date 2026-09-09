@@ -27,7 +27,7 @@ export const appConfig: ApplicationConfig = {
       withComponentInputBinding(),
       withInMemoryScrolling({ scrollPositionRestoration: 'top' }),
     ),
-    provideAppInitializer(() => inject(AuthService).initialize()),
+    provideAppInitializer(() => inject(AuthService).inicializar()),
     { provide: LOCALE_ID, useValue: 'pt-BR' },
   ],
 };

@@ -9,10 +9,10 @@ import { MembersService } from '../../data/members.service';
 import { Reassignment } from '../../models/reassignment.model';
 
 export interface RemoveMemberData {
-  projectId: string;
-  member: ProjectMember;
-  activeTasks: Task[];
-  candidates: ProjectMember[];
+  projetoId: string;
+  membro: ProjectMember;
+  tarefasAtivas: Task[];
+  candidatos: ProjectMember[];
 }
 
 @Component({
@@ -24,36 +24,41 @@ export interface RemoveMemberData {
 })
 export class RemoveMemberDialogComponent {
   protected readonly ref = inject<DialogRef<boolean>>(DialogRef);
-  protected readonly data = inject<RemoveMemberData>(DIALOG_DATA);
-  private readonly service = inject(MembersService);
+  protected readonly dados = inject<RemoveMemberData>(DIALOG_DATA);
+  private readonly servicoDeMembros = inject(MembersService);
 
-  protected readonly loading = signal(false);
-  protected readonly picks = signal<Record<string, string | undefined>>({});
+  protected readonly carregando = signal(false);
+  protected readonly escolhas = signal<Record<string, string | undefined>>({});
 
-  protected readonly allAssigned = computed(() =>
-    this.data.activeTasks.every((t) => !!this.picks()[t.id]),
+  protected readonly todasAtribuidas = computed(() =>
+    this.dados.tarefasAtivas.every((tarefa) => !!this.escolhas()[tarefa.id]),
   );
 
-  protected shortId(id: string): string {
+  protected idCurto(id: string): string {
     return 'T-' + id.slice(0, 4).toUpperCase();
   }
 
-  protected setPick(taskId: string, userId: string): void {
-    this.picks.update((p) => ({ ...p, [taskId]: userId }));
+  protected definirEscolha(tarefaId: string, usuarioId: string): void {
+    this.escolhas.update((atual) => ({ ...atual, [tarefaId]: usuarioId }));
   }
 
-  protected submit(): void {
-    if (this.loading() || (this.data.activeTasks.length > 0 && !this.allAssigned())) {
+  protected enviar(): void {
+    if (
+      this.carregando() ||
+      (this.dados.tarefasAtivas.length > 0 && !this.todasAtribuidas())
+    ) {
       return;
     }
-    this.loading.set(true);
-    const reassignments: Reassignment[] = this.data.activeTasks.map((t) => ({
-      taskId: t.id,
-      newAssigneeId: this.picks()[t.id]!,
+    this.carregando.set(true);
+    const reassignments: Reassignment[] = this.dados.tarefasAtivas.map((tarefa) => ({
+      taskId: tarefa.id,
+      newAssigneeId: this.escolhas()[tarefa.id]!,
     }));
-    this.service.remove(this.data.projectId, this.data.member.userId, reassignments).subscribe({
-      next: () => this.ref.close(true),
-      error: () => this.loading.set(false),
-    });
+    this.servicoDeMembros
+      .remover(this.dados.projetoId, this.dados.membro.userId, reassignments)
+      .subscribe({
+        next: () => this.ref.close(true),
+        error: () => this.carregando.set(false),
+      });
   }
 }

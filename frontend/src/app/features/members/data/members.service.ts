@@ -9,34 +9,41 @@ import { Reassignment } from '../models/reassignment.model';
 export class MembersService {
   private readonly http = inject(HttpClient);
 
-  list(projectId: string): Observable<ProjectMember[]> {
-    return this.http.get<ProjectMember[]>(`${API_BASE}/projects/${projectId}/members`);
+  listar(projetoId: string): Observable<ProjectMember[]> {
+    return this.http.get<ProjectMember[]>(`${API_BASE}/projects/${projetoId}/members`);
   }
 
-  changeRole(projectId: string, userId: string, role: Role): Observable<ProjectMember> {
-    return this.http.patch<ProjectMember>(`${API_BASE}/projects/${projectId}/members/${userId}`, {
-      role,
-    });
+  mudarPapel(projetoId: string, usuarioId: string, role: Role): Observable<ProjectMember> {
+    return this.http.patch<ProjectMember>(
+      `${API_BASE}/projects/${projetoId}/members/${usuarioId}`,
+      { role },
+    );
   }
 
-  remove(projectId: string, userId: string, reassignments: Reassignment[]): Observable<void> {
-    return this.http.request<void>('delete', `${API_BASE}/projects/${projectId}/members/${userId}`, {
-      body: { reassignments },
-    });
+  remover(
+    projetoId: string,
+    usuarioId: string,
+    reassignments: Reassignment[],
+  ): Observable<void> {
+    return this.http.request<void>(
+      'delete',
+      `${API_BASE}/projects/${projetoId}/members/${usuarioId}`,
+      { body: { reassignments } },
+    );
   }
 
-  listInvitations(projectId: string): Observable<Invitation[]> {
-    return this.http.get<Invitation[]>(`${API_BASE}/projects/${projectId}/invitations`);
+  listarConvites(projetoId: string): Observable<Invitation[]> {
+    return this.http.get<Invitation[]>(`${API_BASE}/projects/${projetoId}/invitations`);
   }
 
-  invite(projectId: string, email: string, role: Role): Observable<CreatedInvitation> {
-    return this.http.post<CreatedInvitation>(`${API_BASE}/projects/${projectId}/invitations`, {
+  convidar(projetoId: string, email: string, role: Role): Observable<CreatedInvitation> {
+    return this.http.post<CreatedInvitation>(`${API_BASE}/projects/${projetoId}/invitations`, {
       email,
       role,
     });
   }
 
-  revokeInvitation(projectId: string, invitationId: string): Observable<void> {
-    return this.http.delete<void>(`${API_BASE}/projects/${projectId}/invitations/${invitationId}`);
+  revogarConvite(projetoId: string, conviteId: string): Observable<void> {
+    return this.http.delete<void>(`${API_BASE}/projects/${projetoId}/invitations/${conviteId}`);
   }
 }

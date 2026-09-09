@@ -1,21 +1,21 @@
-@if (totalPages() > 1 || total() > 0) {
+@if (totalDePaginas() > 1 || total() > 0) {
   <div class="paginator">
     <button
       class="paginator__btn"
-      [disabled]="page() === 0"
-      (click)="go.emit(page() - 1)"
+      [disabled]="pagina() === 0"
+      (click)="irPara.emit(pagina() - 1)"
       aria-label="Anterior"
     >
-      <app-icon name="chevron-left" [size]="14" [stroke]="2.4" />
+      <app-icon nome="chevron-left" [tamanho]="14" [traco]="2.4" />
     </button>
-    <span class="paginator__range">{{ from() }}–{{ to() }} de {{ total() }}</span>
+    <span class="paginator__range">{{ de() }}–{{ ate() }} de {{ total() }}</span>
     <button
       class="paginator__btn"
-      [disabled]="page() >= totalPages() - 1"
-      (click)="go.emit(page() + 1)"
+      [disabled]="pagina() >= totalDePaginas() - 1"
+      (click)="irPara.emit(pagina() + 1)"
       aria-label="Próxima"
     >
-      <app-icon name="chevron-right" [size]="14" [stroke]="2.4" />
+      <app-icon nome="chevron-right" [tamanho]="14" [traco]="2.4" />
     </button>
   </div>
 }

@@ -32,41 +32,41 @@ import { ProjectsService } from '../../data/projects.service';
   styleUrl: './projects-list.page.scss',
 })
 export class ProjectsListPage {
-  private readonly service = inject(ProjectsService);
+  private readonly servicoDeProjetos = inject(ProjectsService);
   private readonly dialog = inject(Dialog);
-  private readonly router = inject(Router);
-  private readonly auth = inject(AuthService);
+  private readonly roteador = inject(Router);
+  private readonly autenticacao = inject(AuthService);
 
-  protected readonly loading = signal(true);
-  protected readonly data = signal<PageResponse<Project> | null>(null);
-  protected readonly page = signal(0);
+  protected readonly carregando = signal(true);
+  protected readonly pagina = signal<PageResponse<Project> | null>(null);
+  protected readonly numeroDaPagina = signal(0);
 
   constructor() {
-    this.fetch(0);
+    this.buscar(0);
   }
 
-  protected fetch(page: number): void {
-    this.loading.set(true);
-    this.page.set(page);
-    this.service.page(page).subscribe({
-      next: (res) => {
-        this.data.set(res);
-        this.loading.set(false);
+  protected buscar(numeroDaPagina: number): void {
+    this.carregando.set(true);
+    this.numeroDaPagina.set(numeroDaPagina);
+    this.servicoDeProjetos.pagina(numeroDaPagina).subscribe({
+      next: (resposta) => {
+        this.pagina.set(resposta);
+        this.carregando.set(false);
       },
-      error: () => this.loading.set(false),
+      error: () => this.carregando.set(false),
     });
   }
 
-  protected isOwner(p: Project): boolean {
-    return p.ownerId === this.auth.user()?.id;
+  protected ehDono(projeto: Project): boolean {
+    return projeto.ownerId === this.autenticacao.usuario()?.id;
   }
 
-  protected create(): void {
+  protected criar(): void {
     this.dialog
       .open<Project | undefined>(CreateProjectDialogComponent, { hasBackdrop: true })
-      .closed.subscribe((project) => {
-        if (project) {
-          this.router.navigate(['/projetos', project.id, 'quadro']);
+      .closed.subscribe((projeto) => {
+        if (projeto) {
+          this.roteador.navigate(['/projetos', projeto.id, 'quadro']);
         }
       });
   }

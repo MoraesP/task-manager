@@ -2,12 +2,12 @@
   <div class="modal__head">
     <h3 class="modal__title">Convidar membro</h3>
     <button class="modal__close" (click)="ref.close()" aria-label="Fechar">
-      <app-icon name="x" [size]="18" />
+      <app-icon nome="x" [tamanho]="18" />
     </button>
   </div>
   <div class="modal__body">
-    @if (!created()) {
-      <form class="invite" [formGroup]="form" (ngSubmit)="submit()">
+    @if (!conviteCriado()) {
+      <form class="invite" [formGroup]="form" (ngSubmit)="enviar()">
         <div class="invite__row">
           <div class="field invite__email">
             <label class="field__label" for="inv-email">E-mail</label>
@@ -21,9 +21,9 @@
             </select>
           </div>
         </div>
-        <button class="btn btn--primary" type="submit" [disabled]="form.invalid || loading()">
-          @if (loading()) {
-            <app-spinner [size]="14" />
+        <button class="btn btn--primary" type="submit" [disabled]="form.invalid || carregando()">
+          @if (carregando()) {
+            <app-spinner [tamanho]="14" />
           } @else {
             Gerar convite
           }
@@ -32,12 +32,12 @@
     } @else {
       <div class="callout callout--info">
         <div class="invite__generated-title">
-          Convite gerado · expira {{ created()!.expiresAt | date: 'dd/MM/yyyy' }}
+          Convite gerado · expira {{ conviteCriado()!.expiresAt | date: 'dd/MM/yyyy' }}
         </div>
         <div class="invite__link">
-          <input class="input mono" readonly [value]="link()" #linkInput />
-          <button class="btn btn--sm" (click)="copy(linkInput.value)">
-            <app-icon name="copy" [size]="13" [stroke]="1.8" /> Copiar
+          <input class="input mono" readonly [value]="linkDoConvite()" #linkInput />
+          <button class="btn btn--sm" (click)="copiar(linkInput.value)">
+            <app-icon nome="copy" [tamanho]="13" [traco]="1.8" /> Copiar
           </button>
         </div>
         <p class="invite__note">
@@ -48,11 +48,11 @@
     }
   </div>
   <div class="modal__foot">
-    @if (created()) {
-      <button class="btn btn--ghost" (click)="reset()">Convidar outra pessoa</button>
+    @if (conviteCriado()) {
+      <button class="btn btn--ghost" (click)="limpar()">Convidar outra pessoa</button>
     }
-    <button class="btn" [class.btn--primary]="!!created()" (click)="close()">
-      {{ created() ? 'Concluir' : 'Cancelar' }}
+    <button class="btn" [class.btn--primary]="!!conviteCriado()" (click)="fechar()">
+      {{ conviteCriado() ? 'Concluir' : 'Cancelar' }}
     </button>
   </div>
 </div>

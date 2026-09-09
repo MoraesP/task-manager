@@ -12,12 +12,12 @@ import { PageLoaderComponent } from '@shared/components/page-loader/page-loader.
 import { TopbarComponent } from '@shared/components/topbar/topbar.component';
 import { ReportService } from '../../data/report.service';
 
-interface Row {
-  key: string;
-  label: string;
-  value: number;
-  pct: number;
-  tone: string;
+interface Linha {
+  chave: string;
+  rotulo: string;
+  valor: number;
+  percentual: number;
+  tom: string;
 }
 
 @Component({
@@ -28,66 +28,68 @@ interface Row {
   styleUrl: './report.page.scss',
 })
 export class ReportPage {
-  private readonly service = inject(ReportService);
-  private readonly projects = inject(ProjectsService);
+  private readonly servicoDeRelatorio = inject(ReportService);
+  private readonly servicoDeProjetos = inject(ProjectsService);
 
-  protected readonly project = this.projects.current;
-  protected readonly loading = signal(true);
-  protected readonly report = signal<ProjectReport | null>(null);
+  protected readonly projeto = this.servicoDeProjetos.projetoAtual;
+  protected readonly carregando = signal(true);
+  protected readonly relatorio = signal<ProjectReport | null>(null);
 
   protected readonly total = computed(() => {
-    const r = this.report();
-    return r ? Object.values(r.byStatus).reduce((a, b) => a + b, 0) : 0;
+    const relatorioAtual = this.relatorio();
+    return relatorioAtual
+      ? Object.values(relatorioAtual.byStatus).reduce((soma, valor) => soma + valor, 0)
+      : 0;
   });
 
-  protected readonly statusRows = computed<Row[]>(() => this.rows('status'));
-  protected readonly priorityRows = computed<Row[]>(() => this.rows('priority'));
+  protected readonly linhasDeStatus = computed<Linha[]>(() => this.linhas('status'));
+  protected readonly linhasDePrioridade = computed<Linha[]>(() => this.linhas('priority'));
 
   constructor() {
     effect(() => {
-      const p = this.project();
-      if (!p) {
+      const projetoAtual = this.projeto();
+      if (!projetoAtual) {
         return;
       }
-      this.loading.set(true);
-      this.service.forProject(p.id).subscribe({
-        next: (r) => {
-          this.report.set(r);
-          this.loading.set(false);
+      this.carregando.set(true);
+      this.servicoDeRelatorio.doProjeto(projetoAtual.id).subscribe({
+        next: (relatorioAtual) => {
+          this.relatorio.set(relatorioAtual);
+          this.carregando.set(false);
         },
-        error: () => this.loading.set(false),
+        error: () => this.carregando.set(false),
       });
     });
   }
 
-  private rows(kind: 'status' | 'priority'): Row[] {
-    const r = this.report();
-    if (!r) {
+  private linhas(tipo: 'status' | 'priority'): Linha[] {
+    const relatorioAtual = this.relatorio();
+    if (!relatorioAtual) {
       return [];
     }
     const total = this.total() || 1;
-    if (kind === 'status') {
-      const tones: Record<string, string> = { TODO: 'gray', IN_PROGRESS: 'blue', DONE: 'green' };
-      return TASK_STATUSES.map((k) => ({
-        key: k,
-        label: STATUS_LABEL[k],
-        value: r.byStatus[k],
-        pct: (r.byStatus[k] / total) * 100,
-        tone: tones[k],
+    if (tipo === 'status') {
+      const tons: Record<string, string> = { TODO: 'gray', IN_PROGRESS: 'blue', DONE: 'green' };
+      return TASK_STATUSES.map((chave) => ({
+        chave,
+        rotulo: STATUS_LABEL[chave],
+        valor: relatorioAtual.byStatus[chave],
+        percentual: (relatorioAtual.byStatus[chave] / total) * 100,
+        tom: tons[chave],
       }));
     }
-    const tones: Record<string, string> = {
+    const tons: Record<string, string> = {
       LOW: 'gray',
       MEDIUM: 'blue',
       HIGH: 'amber',
       CRITICAL: 'red',
     };
-    return TASK_PRIORITIES.map((k) => ({
-      key: k,
-      label: PRIORITY_LABEL[k],
-      value: r.byPriority[k],
-      pct: (r.byPriority[k] / total) * 100,
-      tone: tones[k],
+    return TASK_PRIORITIES.map((chave) => ({
+      chave,
+      rotulo: PRIORITY_LABEL[chave],
+      valor: relatorioAtual.byPriority[chave],
+      percentual: (relatorioAtual.byPriority[chave] / total) * 100,
+      tom: tons[chave],
     }));
   }
 }

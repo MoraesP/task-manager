@@ -1,11 +1,11 @@
 <header class="topbar">
-  <button class="topbar__burger" (click)="layout.toggleSidebar()" aria-label="Menu">
-    <app-icon name="list" [size]="18" [stroke]="1.8" />
+  <button class="topbar__burger" (click)="layout.alternarMenuLateral()" aria-label="Menu">
+    <app-icon nome="list" [tamanho]="18" [traco]="1.8" />
   </button>
-  <h1 class="topbar__title">{{ title() }}</h1>
-  @if (crumb()) {
+  <h1 class="topbar__title">{{ titulo() }}</h1>
+  @if (trilha()) {
     <span class="topbar__sep">·</span>
-    <span class="topbar__crumb">{{ crumb() }}</span>
+    <span class="topbar__crumb">{{ trilha() }}</span>
   }
   <ng-content select="[badge]" />
   <span class="topbar__spacer"></span>

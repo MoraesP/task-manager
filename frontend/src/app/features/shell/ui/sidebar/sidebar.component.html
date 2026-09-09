@@ -1,6 +1,6 @@
-<aside class="sidebar" [class.sidebar--dim-project]="section() === 'projetos'">
+<aside class="sidebar" [class.sidebar--dim-project]="secao() === 'projetos'">
   <div class="sidebar__brand">
-    <app-icon name="board" [size]="20" [stroke]="1.7" />
+    <app-icon nome="board" [tamanho]="20" [traco]="1.7" />
     <span>Task Manager</span>
   </div>
 
@@ -8,54 +8,54 @@
     <a
       class="sidebar__item"
       routerLink="/projetos"
-      [class.sidebar__item--active]="section() === 'projetos'"
-      (click)="close()"
+      [class.sidebar__item--active]="secao() === 'projetos'"
+      (click)="fechar()"
     >
-      <app-icon name="folder" [size]="18" [stroke]="1.6" /> Projetos
+      <app-icon nome="folder" [tamanho]="18" [traco]="1.6" /> Projetos
     </a>
   </nav>
 
-  @if (project(); as p) {
+  @if (projeto(); as projetoAtual) {
     <div class="sidebar__project">
       <div class="sidebar__label">Projeto</div>
-      <button class="sidebar__switch" (click)="goProjects()">
-        <span class="sidebar__switch-name">{{ p.name }}</span>
-        <app-role-badge [value]="p.role" />
-        <app-icon name="chevron-down" [size]="14" [stroke]="2" />
+      <button class="sidebar__switch" (click)="irParaProjetos()">
+        <span class="sidebar__switch-name">{{ projetoAtual.name }}</span>
+        <app-role-badge [valor]="projetoAtual.role" />
+        <app-icon nome="chevron-down" [tamanho]="14" [traco]="2" />
       </button>
       <nav class="sidebar__nav">
         <a
           class="sidebar__item"
-          [routerLink]="['/projetos', p.id, 'quadro']"
-          [class.sidebar__item--active]="section() === 'quadro'"
-          (click)="close()"
+          [routerLink]="['/projetos', projetoAtual.id, 'quadro']"
+          [class.sidebar__item--active]="secao() === 'quadro'"
+          (click)="fechar()"
         >
-          <app-icon name="board" [size]="18" [stroke]="1.6" /> Quadro
+          <app-icon nome="board" [tamanho]="18" [traco]="1.6" /> Quadro
         </a>
         <a
           class="sidebar__item"
-          [routerLink]="['/projetos', p.id, 'relatorio']"
-          [class.sidebar__item--active]="section() === 'relatorio'"
-          (click)="close()"
+          [routerLink]="['/projetos', projetoAtual.id, 'relatorio']"
+          [class.sidebar__item--active]="secao() === 'relatorio'"
+          (click)="fechar()"
         >
-          <app-icon name="chart" [size]="18" [stroke]="1.6" /> Relatório
+          <app-icon nome="chart" [tamanho]="18" [traco]="1.6" /> Relatório
         </a>
         <a
           class="sidebar__item"
-          [routerLink]="['/projetos', p.id, 'membros']"
-          [class.sidebar__item--active]="section() === 'membros'"
-          (click)="close()"
+          [routerLink]="['/projetos', projetoAtual.id, 'membros']"
+          [class.sidebar__item--active]="secao() === 'membros'"
+          (click)="fechar()"
         >
-          <app-icon name="users" [size]="18" [stroke]="1.6" /> Membros
+          <app-icon nome="users" [tamanho]="18" [traco]="1.6" /> Membros
         </a>
-        @if (p.role === 'ADMIN') {
+        @if (projetoAtual.role === 'ADMIN') {
           <a
             class="sidebar__item"
-            [routerLink]="['/projetos', p.id, 'configuracoes']"
-            [class.sidebar__item--active]="section() === 'configuracoes'"
-            (click)="close()"
+            [routerLink]="['/projetos', projetoAtual.id, 'configuracoes']"
+            [class.sidebar__item--active]="secao() === 'configuracoes'"
+            (click)="fechar()"
           >
-            <app-icon name="settings" [size]="18" [stroke]="1.6" /> Configurações
+            <app-icon nome="settings" [tamanho]="18" [traco]="1.6" /> Configurações
           </a>
         }
       </nav>
@@ -64,9 +64,9 @@
 
   <div class="sidebar__spacer"></div>
 
-  <button class="sidebar__user" (click)="logout()">
-    <app-avatar [name]="userName()" [size]="26" />
-    <span class="sidebar__user-name">{{ userName() }}</span>
-    <app-icon name="logout" [size]="15" [stroke]="1.8" />
+  <button class="sidebar__user" (click)="sair()">
+    <app-avatar [nome]="nomeDoUsuario()" [tamanho]="26" />
+    <span class="sidebar__user-name">{{ nomeDoUsuario() }}</span>
+    <app-icon nome="logout" [tamanho]="15" [traco]="1.8" />
   </button>
 </aside>

@@ -9,7 +9,7 @@ import {
   canTransition,
 } from '@shared/models';
 import { AuthService } from '@core/auth/auth.service';
-import { errorMessage } from '@core/http/problem-detail';
+import { mensagemDeErro } from '@core/http/problem-detail';
 import { ToastService } from '@core/notifications/toast.service';
 import { ProjectsService } from '@features/projects/data/projects.service';
 import { PaginatorComponent } from '@shared/components/paginator/paginator.component';
@@ -26,7 +26,7 @@ import { TaskFilter } from '../../models/task-filter.model';
 @Component({
   selector: 'app-board-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  host: { '(document:click)': 'openMenuId.set(null)' },
+  host: { '(document:click)': 'idDoMenuAberto.set(null)' },
   providers: [BoardService],
   imports: [
     CdkDropList,
@@ -43,114 +43,118 @@ import { TaskFilter } from '../../models/task-filter.model';
   styleUrl: './board.page.scss',
 })
 export class BoardPage {
-  protected readonly board = inject(BoardService);
-  private readonly projects = inject(ProjectsService);
+  protected readonly quadro = inject(BoardService);
+  private readonly servicoDeProjetos = inject(ProjectsService);
   private readonly dialog = inject(Dialog);
-  private readonly toast = inject(ToastService);
-  private readonly auth = inject(AuthService);
+  private readonly notificacoes = inject(ToastService);
+  private readonly autenticacao = inject(AuthService);
 
-  protected readonly project = this.projects.current;
-  protected readonly statusLabel = STATUS_LABEL;
-  protected readonly columnIds = ['col-TODO', 'col-IN_PROGRESS', 'col-DONE'];
+  protected readonly projeto = this.servicoDeProjetos.projetoAtual;
+  protected readonly rotuloDeStatus = STATUS_LABEL;
+  protected readonly idsDasColunas = ['col-TODO', 'col-IN_PROGRESS', 'col-DONE'];
 
-  protected readonly openMenuId = signal<string | null>(null);
+  protected readonly idDoMenuAberto = signal<string | null>(null);
 
-  protected readonly searchTerm = signal('');
-  protected readonly searching = signal(false);
-  protected readonly searchPage = signal(0);
-  protected readonly searchResult = signal<PageResponse<Task> | null>(null);
-  protected readonly showBoard = computed(() => this.searchTerm().length === 0);
+  protected readonly termoDeBusca = signal('');
+  protected readonly buscando = signal(false);
+  protected readonly paginaDaBusca = signal(0);
+  protected readonly resultadoDaBusca = signal<PageResponse<Task> | null>(null);
+  protected readonly mostrarQuadro = computed(() => this.termoDeBusca().length === 0);
 
   constructor() {
-    const id = this.project()?.id;
-    if (id) {
-      this.board.init(id);
+    const idDoProjeto = this.projeto()?.id;
+    if (idDoProjeto) {
+      this.quadro.iniciar(idDoProjeto);
     }
   }
 
-  protected onFilter(patch: Partial<TaskFilter>): void {
-    this.board.setFilter(patch);
+  protected aoMudarFiltro(ajuste: Partial<TaskFilter>): void {
+    this.quadro.definirFiltro(ajuste);
   }
 
-  protected onSearch(term: string): void {
-    this.searchTerm.set(term);
-    if (term.length >= 2) {
-      this.runSearch(0);
+  protected aoBuscar(termo: string): void {
+    this.termoDeBusca.set(termo);
+    if (termo.length >= 2) {
+      this.executarBusca(0);
     } else {
-      this.searchResult.set(null);
+      this.resultadoDaBusca.set(null);
     }
   }
 
-  protected runSearch(page: number): void {
-    this.searching.set(true);
-    this.searchPage.set(page);
-    this.board.search(this.searchTerm(), page, 20).subscribe({
-      next: (res) => {
-        this.searchResult.set(res);
-        this.searching.set(false);
+  protected executarBusca(pagina: number): void {
+    this.buscando.set(true);
+    this.paginaDaBusca.set(pagina);
+    this.quadro.buscar(this.termoDeBusca(), pagina, 20).subscribe({
+      next: (resposta) => {
+        this.resultadoDaBusca.set(resposta);
+        this.buscando.set(false);
       },
-      error: () => this.searching.set(false),
+      error: () => this.buscando.set(false),
     });
   }
 
-  protected drop(event: CdkDragDrop<Task[]>, to: TaskStatus): void {
-    if (event.previousContainer === event.container) {
+  protected aoSoltarCard(evento: CdkDragDrop<Task[]>, destino: TaskStatus): void {
+    if (evento.previousContainer === evento.container) {
       return;
     }
-    this.applyStatusChange(event.item.data as Task, to);
+    this.aplicarMudancaDeStatus(evento.item.data as Task, destino);
   }
 
-  protected menuMove(task: Task, to: TaskStatus): void {
-    this.applyStatusChange(task, to);
+  protected moverPeloMenu(tarefa: Task, destino: TaskStatus): void {
+    this.aplicarMudancaDeStatus(tarefa, destino);
   }
 
-  private applyStatusChange(task: Task, to: TaskStatus): void {
-    if (task.status === to) {
+  private aplicarMudancaDeStatus(tarefa: Task, destino: TaskStatus): void {
+    if (tarefa.status === destino) {
       return;
     }
-    if (!canTransition(task.status, to)) {
-      this.toast.error(
-        `Transição inválida: “${STATUS_LABEL[task.status]}” não vai direto para “${STATUS_LABEL[to]}”.`,
+    if (!canTransition(tarefa.status, destino)) {
+      this.notificacoes.erro(
+        `Transição inválida: “${STATUS_LABEL[tarefa.status]}” não vai direto para “${STATUS_LABEL[destino]}”.`,
       );
       return;
     }
-    const from = task.status;
-    this.board.moveOptimistic(task.id, to);
-    this.board.changeStatus(task.id, to).subscribe({
-      error: (err) => {
-        this.board.moveOptimistic(task.id, from);
-        this.toast.error(errorMessage(err));
+    const origem = tarefa.status;
+    this.quadro.moverOtimista(tarefa.id, destino);
+    this.quadro.mudarStatus(tarefa.id, destino).subscribe({
+      error: (erro) => {
+        this.quadro.moverOtimista(tarefa.id, origem);
+        this.notificacoes.erro(mensagemDeErro(erro));
       },
     });
   }
 
-  protected removeTask(task: Task): void {
-    this.board.remove(task.id).subscribe({
-      next: () => this.toast.success('Tarefa excluída.'),
+  protected excluirTarefa(tarefa: Task): void {
+    this.quadro.excluir(tarefa.id).subscribe({
+      next: () => this.notificacoes.sucesso('Tarefa excluída.'),
     });
   }
 
-  protected newTask(): void {
-    this.openDrawer(null);
+  protected novaTarefa(): void {
+    this.abrirGaveta(null);
   }
 
-  protected editTask(task: Task): void {
-    this.openDrawer(task);
+  protected editarTarefa(tarefa: Task): void {
+    this.abrirGaveta(tarefa);
   }
 
-  private openDrawer(task: Task | null): void {
-    const data: TaskDrawerData = { task, members: this.board.members() };
-    const wasMine = task?.assigneeId === this.auth.user()?.id;
+  private abrirGaveta(tarefa: Task | null): void {
+    const dados: TaskDrawerData = { tarefa, membros: this.quadro.membros() };
+    const eraMinha = tarefa?.assigneeId === this.autenticacao.usuario()?.id;
     this.dialog
       .open<Task | undefined>(TaskDrawerComponent, {
-        data,
+        data: dados,
         panelClass: 'drawer-pane',
         hasBackdrop: true,
-        providers: [{ provide: BoardService, useValue: this.board }],
+        providers: [{ provide: BoardService, useValue: this.quadro }],
       })
-      .closed.subscribe((saved) => {
-        if (saved && !wasMine && saved.assigneeId === this.auth.user()?.id) {
-          this.toast.success(`Tarefa atribuída a você: “${saved.title}”.`);
+      .closed.subscribe((tarefaSalva) => {
+        if (
+          tarefaSalva &&
+          !eraMinha &&
+          tarefaSalva.assigneeId === this.autenticacao.usuario()?.id
+        ) {
+          this.notificacoes.sucesso(`Tarefa atribuída a você: “${tarefaSalva.title}”.`);
         }
       });
   }

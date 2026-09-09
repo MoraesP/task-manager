@@ -2,11 +2,11 @@ import { DIALOG_DATA, DialogRef } from '@angular/cdk/dialog';
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { IconComponent } from '../icon/icon.component';
 
-export interface ConfirmData {
-  title: string;
-  message: string;
-  confirmLabel?: string;
-  danger?: boolean;
+export interface DadosDeConfirmacao {
+  titulo: string;
+  mensagem: string;
+  rotuloConfirmar?: string;
+  perigo?: boolean;
 }
 
 @Component({
@@ -17,5 +17,5 @@ export interface ConfirmData {
 })
 export class ConfirmDialogComponent {
   protected readonly ref = inject<DialogRef<boolean>>(DialogRef);
-  protected readonly data = inject<ConfirmData>(DIALOG_DATA);
+  protected readonly dados = inject<DadosDeConfirmacao>(DIALOG_DATA);
 }

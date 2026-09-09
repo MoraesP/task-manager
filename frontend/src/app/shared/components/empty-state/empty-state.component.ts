@@ -7,6 +7,6 @@ import { ChangeDetectionStrategy, Component, input } from '@angular/core';
   styleUrl: './empty-state.component.scss',
 })
 export class EmptyStateComponent {
-  readonly title = input.required<string>();
-  readonly message = input('');
+  readonly titulo = input.required<string>();
+  readonly mensagem = input('');
 }

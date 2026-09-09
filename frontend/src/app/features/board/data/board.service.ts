@@ -8,8 +8,8 @@ import { ProjectMember } from '@shared/models';
 import { TaskFilter } from '../models/task-filter.model';
 import { TaskInput } from '../models/task-input.model';
 
-const skipToast = () => new HttpContext().set(SKIP_ERROR_TOAST, true);
-const BOARD_PAGE_SIZE = 100;
+const ignorarToast = () => new HttpContext().set(SKIP_ERROR_TOAST, true);
+const TAMANHO_DA_PAGINA_DO_QUADRO = 100;
 
 /**
  * Estado do quadro de um projeto. Fornecido pelo BoardPage, portanto recriado ao
@@ -18,119 +18,128 @@ const BOARD_PAGE_SIZE = 100;
 @Injectable()
 export class BoardService {
   private readonly http = inject(HttpClient);
-  private readonly membersService = inject(MembersService);
+  private readonly servicoDeMembros = inject(MembersService);
 
-  private projectId = '';
+  private projetoId = '';
 
-  private readonly _tasks = signal<Task[]>([]);
-  private readonly _members = signal<ProjectMember[]>([]);
-  private readonly _loading = signal(true);
+  private readonly _tarefas = signal<Task[]>([]);
+  private readonly _membros = signal<ProjectMember[]>([]);
+  private readonly _carregando = signal(true);
   private readonly _total = signal(0);
-  private readonly _filter = signal<TaskFilter>({ sort: 'priority,desc' });
+  private readonly _filtro = signal<TaskFilter>({ sort: 'priority,desc' });
 
-  readonly tasks = this._tasks.asReadonly();
-  readonly members = this._members.asReadonly();
-  readonly loading = this._loading.asReadonly();
+  readonly tarefas = this._tarefas.asReadonly();
+  readonly membros = this._membros.asReadonly();
+  readonly carregando = this._carregando.asReadonly();
   readonly total = this._total.asReadonly();
-  readonly filter = this._filter.asReadonly();
-  readonly truncated = computed(() => this._total() > this._tasks().length);
-  readonly statuses = TASK_STATUSES;
+  readonly filtro = this._filtro.asReadonly();
+  readonly truncado = computed(() => this._total() > this._tarefas().length);
+  readonly statusDisponiveis = TASK_STATUSES;
 
-  readonly columns = computed<Record<TaskStatus, Task[]>>(() => {
-    const grouped = { TODO: [], IN_PROGRESS: [], DONE: [] } as Record<TaskStatus, Task[]>;
-    for (const t of this._tasks()) {
-      grouped[t.status].push(t);
+  readonly colunas = computed<Record<TaskStatus, Task[]>>(() => {
+    const agrupado = { TODO: [], IN_PROGRESS: [], DONE: [] } as Record<TaskStatus, Task[]>;
+    for (const tarefa of this._tarefas()) {
+      agrupado[tarefa.status].push(tarefa);
     }
-    return grouped;
+    return agrupado;
   });
 
-  init(projectId: string): void {
-    this.projectId = projectId;
-    this.membersService.list(projectId).subscribe((m) => this._members.set(m));
-    this.reload();
+  iniciar(projetoId: string): void {
+    this.projetoId = projetoId;
+    this.servicoDeMembros.listar(projetoId).subscribe((membros) => this._membros.set(membros));
+    this.recarregar();
   }
 
-  setFilter(patch: Partial<TaskFilter>): void {
-    this._filter.update((f) => ({ ...f, ...patch }));
-    this.reload();
+  definirFiltro(ajuste: Partial<TaskFilter>): void {
+    this._filtro.update((filtro) => ({ ...filtro, ...ajuste }));
+    this.recarregar();
   }
 
-  reload(): void {
-    this._loading.set(true);
-    let params = new HttpParams().set('page', 0).set('size', BOARD_PAGE_SIZE);
-    const f = this._filter();
-    if (f.status) {
-      params = params.set('status', f.status);
+  recarregar(): void {
+    this._carregando.set(true);
+    let parametros = new HttpParams().set('page', 0).set('size', TAMANHO_DA_PAGINA_DO_QUADRO);
+    const filtro = this._filtro();
+    if (filtro.status) {
+      parametros = parametros.set('status', filtro.status);
     }
-    if (f.priority) {
-      params = params.set('priority', f.priority);
+    if (filtro.priority) {
+      parametros = parametros.set('priority', filtro.priority);
     }
-    if (f.assigneeId) {
-      params = params.set('assigneeId', f.assigneeId);
+    if (filtro.assigneeId) {
+      parametros = parametros.set('assigneeId', filtro.assigneeId);
     }
-    if (f.deadlineFrom) {
-      params = params.set('deadlineFrom', f.deadlineFrom);
+    if (filtro.deadlineFrom) {
+      parametros = parametros.set('deadlineFrom', filtro.deadlineFrom);
     }
-    if (f.deadlineTo) {
-      params = params.set('deadlineTo', f.deadlineTo);
+    if (filtro.deadlineTo) {
+      parametros = parametros.set('deadlineTo', filtro.deadlineTo);
     }
-    if (f.sort) {
-      params = params.set('sort', f.sort);
+    if (filtro.sort) {
+      parametros = parametros.set('sort', filtro.sort);
     }
 
     this.http
-      .get<PageResponse<Task>>(`${API_BASE}/projects/${this.projectId}/tasks`, { params })
+      .get<PageResponse<Task>>(`${API_BASE}/projects/${this.projetoId}/tasks`, { params: parametros })
       .subscribe({
-        next: (res) => {
-          this._tasks.set(res.content);
-          this._total.set(res.totalElements);
-          this._loading.set(false);
+        next: (resposta) => {
+          this._tarefas.set(resposta.content);
+          this._total.set(resposta.totalElements);
+          this._carregando.set(false);
         },
-        error: () => this._loading.set(false),
+        error: () => this._carregando.set(false),
       });
   }
 
-  search(term: string, page: number, size: number): Observable<PageResponse<Task>> {
-    const params = new HttpParams().set('q', term).set('page', page).set('size', size);
-    return this.http.get<PageResponse<Task>>(`${API_BASE}/projects/${this.projectId}/tasks/search`, {
-      params,
-    });
+  buscar(termo: string, pagina: number, tamanho: number): Observable<PageResponse<Task>> {
+    const parametros = new HttpParams().set('q', termo).set('page', pagina).set('size', tamanho);
+    return this.http.get<PageResponse<Task>>(
+      `${API_BASE}/projects/${this.projetoId}/tasks/search`,
+      { params: parametros },
+    );
   }
 
-  create(input: TaskInput): Observable<Task> {
+  criar(dados: TaskInput): Observable<Task> {
     return this.http
-      .post<Task>(`${API_BASE}/projects/${this.projectId}/tasks`, input)
-      .pipe(tap((task) => this._tasks.update((list) => [task, ...list])));
+      .post<Task>(`${API_BASE}/projects/${this.projetoId}/tasks`, dados)
+      .pipe(tap((tarefa) => this._tarefas.update((lista) => [tarefa, ...lista])));
   }
 
-  update(taskId: string, input: TaskInput): Observable<Task> {
+  atualizar(tarefaId: string, dados: TaskInput): Observable<Task> {
     return this.http
-      .put<Task>(`${API_BASE}/projects/${this.projectId}/tasks/${taskId}`, input)
-      .pipe(tap((task) => this.replace(task)));
+      .put<Task>(`${API_BASE}/projects/${this.projetoId}/tasks/${tarefaId}`, dados)
+      .pipe(tap((tarefa) => this.substituir(tarefa)));
   }
 
-  changeStatus(taskId: string, status: TaskStatus): Observable<Task> {
+  mudarStatus(tarefaId: string, status: TaskStatus): Observable<Task> {
     return this.http
       .patch<Task>(
-        `${API_BASE}/projects/${this.projectId}/tasks/${taskId}/status`,
+        `${API_BASE}/projects/${this.projetoId}/tasks/${tarefaId}/status`,
         { status },
-        { context: skipToast() },
+        { context: ignorarToast() },
       )
-      .pipe(tap((task) => this.replace(task)));
+      .pipe(tap((tarefa) => this.substituir(tarefa)));
   }
 
-  remove(taskId: string): Observable<void> {
+  excluir(tarefaId: string): Observable<void> {
     return this.http
-      .delete<void>(`${API_BASE}/projects/${this.projectId}/tasks/${taskId}`)
-      .pipe(tap(() => this._tasks.update((list) => list.filter((t) => t.id !== taskId))));
+      .delete<void>(`${API_BASE}/projects/${this.projetoId}/tasks/${tarefaId}`)
+      .pipe(
+        tap(() =>
+          this._tarefas.update((lista) => lista.filter((tarefa) => tarefa.id !== tarefaId)),
+        ),
+      );
   }
 
   /** Move otimista de um card entre colunas (revertido pelo componente em caso de erro). */
-  moveOptimistic(taskId: string, to: TaskStatus): void {
-    this._tasks.update((list) => list.map((t) => (t.id === taskId ? { ...t, status: to } : t)));
+  moverOtimista(tarefaId: string, destino: TaskStatus): void {
+    this._tarefas.update((lista) =>
+      lista.map((tarefa) => (tarefa.id === tarefaId ? { ...tarefa, status: destino } : tarefa)),
+    );
   }
 
-  private replace(task: Task): void {
-    this._tasks.update((list) => list.map((t) => (t.id === task.id ? task : t)));
+  private substituir(tarefaAtualizada: Task): void {
+    this._tarefas.update((lista) =>
+      lista.map((tarefa) => (tarefa.id === tarefaAtualizada.id ? tarefaAtualizada : tarefa)),
+    );
   }
 }

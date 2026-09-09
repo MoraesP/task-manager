@@ -3,16 +3,16 @@ import { Injectable, signal } from '@angular/core';
 /** Estado do menu lateral em telas estreitas (slide-over). */
 @Injectable({ providedIn: 'root' })
 export class LayoutService {
-  private readonly _sidebarOpen = signal(false);
-  readonly sidebarOpen = this._sidebarOpen.asReadonly();
+  private readonly _menuLateralAberto = signal(false);
+  readonly menuLateralAberto = this._menuLateralAberto.asReadonly();
 
-  openSidebar(): void {
-    this._sidebarOpen.set(true);
+  abrirMenuLateral(): void {
+    this._menuLateralAberto.set(true);
   }
-  closeSidebar(): void {
-    this._sidebarOpen.set(false);
+  fecharMenuLateral(): void {
+    this._menuLateralAberto.set(false);
   }
-  toggleSidebar(): void {
-    this._sidebarOpen.update((v) => !v);
+  alternarMenuLateral(): void {
+    this._menuLateralAberto.update((aberto) => !aberto);
   }
 }

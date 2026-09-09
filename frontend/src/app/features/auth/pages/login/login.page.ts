@@ -14,39 +14,39 @@ import { AuthCardComponent } from '../../ui/auth-card/auth-card.component';
   styleUrl: './login.page.scss',
 })
 export class LoginPage {
-  private readonly fb = inject(NonNullableFormBuilder);
-  private readonly auth = inject(AuthService);
-  private readonly router = inject(Router);
+  private readonly formBuilder = inject(NonNullableFormBuilder);
+  private readonly autenticacao = inject(AuthService);
+  private readonly roteador = inject(Router);
 
   readonly retorno = input<string>();
   readonly email = input<string>();
 
-  protected readonly show = signal(false);
-  protected readonly loading = signal(false);
+  protected readonly mostrarSenha = signal(false);
+  protected readonly carregando = signal(false);
 
-  protected readonly form = this.fb.group({
+  protected readonly form = this.formBuilder.group({
     email: ['', [Validators.required, Validators.email]],
     password: ['', [Validators.required]],
   });
 
   constructor() {
     effect(() => {
-      const e = this.email();
-      if (e) {
-        this.form.controls.email.setValue(e);
+      const emailDoLink = this.email();
+      if (emailDoLink) {
+        this.form.controls.email.setValue(emailDoLink);
       }
     });
   }
 
-  protected submit(): void {
-    if (this.form.invalid || this.loading()) {
+  protected enviar(): void {
+    if (this.form.invalid || this.carregando()) {
       return;
     }
-    this.loading.set(true);
+    this.carregando.set(true);
     const { email, password } = this.form.getRawValue();
-    this.auth.login(email, password).subscribe({
-      next: () => this.router.navigateByUrl(this.retorno() || '/projetos'),
-      error: () => this.loading.set(false),
+    this.autenticacao.entrar(email, password).subscribe({
+      next: () => this.roteador.navigateByUrl(this.retorno() || '/projetos'),
+      error: () => this.carregando.set(false),
     });
   }
 }

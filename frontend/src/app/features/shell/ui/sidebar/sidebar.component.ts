@@ -17,46 +17,46 @@ import { IconComponent } from '@shared/components/icon/icon.component';
   styleUrl: './sidebar.component.scss',
 })
 export class SidebarComponent {
-  private readonly router = inject(Router);
-  private readonly auth = inject(AuthService);
-  private readonly projects = inject(ProjectsService);
+  private readonly roteador = inject(Router);
+  private readonly autenticacao = inject(AuthService);
+  private readonly servicoDeProjetos = inject(ProjectsService);
   private readonly layout = inject(LayoutService);
 
-  protected readonly project = this.projects.current;
-  protected readonly userName = computed(() => this.auth.user()?.name ?? '');
+  protected readonly projeto = this.servicoDeProjetos.projetoAtual;
+  protected readonly nomeDoUsuario = computed(() => this.autenticacao.usuario()?.name ?? '');
 
-  private readonly url = toSignal(
-    this.router.events.pipe(
-      filter((e) => e instanceof NavigationEnd),
-      map(() => this.router.url),
-      startWith(this.router.url),
+  private readonly urlAtual = toSignal(
+    this.roteador.events.pipe(
+      filter((evento) => evento instanceof NavigationEnd),
+      map(() => this.roteador.url),
+      startWith(this.roteador.url),
     ),
-    { initialValue: this.router.url },
+    { initialValue: this.roteador.url },
   );
 
-  protected readonly section = computed(() => {
-    const u = this.url().split('?')[0];
-    const m = u.match(/^\/projetos\/[^/]+\/([^/]+)/);
-    if (m) {
-      return m[1];
+  protected readonly secao = computed(() => {
+    const caminho = this.urlAtual().split('?')[0];
+    const correspondencia = caminho.match(/^\/projetos\/[^/]+\/([^/]+)/);
+    if (correspondencia) {
+      return correspondencia[1];
     }
-    if (u === '/projetos' || u === '/') {
+    if (caminho === '/projetos' || caminho === '/') {
       return 'projetos';
     }
     return '';
   });
 
-  protected close(): void {
-    this.layout.closeSidebar();
+  protected fechar(): void {
+    this.layout.fecharMenuLateral();
   }
 
-  protected goProjects(): void {
-    this.close();
-    this.router.navigateByUrl('/projetos');
+  protected irParaProjetos(): void {
+    this.fechar();
+    this.roteador.navigateByUrl('/projetos');
   }
 
-  protected logout(): void {
-    this.auth.logout();
-    this.router.navigateByUrl('/entrar');
+  protected sair(): void {
+    this.autenticacao.sair();
+    this.roteador.navigateByUrl('/entrar');
   }
 }

@@ -1,6 +1,6 @@
-@if (project(); as p) {
-  <app-topbar [title]="p.name" crumb="Configurações">
-    <app-role-badge badge [value]="p.role" />
+@if (projeto(); as projetoAtual) {
+  <app-topbar [titulo]="projetoAtual.name" trilha="Configurações">
+    <app-role-badge badge [valor]="projetoAtual.role" />
   </app-topbar>
 
   <div class="settings">
@@ -13,7 +13,7 @@
       <section class="settings-card">
         <div class="settings-card__title">Detalhes</div>
         <p class="settings-card__subtitle">Nome e descrição exibidos para toda a equipe.</p>
-        <form [formGroup]="form" (ngSubmit)="save()" class="settings-card__form">
+        <form [formGroup]="form" (ngSubmit)="salvar()" class="settings-card__form">
           <div class="field">
             <label class="field__label" for="ps-name">Nome</label>
             <input id="ps-name" class="input" formControlName="name" />
@@ -26,15 +26,15 @@
             <button
               class="btn btn--primary"
               type="submit"
-              [disabled]="form.invalid || form.pristine || saving()"
+              [disabled]="form.invalid || form.pristine || salvando()"
             >
-              @if (saving()) {
-                <app-spinner [size]="14" />
+              @if (salvando()) {
+                <app-spinner [tamanho]="14" />
               } @else {
                 Salvar alterações
               }
             </button>
-            <button class="btn btn--ghost" type="button" (click)="discard()" [disabled]="form.pristine">
+            <button class="btn btn--ghost" type="button" (click)="descartar()" [disabled]="form.pristine">
               Descartar
             </button>
           </div>
@@ -45,13 +45,13 @@
         <div class="settings-card__title">Informações</div>
         <div class="settings-card__info">
           <div>
-            <span class="field__hint">Dono</span><strong>{{ isOwner() ? 'Você' : '—' }}</strong>
+            <span class="field__hint">Dono</span><strong>{{ ehDono() ? 'Você' : '—' }}</strong>
           </div>
           <div>
-            <span class="field__hint">Criado em</span><strong>{{ p.createdAt | date: 'dd MMM yyyy' }}</strong>
+            <span class="field__hint">Criado em</span><strong>{{ projetoAtual.createdAt | date: 'dd MMM yyyy' }}</strong>
           </div>
           <div>
-            <span class="field__hint">Membros</span><strong>{{ p.memberCount }}</strong>
+            <span class="field__hint">Membros</span><strong>{{ projetoAtual.memberCount }}</strong>
           </div>
         </div>
         <div class="callout">
@@ -60,7 +60,7 @@
         </div>
       </section>
 
-      @if (isOwner()) {
+      @if (ehDono()) {
         <section class="settings-card settings-card--danger">
           <div class="settings-card__title settings-card__title--danger">Zona de perigo</div>
           <div class="settings-card__danger-row">
@@ -71,7 +71,7 @@
                 Irreversível.
               </p>
             </div>
-            <button class="btn btn--danger" (click)="confirmDelete()">Excluir projeto</button>
+            <button class="btn btn--danger" (click)="confirmarExclusao()">Excluir projeto</button>
           </div>
         </section>
       }

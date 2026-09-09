@@ -2,7 +2,7 @@
   <h1 class="register__title">Criar conta</h1>
   <p class="register__lead">Comece criando um projeto e convidando sua equipe.</p>
 
-  <form class="register__form" [formGroup]="form" (ngSubmit)="submit()">
+  <form class="register__form" [formGroup]="form" (ngSubmit)="enviar()">
     <div class="field">
       <label class="field__label" for="nome">Nome</label>
       <input id="nome" class="input" type="text" formControlName="name" autocomplete="name" />
@@ -22,9 +22,9 @@
       />
       <span class="field__hint">Mínimo de 8 caracteres.</span>
     </div>
-    <button class="btn btn--primary btn--block btn--lg" type="submit" [disabled]="form.invalid || loading()">
-      @if (loading()) {
-        <app-spinner [size]="15" />
+    <button class="btn btn--primary btn--block btn--lg" type="submit" [disabled]="form.invalid || carregando()">
+      @if (carregando()) {
+        <app-spinner [tamanho]="15" />
       } @else {
         Criar conta
       }

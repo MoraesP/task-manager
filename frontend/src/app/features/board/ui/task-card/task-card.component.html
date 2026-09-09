@@ -1,49 +1,49 @@
-<article class="task-card" (click)="open.emit()">
+<article class="task-card" (click)="abrir.emit()">
   <div class="task-card__row">
-    <app-priority-badge [value]="task().priority" />
-    <span class="task-card__id mono">{{ shortId() }}</span>
-    <button class="task-card__menu-btn" (click)="toggleMenu($event)" aria-label="Ações">
-      <app-icon name="dots" [size]="15" [stroke]="2" />
+    <app-priority-badge [valor]="tarefa().priority" />
+    <span class="task-card__id mono">{{ idCurto() }}</span>
+    <button class="task-card__menu-btn" (click)="alternarMenu($event)" aria-label="Ações">
+      <app-icon nome="dots" [tamanho]="15" [traco]="2" />
     </button>
   </div>
 
-  <p class="task-card__title">{{ task().title }}</p>
+  <p class="task-card__title">{{ tarefa().title }}</p>
 
   <div class="task-card__meta">
     <span class="task-card__assignee">
-      <app-avatar [name]="task().assigneeName" [size]="20" />
-      {{ task().assigneeName }}
+      <app-avatar [nome]="tarefa().assigneeName" [tamanho]="20" />
+      {{ tarefa().assigneeName }}
     </span>
-    @if (task().deadline) {
-      <span class="chip" [class.chip--late]="task().overdue">
-        <app-icon [name]="task().overdue ? 'clock' : 'calendar'" [size]="12" [stroke]="1.7" />
-        {{ task().overdue ? 'Atrasada · ' : '' }}{{ task().deadline | date: 'dd MMM' }}
+    @if (tarefa().deadline) {
+      <span class="chip" [class.chip--late]="tarefa().overdue">
+        <app-icon [nome]="tarefa().overdue ? 'clock' : 'calendar'" [tamanho]="12" [traco]="1.7" />
+        {{ tarefa().overdue ? 'Atrasada · ' : '' }}{{ tarefa().deadline | date: 'dd MMM' }}
       </span>
     }
   </div>
 
-  @if (task().priority === 'CRITICAL' && task().status === 'IN_PROGRESS') {
+  @if (tarefa().priority === 'CRITICAL' && tarefa().status === 'IN_PROGRESS') {
     <span class="chip chip--lock">
-      <app-icon name="lock" [size]="12" [stroke]="1.8" /> Concluir: só Admin
+      <app-icon nome="lock" [tamanho]="12" [traco]="1.8" /> Concluir: só Admin
     </span>
   }
 
-  @if (menuOpen()) {
+  @if (menuAberto()) {
     <div class="card-menu" role="menu" (click)="$event.stopPropagation()">
       <div class="card-menu__header">Mover para</div>
-      @for (s of nextStates(); track s) {
-        <button class="card-menu__item" (click)="pick(s)">
-          <app-icon [name]="isReopen(s) ? 'reopen' : 'chevron-right'" [size]="14" [stroke]="1.8" />
-          {{ label(s) }}
-          @if (isReopen(s)) {
+      @for (status of proximosEstados(); track status) {
+        <button class="card-menu__item" (click)="escolher(status)">
+          <app-icon [nome]="ehReabertura(status) ? 'reopen' : 'chevron-right'" [tamanho]="14" [traco]="1.8" />
+          {{ rotulo(status) }}
+          @if (ehReabertura(status)) {
             <span class="card-menu__tag">reabrir</span>
           }
         </button>
       }
-      <button class="card-menu__item card-menu__item--danger" (click)="del()">
-        <app-icon name="trash" [size]="14" [stroke]="1.8" /> Excluir
+      <button class="card-menu__item card-menu__item--danger" (click)="remover()">
+        <app-icon nome="trash" [tamanho]="14" [traco]="1.8" /> Excluir
       </button>
-      @if (task().status === 'DONE') {
+      @if (tarefa().status === 'DONE') {
         <p class="card-menu__note">
           Concluídas não voltam para “A fazer” — só reabrem em Em progresso.
         </p>

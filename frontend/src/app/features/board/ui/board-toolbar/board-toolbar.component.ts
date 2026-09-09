@@ -20,21 +20,21 @@ import { TaskFilter } from '../../models/task-filter.model';
   styleUrl: './board-toolbar.component.scss',
 })
 export class BoardToolbarComponent {
-  private readonly fb = inject(NonNullableFormBuilder);
+  private readonly formBuilder = inject(NonNullableFormBuilder);
 
-  readonly members = input<ProjectMember[]>([]);
-  readonly newTask = output<void>();
-  readonly filterChange = output<Partial<TaskFilter>>();
-  readonly searchChange = output<string>();
+  readonly membros = input<ProjectMember[]>([]);
+  readonly novaTarefa = output<void>();
+  readonly filtroMudou = output<Partial<TaskFilter>>();
+  readonly buscaMudou = output<string>();
 
-  protected readonly statuses = TASK_STATUSES;
-  protected readonly priorities = TASK_PRIORITIES;
-  protected readonly statusLabel = STATUS_LABEL;
-  protected readonly priorityLabel = PRIORITY_LABEL;
+  protected readonly statusDisponiveis = TASK_STATUSES;
+  protected readonly prioridades = TASK_PRIORITIES;
+  protected readonly rotuloDeStatus = STATUS_LABEL;
+  protected readonly rotuloDePrioridade = PRIORITY_LABEL;
 
-  protected readonly search = new FormControl('', { nonNullable: true });
+  protected readonly campoDeBusca = new FormControl('', { nonNullable: true });
 
-  protected readonly filters = this.fb.group({
+  protected readonly filtros = this.formBuilder.group({
     status: [''],
     priority: [''],
     assigneeId: [''],
@@ -43,24 +43,28 @@ export class BoardToolbarComponent {
     sort: ['priority,desc'],
   });
 
-  private readonly searchValue = toSignal(
-    this.search.valueChanges.pipe(debounceTime(300), distinctUntilChanged()),
+  private readonly valorDeBusca = toSignal(
+    this.campoDeBusca.valueChanges.pipe(debounceTime(300), distinctUntilChanged()),
     { initialValue: '' },
   );
 
   constructor() {
-    effect(() => this.searchChange.emit(this.searchValue().trim()));
+    effect(() => this.buscaMudou.emit(this.valorDeBusca().trim()));
   }
 
-  protected apply(): void {
-    const v = this.filters.getRawValue();
-    this.filterChange.emit({
-      status: (v.status || null) as TaskFilter['status'],
-      priority: (v.priority || null) as TaskFilter['priority'],
-      assigneeId: v.assigneeId || null,
-      deadlineFrom: v.deadlineFrom ? new Date(v.deadlineFrom + 'T00:00:00').toISOString() : null,
-      deadlineTo: v.deadlineTo ? new Date(v.deadlineTo + 'T23:59:59').toISOString() : null,
-      sort: v.sort,
+  protected aplicar(): void {
+    const valores = this.filtros.getRawValue();
+    this.filtroMudou.emit({
+      status: (valores.status || null) as TaskFilter['status'],
+      priority: (valores.priority || null) as TaskFilter['priority'],
+      assigneeId: valores.assigneeId || null,
+      deadlineFrom: valores.deadlineFrom
+        ? new Date(valores.deadlineFrom + 'T00:00:00').toISOString()
+        : null,
+      deadlineTo: valores.deadlineTo
+        ? new Date(valores.deadlineTo + 'T23:59:59').toISOString()
+        : null,
+      sort: valores.sort,
     });
   }
 }

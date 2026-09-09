@@ -1,24 +1,24 @@
 <div class="modal modal--sm">
   <div class="modal__head">
-    @if (data.danger) {
+    @if (dados.perigo) {
       <span class="modal__head-icon modal__head-icon--danger">
-        <app-icon name="alert" [size]="20" [stroke]="1.8" />
+        <app-icon nome="alert" [tamanho]="20" [traco]="1.8" />
       </span>
     }
-    <h3 class="modal__title">{{ data.title }}</h3>
+    <h3 class="modal__title">{{ dados.titulo }}</h3>
   </div>
   <div class="modal__body">
-    <p class="modal__text">{{ data.message }}</p>
+    <p class="modal__text">{{ dados.mensagem }}</p>
   </div>
   <div class="modal__foot">
     <button class="btn btn--ghost" (click)="ref.close(false)">Cancelar</button>
     <button
       class="btn"
-      [class.btn--danger]="data.danger"
-      [class.btn--primary]="!data.danger"
+      [class.btn--danger]="dados.perigo"
+      [class.btn--primary]="!dados.perigo"
       (click)="ref.close(true)"
     >
-      {{ data.confirmLabel ?? 'Confirmar' }}
+      {{ dados.rotuloConfirmar ?? 'Confirmar' }}
     </button>
   </div>
 </div>

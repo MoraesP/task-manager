@@ -17,57 +17,63 @@ import { MembersService } from '../../data/members.service';
 })
 export class InviteDialogComponent {
   protected readonly ref = inject<DialogRef<Invitation | undefined>>(DialogRef);
-  private readonly data = inject<{ projectId: string }>(DIALOG_DATA);
-  private readonly fb = inject(NonNullableFormBuilder);
-  private readonly members = inject(MembersService);
-  private readonly toast = inject(ToastService);
+  private readonly dados = inject<{ projetoId: string }>(DIALOG_DATA);
+  private readonly formBuilder = inject(NonNullableFormBuilder);
+  private readonly servicoDeMembros = inject(MembersService);
+  private readonly notificacoes = inject(ToastService);
 
-  protected readonly loading = signal(false);
-  protected readonly created = signal<CreatedInvitation | null>(null);
+  protected readonly carregando = signal(false);
+  protected readonly conviteCriado = signal<CreatedInvitation | null>(null);
 
-  protected readonly form = this.fb.group({
+  protected readonly form = this.formBuilder.group({
     email: ['', [Validators.required, Validators.email]],
     role: ['MEMBER' as Role],
   });
 
-  protected link(): string {
-    const c = this.created();
-    return c ? `${location.origin}/convite?token=${c.token}` : '';
+  protected linkDoConvite(): string {
+    const convite = this.conviteCriado();
+    return convite ? `${location.origin}/convite?token=${convite.token}` : '';
   }
 
-  protected submit(): void {
-    if (this.form.invalid || this.loading()) {
+  protected enviar(): void {
+    if (this.form.invalid || this.carregando()) {
       return;
     }
-    this.loading.set(true);
+    this.carregando.set(true);
     const { email, role } = this.form.getRawValue();
-    this.members.invite(this.data.projectId, email, role).subscribe({
-      next: (c) => {
-        this.created.set(c);
-        this.loading.set(false);
+    this.servicoDeMembros.convidar(this.dados.projetoId, email, role).subscribe({
+      next: (convite) => {
+        this.conviteCriado.set(convite);
+        this.carregando.set(false);
       },
-      error: () => this.loading.set(false),
+      error: () => this.carregando.set(false),
     });
   }
 
-  protected copy(value: string): void {
-    navigator.clipboard?.writeText(value).then(
-      () => this.toast.success('Link copiado.'),
+  protected copiar(valor: string): void {
+    navigator.clipboard?.writeText(valor).then(
+      () => this.notificacoes.sucesso('Link copiado.'),
       () => void 0,
     );
   }
 
-  protected reset(): void {
-    this.created.set(null);
+  protected limpar(): void {
+    this.conviteCriado.set(null);
     this.form.reset({ email: '', role: 'MEMBER' });
   }
 
-  protected close(): void {
-    this.ref.close(this.created() ? this.toInvitation() : undefined);
+  protected fechar(): void {
+    this.ref.close(this.conviteCriado() ? this.paraConvite() : undefined);
   }
 
-  private toInvitation(): Invitation {
-    const c = this.created()!;
-    return { id: c.id, email: c.email, role: c.role, status: 'PENDING', expiresAt: c.expiresAt };
+  private paraConvite(): Invitation {
+    const convite = this.conviteCriado()!;
+    return {
+      id: convite.id,
+      email: convite.email,
+      role: convite.role,
+      status: 'PENDING',
+      expiresAt: convite.expiresAt,
+    };
   }
 }

@@ -1,9 +1,9 @@
-@if (project(); as p) {
-  <app-topbar [title]="p.name" crumb="Membros">
-    <app-role-badge badge [value]="p.role" />
-    @if (isAdmin()) {
-      <button class="btn btn--primary" (click)="invite()">
-        <app-icon name="mail-plus" [size]="15" [stroke]="1.9" /> Convidar membro
+@if (projeto(); as projetoAtual) {
+  <app-topbar [titulo]="projetoAtual.name" trilha="Membros">
+    <app-role-badge badge [valor]="projetoAtual.role" />
+    @if (ehAdmin()) {
+      <button class="btn btn--primary" (click)="convidar()">
+        <app-icon nome="mail-plus" [tamanho]="15" [traco]="1.9" /> Convidar membro
       </button>
     }
   </app-topbar>
@@ -15,23 +15,23 @@
     </header>
 
     <div class="tabs">
-      <button class="tab" [class.tab--active]="tab() === 'members'" (click)="tab.set('members')">
-        Membros · {{ members().length }}
+      <button class="tab" [class.tab--active]="aba() === 'members'" (click)="aba.set('members')">
+        Membros · {{ membros().length }}
       </button>
-      @if (isAdmin()) {
+      @if (ehAdmin()) {
         <button
           class="tab"
-          [class.tab--active]="tab() === 'invitations'"
-          (click)="tab.set('invitations')"
+          [class.tab--active]="aba() === 'invitations'"
+          (click)="aba.set('invitations')"
         >
-          Convites pendentes · {{ invitations().length }}
+          Convites pendentes · {{ convites().length }}
         </button>
       }
     </div>
 
-    @if (loading() && members().length === 0) {
+    @if (carregando() && membros().length === 0) {
       <app-page-loader />
-    } @else if (tab() === 'members') {
+    } @else if (aba() === 'members') {
       <div class="card members__table-card">
         <table class="table">
           <thead>
@@ -43,52 +43,52 @@
             </tr>
           </thead>
           <tbody>
-            @for (m of members(); track m.userId) {
+            @for (membro of membros(); track membro.userId) {
               <tr>
                 <td>
                   <div class="member-cell">
-                    <app-avatar [name]="m.name" [size]="30" />
+                    <app-avatar [nome]="membro.name" [tamanho]="30" />
                     <div>
                       <div class="member-cell__name">
-                        {{ m.name }} @if (isYou(m)) { <span class="field__hint">(Você)</span> }
+                        {{ membro.name }} @if (ehVoce(membro)) { <span class="field__hint">(Você)</span> }
                       </div>
-                      <div class="field__hint">{{ m.email }}</div>
+                      <div class="field__hint">{{ membro.email }}</div>
                     </div>
                   </div>
                 </td>
                 <td>
-                  @if (isOwner(m)) {
-                    <app-role-badge [value]="m.role" /> <span class="field__hint">· Dono</span>
-                  } @else if (isAdmin()) {
+                  @if (ehDono(membro)) {
+                    <app-role-badge [valor]="membro.role" /> <span class="field__hint">· Dono</span>
+                  } @else if (ehAdmin()) {
                     <select
                       class="input input--sm"
-                      (change)="changeRole(m, $any($event.target).value)"
+                      (change)="mudarPapel(membro, $any($event.target).value)"
                     >
-                      @for (r of roles; track r) {
-                        <option [value]="r" [selected]="r === m.role">
-                          {{ r === 'ADMIN' ? 'Admin' : 'Membro' }}
+                      @for (papel of papeis; track papel) {
+                        <option [value]="papel" [selected]="papel === membro.role">
+                          {{ papel === 'ADMIN' ? 'Admin' : 'Membro' }}
                         </option>
                       }
                     </select>
                   } @else {
-                    <app-role-badge [value]="m.role" />
+                    <app-role-badge [valor]="membro.role" />
                   }
                 </td>
-                <td class="mono">{{ activeByAssignee()[m.userId] ?? 0 }}</td>
+                <td class="mono">{{ ativasPorResponsavel()[membro.userId] ?? 0 }}</td>
                 <td>
-                  @if (isAdmin() && !isOwner(m)) {
+                  @if (ehAdmin() && !ehDono(membro)) {
                     <div class="row-menu">
                       <button
                         class="row-menu__trigger"
-                        (click)="$event.stopPropagation(); menuFor.set(menuFor() === m.userId ? null : m.userId)"
+                        (click)="$event.stopPropagation(); membroComMenuAberto.set(membroComMenuAberto() === membro.userId ? null : membro.userId)"
                         aria-label="Ações"
                       >
-                        <app-icon name="dots" [size]="15" [stroke]="2" />
+                        <app-icon nome="dots" [tamanho]="15" [traco]="2" />
                       </button>
-                      @if (menuFor() === m.userId) {
+                      @if (membroComMenuAberto() === membro.userId) {
                         <div class="row-menu__list" (click)="$event.stopPropagation()">
-                          <button class="row-menu__item row-menu__item--danger" (click)="removeMember(m)">
-                            <app-icon name="trash" [size]="14" [stroke]="1.8" /> Remover do projeto
+                          <button class="row-menu__item row-menu__item--danger" (click)="removerMembro(membro)">
+                            <app-icon nome="trash" [tamanho]="14" [traco]="1.8" /> Remover do projeto
                           </button>
                         </div>
                       }
@@ -107,7 +107,7 @@
         pessoa, somando todos os projetos.
       </p>
     } @else {
-      @if (invitations().length === 0) {
+      @if (convites().length === 0) {
         <div class="card members__empty">Nenhum convite pendente.</div>
       } @else {
         <div class="card members__table-card">
@@ -121,15 +121,15 @@
               </tr>
             </thead>
             <tbody>
-              @for (inv of invitations(); track inv.id) {
+              @for (convite of convites(); track convite.id) {
                 <tr>
-                  <td>{{ inv.email }}</td>
-                  <td><app-role-badge [value]="inv.role" /></td>
+                  <td>{{ convite.email }}</td>
+                  <td><app-role-badge [valor]="convite.role" /></td>
                   <td>
-                    <span class="badge" [class]="'badge--' + inv.status.toLowerCase()">{{ inv.status }}</span>
+                    <span class="badge" [class]="'badge--' + convite.status.toLowerCase()">{{ convite.status }}</span>
                   </td>
                   <td>
-                    <button class="btn btn--ghost btn--sm" (click)="revoke(inv)">Revogar</button>
+                    <button class="btn btn--ghost btn--sm" (click)="revogar(convite)">Revogar</button>
                   </td>
                 </tr>
               }

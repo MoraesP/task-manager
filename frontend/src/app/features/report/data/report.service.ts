@@ -8,7 +8,7 @@ import { API_BASE } from '@core/http/api.config';
 export class ReportService {
   private readonly http = inject(HttpClient);
 
-  forProject(projectId: string): Observable<ProjectReport> {
-    return this.http.get<ProjectReport>(`${API_BASE}/projects/${projectId}/report`);
+  doProjeto(projetoId: string): Observable<ProjectReport> {
+    return this.http.get<ProjectReport>(`${API_BASE}/projects/${projetoId}/report`);
   }
 }

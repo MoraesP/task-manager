@@ -13,38 +13,40 @@ import { IconComponent } from '@shared/components/icon/icon.component';
   styleUrl: './task-card.component.scss',
 })
 export class TaskCardComponent {
-  readonly task = input.required<Task>();
-  readonly menuOpen = input(false);
-  readonly open = output<void>();
-  readonly move = output<TaskStatus>();
-  readonly delete = output<void>();
-  readonly menuToggled = output<boolean>();
+  readonly tarefa = input.required<Task>();
+  readonly menuAberto = input(false);
+  readonly abrir = output<void>();
+  readonly mover = output<TaskStatus>();
+  readonly excluir = output<void>();
+  readonly menuAlternado = output<boolean>();
 
-  protected readonly shortId = computed(() => 'T-' + this.task().id.slice(0, 4).toUpperCase());
-  protected readonly nextStates = computed<readonly TaskStatus[]>(
-    () => ALLOWED_TRANSITIONS[this.task().status],
+  protected readonly idCurto = computed(
+    () => 'T-' + this.tarefa().id.slice(0, 4).toUpperCase(),
+  );
+  protected readonly proximosEstados = computed<readonly TaskStatus[]>(
+    () => ALLOWED_TRANSITIONS[this.tarefa().status],
   );
 
-  protected label(s: TaskStatus): string {
-    return STATUS_LABEL[s];
+  protected rotulo(status: TaskStatus): string {
+    return STATUS_LABEL[status];
   }
 
-  protected isReopen(s: TaskStatus): boolean {
-    return s === 'IN_PROGRESS' && this.task().status === 'DONE';
+  protected ehReabertura(status: TaskStatus): boolean {
+    return status === 'IN_PROGRESS' && this.tarefa().status === 'DONE';
   }
 
-  protected toggleMenu(ev: Event): void {
-    ev.stopPropagation();
-    this.menuToggled.emit(!this.menuOpen());
+  protected alternarMenu(evento: Event): void {
+    evento.stopPropagation();
+    this.menuAlternado.emit(!this.menuAberto());
   }
 
-  protected pick(s: TaskStatus): void {
-    this.menuToggled.emit(false);
-    this.move.emit(s);
+  protected escolher(status: TaskStatus): void {
+    this.menuAlternado.emit(false);
+    this.mover.emit(status);
   }
 
-  protected del(): void {
-    this.menuToggled.emit(false);
-    this.delete.emit();
+  protected remover(): void {
+    this.menuAlternado.emit(false);
+    this.excluir.emit();
   }
 }

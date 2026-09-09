@@ -24,12 +24,12 @@ código na branch `main`. Cruzado com [02](02-requisitos-funcionais.md),
 
 | ID | Status | Evidência | Observação |
 |---|---|---|---|
-| RF-01 Registro + email único + BCrypt | ✅ | `auth/api/AuthController#register`, `auth/domain/UserService`, `V2__auth.sql` (unique) | |
-| RF-02 Login → access + refresh | ✅ | `AuthController#login`, `AuthService` | |
+| RF-01 Registro + email único + BCrypt | ✅ | `auth/api/AuthController#registrar`, `auth/domain/UserService`, `V2__auth.sql` (unique) | |
+| RF-02 Login → access + refresh | ✅ | `AuthController#autenticar`, `AuthService` | |
 | RF-03 Refresh com rotação | ✅ | `auth/domain/RefreshTokenService`, `RefreshTokenServiceTest` | DIFERENCIAL entregue |
-| RF-04 Logout revoga refresh | ✅ | `AuthController#logout` | DIFERENCIAL entregue |
+| RF-04 Logout revoga refresh | ✅ | `AuthController#sair` | DIFERENCIAL entregue |
 | RF-05 Endpoint de negócio exige token → 401 | ✅ | `shared/security/JwtAuthenticationFilter`, `SecurityConfig` | |
-| RF-06 Só vê projeto que pertence → 403 | ✅ | `project/domain/ProjectAuthorization#requireMembership` | |
+| RF-06 Só vê projeto que pertence → 403 | ✅ | `project/domain/ProjectAuthorization#exigirMembro` | |
 | RF-07 Papéis ADMIN / MEMBER por projeto | ✅ | `project/domain/Role`, `ProjectMembership` | |
 | RF-08 `GET /users/me` | ✅ | `auth/api/UserController` | |
 
@@ -37,32 +37,32 @@ código na branch `main`. Cruzado com [02](02-requisitos-funcionais.md),
 
 | ID | Status | Evidência | Observação |
 |---|---|---|---|
-| RF-10 Criar projeto (criador vira owner/ADMIN) | ✅ | `project/domain/ProjectService#create` | |
-| RF-11 Listar projetos do usuário (paginado) | ✅ | `ProjectController#list`, `shared/web/PageResponse` | |
-| RF-12 Detalhar projeto (só membro) | ✅ | `ProjectController#get` + `ProjectAuthorization` | |
-| RF-13 Editar nome/descrição (só ADMIN) | ✅ | `ProjectService#update` | |
-| RF-14 Excluir projeto (só owner) + cascade | ✅ | `ProjectService#delete`; `ON DELETE CASCADE` em `V3`/`V4` | |
-| RF-15 Listar membros com papéis | ✅ | `project/api/MembershipController#list` | |
+| RF-10 Criar projeto (criador vira owner/ADMIN) | ✅ | `project/domain/ProjectService#criar` | |
+| RF-11 Listar projetos do usuário (paginado) | ✅ | `ProjectController#listar`, `shared/web/PageResponse` | |
+| RF-12 Detalhar projeto (só membro) | ✅ | `ProjectController#obter` + `ProjectAuthorization` | |
+| RF-13 Editar nome/descrição (só ADMIN) | ✅ | `ProjectService#atualizar` | |
+| RF-14 Excluir projeto (só owner) + cascade | ✅ | `ProjectService#excluir`; `ON DELETE CASCADE` em `V3`/`V4` | |
+| RF-15 Listar membros com papéis | ✅ | `project/api/MembershipController#listar` | |
 
 ### Membros e convites
 
 | ID | Status | Evidência | Observação |
 |---|---|---|---|
-| RF-20 Convite por email + papel, token 7d, sem envio | ✅ | `project/domain/InvitationService#create`, `app.invitations.ttl=P7D` | token volta no corpo |
-| RF-21 Aceitar convite (cria conta se preciso) | ✅ | `InvitationService#accept`, `AuthController#acceptInvitation` | |
+| RF-20 Convite por email + papel, token 7d, sem envio | ✅ | `project/domain/InvitationService#criar`, `app.invitations.ttl=P7D` | token volta no corpo |
+| RF-21 Aceitar convite (cria conta se preciso) | ✅ | `InvitationService#aceitar`, `AuthController#acceptInvitation` | |
 | RF-22 Listar e revogar convites pendentes (ADMIN) | ✅ | `project/api/InvitationController` | |
-| RF-23 Alterar papel de membro (não rebaixa owner) | ✅ | `project/domain/MembershipService#changeRole` | ver inconsistência RN-43 abaixo |
-| RF-24 Remover membro com realocação + rollback | ✅ | `MembershipService#remove`, `task/domain/TaskReassignmentAdapter`, `MemberTasksPort` | transação única |
+| RF-23 Alterar papel de membro (não rebaixa owner) | ✅ | `project/domain/MembershipService#alterarPapel` | ver inconsistência RN-43 abaixo |
+| RF-24 Remover membro com realocação + rollback | ✅ | `MembershipService#removerMembro`, `task/domain/TaskReassignmentAdapter`, `MemberTasksPort` | transação única |
 
 ### Tarefas
 
 | ID | Status | Evidência | Observação |
 |---|---|---|---|
-| RF-30 Criar tarefa (status inicial TODO, responsável obrigatório) | ✅ | `task/domain/TaskService#create` | |
-| RF-31 Editar campos da tarefa | ✅ | `TaskService#update` | |
-| RF-32 Alterar status respeitando a máquina de estados | ✅ | `task/domain/TaskStatus#canTransitionTo`, `TaskService#changeStatus` | |
-| RF-33 Excluir tarefa (ADMIN ou responsável) | ✅ | `TaskService#delete` | |
-| RF-34 Detalhar tarefa | ✅ | `task/api/TaskController#get` | |
+| RF-30 Criar tarefa (status inicial TODO, responsável obrigatório) | ✅ | `task/domain/TaskService#criar` | |
+| RF-31 Editar campos da tarefa | ✅ | `TaskService#atualizar` | |
+| RF-32 Alterar status respeitando a máquina de estados | ✅ | `task/domain/TaskStatus#podeTransicionarPara`, `TaskService#alterarStatus` | |
+| RF-33 Excluir tarefa (ADMIN ou responsável) | ✅ | `TaskService#excluir` | |
+| RF-34 Detalhar tarefa | ✅ | `task/api/TaskController#obter` | |
 | RF-35 createdAt / updatedAt / deadline | ✅ | `shared/domain/BaseEntity`, `Task` | |
 
 ### Listagem, filtros, ordenação, busca
@@ -119,7 +119,7 @@ código na branch `main`. Cruzado com [02](02-requisitos-funcionais.md),
 | RNF-41 Actuator `/actuator/health` | ✅ | `spring-boot-starter-actuator`, `management.endpoints...include: health, info` |
 | RNF-50 Separação de camadas por feature | ✅ | `api`/`domain`/`infra` em `auth`/`project`/`task`/`report` |
 | RNF-51 Sem over-engineering | ✅ | mapper manual, sem MapStruct, sem store global no front |
-| RNF-52 Nomeação segue o glossário | ✅ | termos de [glossario.md](glossario.md) |
+| RNF-52 Nomeação segue o glossário | ✅ | termos de [glossario.md](glossario.md); idioma/nomenclatura em [11-convencoes-de-codigo.md](11-convencoes-de-codigo.md) — código em português (variáveis, métodos), contrato da API em inglês |
 | RNF-53 Timestamps em UTC (`timestamptz`) | ✅ | `hibernate.jdbc.time_zone: UTC`, colunas `TIMESTAMPTZ` |
 | RNF-60 Unitários de service cobrindo as RN | ✅ | 51 testes (ver §5) |
 | RNF-61 Integração `@SpringBootTest` + Testcontainers | ✅ | `AuthFlowIT`, `TaskLifecycleIT`, `TaskSearchIT` |
@@ -133,35 +133,35 @@ código na branch `main`. Cruzado com [02](02-requisitos-funcionais.md),
 
 | ID | Status | Evidência | Observação |
 |---|---|---|---|
-| RN-01 Transições válidas | ✅ | `task/domain/TaskStatus#canTransitionTo`, `TaskStatusTest` | 422 em transição inválida |
+| RN-01 Transições válidas | ✅ | `task/domain/TaskStatus#podeTransicionarPara`, `TaskStatusTest` | 422 em transição inválida |
 | RN-02 `DONE→TODO` proibido | ✅ | `TaskStatus`, `TaskServiceTest` | |
 | RN-03 `TODO→DONE` proibido | ✅ | `TaskStatus`, `TaskServiceTest` | |
-| RN-04 Mesmo estado = no-op idempotente (200) | ✅ | `TaskService#changeStatus`, `TaskServiceTest` | |
+| RN-04 Mesmo estado = no-op idempotente (200) | ✅ | `TaskService#alterarStatus`, `TaskServiceTest` | |
 | RN-10 WIP limit 5, somando projetos | ✅ | `task/domain/WipLimitPolicy`, `WipLimitPolicyTest`, `TaskLifecycleIT#wipLimitBlocksSixthInProgressTask` | 409 |
 | RN-11 Checagem em status→IN_PROGRESS e reassign de IN_PROGRESS | ✅ | `WipLimitPolicy` chamado em `changeStatus` e `update` | |
 | RN-12 Erro informa limite + `tasksInProgress` | ✅ | `Errors` + corpo do `ProblemDetail` | |
-| RN-20 Fechar CRITICAL (`IN_PROGRESS→DONE`) só ADMIN | ✅ | `TaskService#changeStatus` + `ProjectAuthorization#requireAdmin`, `TaskServiceTest` | 403 |
+| RN-20 Fechar CRITICAL (`IN_PROGRESS→DONE`) só ADMIN | ✅ | `TaskService#alterarStatus` + `ProjectAuthorization#exigirAdmin`, `TaskServiceTest` | 403 |
 | RN-21 Demais transições de CRITICAL livres (inclui reabrir) | ✅ | `TaskService`, `TaskServiceTest` | |
-| RN-22 Mudar prioridade de/para CRITICAL livre | ✅ | `TaskService#update` | |
+| RN-22 Mudar prioridade de/para CRITICAL livre | ✅ | `TaskService#atualizar` | |
 | RN-30 Responsável obrigatório na criação | ✅ | `TaskDtos` (`@NotNull assigneeId`), `TaskServiceTest` | 400 |
-| RN-31 Responsável precisa ser membro ativo | ✅ | `TaskService` valida via `ProjectAuthorization#isMember`, `TaskServiceTest` | 422 |
-| RN-32 Reassign de IN_PROGRESS aplica WIP ao novo dono | ✅ | `TaskService#update` + `WipLimitPolicy` | 409 |
-| RN-40 Só membro acessa projeto/tarefa/relatório/busca | ✅ | `ProjectAuthorization#requireMembership` | 403 |
+| RN-31 Responsável precisa ser membro ativo | ✅ | `TaskService` valida via `ProjectAuthorization#ehMembro`, `TaskServiceTest` | 422 |
+| RN-32 Reassign de IN_PROGRESS aplica WIP ao novo dono | ✅ | `TaskService#atualizar` + `WipLimitPolicy` | 409 |
+| RN-40 Só membro acessa projeto/tarefa/relatório/busca | ✅ | `ProjectAuthorization#exigirMembro` | 403 |
 | RN-41 MEMBER só gerencia tarefas | ✅ | `ProjectAuthorization`, `ProjectServiceTest` | 403 |
-| RN-42 ADMIN edita projeto/convites/papéis/remoção/fecha CRITICAL | ✅ | `requireAdmin` nos pontos correspondentes | |
+| RN-42 ADMIN edita projeto/convites/papéis/remoção/fecha CRITICAL | ✅ | `exigirAdmin` nos pontos correspondentes | |
 | RN-43 owner sempre ADMIN, não rebaixável nem removível | ⚠️ | `MembershipService` bloqueia; `owner-role-immutable` | **Inconsistência doc:** RN-43 diz 403 para rebaixar; implementação e [06](06-api-endpoints.md) usam **422**. Decidir redação (HANDOFF §3) |
-| RN-44 Excluir tarefa: ADMIN ou responsável | ✅ | `TaskService#delete` | 403 |
-| RN-50 Convite expirado não aceita (`EXPIRED`) | ✅ | `InvitationService#accept`, `InvitationServiceTest` | 422 |
-| RN-51 Sem convite `PENDING` duplicado | ✅ | `InvitationService#create`, `InvitationServiceTest` | 409 |
-| RN-52 Não convidar quem já é membro | ✅ | `InvitationService#create`, `InvitationServiceTest` | 409 |
-| RN-53 Aceite cria conta vs. só associação | ✅ | `InvitationService#accept`, `InvitationServiceTest` | |
-| RN-54 Só ADMIN cria/lista/revoga convites | ✅ | `InvitationController` + `requireAdmin` | 403 |
-| RN-60 Remoção iniciada por ADMIN; membro sem tarefa fica | ✅ | `MembershipService#remove`, `MembershipServiceTest` | |
-| RN-61 Tarefas ativas exigem novo responsável para cada | ✅ | `MembershipService#remove`, `MembershipServiceTest` | 422 |
+| RN-44 Excluir tarefa: ADMIN ou responsável | ✅ | `TaskService#excluir` | 403 |
+| RN-50 Convite expirado não aceita (`EXPIRED`) | ✅ | `InvitationService#aceitar`, `InvitationServiceTest` | 422 |
+| RN-51 Sem convite `PENDING` duplicado | ✅ | `InvitationService#criar`, `InvitationServiceTest` | 409 |
+| RN-52 Não convidar quem já é membro | ✅ | `InvitationService#criar`, `InvitationServiceTest` | 409 |
+| RN-53 Aceite cria conta vs. só associação | ✅ | `InvitationService#aceitar`, `InvitationServiceTest` | |
+| RN-54 Só ADMIN cria/lista/revoga convites | ✅ | `InvitationController` + `exigirAdmin` | 403 |
+| RN-60 Remoção iniciada por ADMIN; membro sem tarefa fica | ✅ | `MembershipService#removerMembro`, `MembershipServiceTest` | |
+| RN-61 Tarefas ativas exigem novo responsável para cada | ✅ | `MembershipService#removerMembro`, `MembershipServiceTest` | 422 |
 | RN-62 Novo responsável membro + sem estourar WIP | ✅ | `MembershipService` + `WipLimitPolicy` | 409 |
-| RN-63 Realocação inválida = nada aplicado (transação única) | ✅ | `@Transactional` em `MembershipService#remove`, `MembershipServiceTest` | |
+| RN-63 Realocação inválida = nada aplicado (transação única) | ✅ | `@Transactional` em `MembershipService#removerMembro`, `MembershipServiceTest` | |
 | RN-64 Tarefas DONE do removido permanecem com ele | ✅ | `MembershipService`, `MembershipServiceTest` | |
-| RN-65 owner nunca removível | ✅ | `MembershipService#remove` | 403 |
+| RN-65 owner nunca removível | ✅ | `MembershipService#removerMembro` | 403 |
 | RN-70 `createdAt` imutável, `updatedAt` a cada alteração | ✅ | `shared/domain/BaseEntity` (`@CreatedDate`/`@LastModifiedDate`) | |
 | RN-71 `deadline` opcional, pode estar no passado; `overdue` derivado | ✅ | `Task`, `task/api/TaskResponseAssembler` (`overdue` calculado) | |
 

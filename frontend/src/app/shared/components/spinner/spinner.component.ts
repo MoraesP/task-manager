@@ -7,5 +7,5 @@ import { ChangeDetectionStrategy, Component, input } from '@angular/core';
   styleUrl: './spinner.component.scss',
 })
 export class SpinnerComponent {
-  readonly size = input(18);
+  readonly tamanho = input(18);
 }

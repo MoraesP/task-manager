@@ -14,24 +14,24 @@ import { ProjectsService } from '../../data/projects.service';
 })
 export class CreateProjectDialogComponent {
   protected readonly ref = inject<DialogRef<Project | undefined>>(DialogRef);
-  private readonly fb = inject(NonNullableFormBuilder);
-  private readonly projects = inject(ProjectsService);
+  private readonly formBuilder = inject(NonNullableFormBuilder);
+  private readonly servicoDeProjetos = inject(ProjectsService);
 
-  protected readonly loading = signal(false);
-  protected readonly form = this.fb.group({
+  protected readonly carregando = signal(false);
+  protected readonly form = this.formBuilder.group({
     name: ['', [Validators.required, Validators.maxLength(255)]],
     description: [''],
   });
 
-  protected submit(): void {
-    if (this.form.invalid || this.loading()) {
+  protected enviar(): void {
+    if (this.form.invalid || this.carregando()) {
       return;
     }
-    this.loading.set(true);
+    this.carregando.set(true);
     const { name, description } = this.form.getRawValue();
-    this.projects.create(name, description).subscribe({
-      next: (p) => this.ref.close(p),
-      error: () => this.loading.set(false),
+    this.servicoDeProjetos.criar(name, description).subscribe({
+      next: (projeto) => this.ref.close(projeto),
+      error: () => this.carregando.set(false),
     });
   }
 }

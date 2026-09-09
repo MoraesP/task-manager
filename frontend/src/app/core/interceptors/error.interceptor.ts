@@ -2,7 +2,7 @@ import { HttpErrorResponse, HttpInterceptorFn } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { catchError, throwError } from 'rxjs';
 import { SKIP_ERROR_TOAST } from '@core/http/api.config';
-import { errorMessage } from '@core/http/problem-detail';
+import { mensagemDeErro } from '@core/http/problem-detail';
 import { ToastService } from '@core/notifications/toast.service';
 
 /**
@@ -10,16 +10,16 @@ import { ToastService } from '@core/notifications/toast.service';
  * ProblemDetail. Requisições marcadas com SKIP_ERROR_TOAST tratam o erro sozinhas
  * (ex.: reverter card no quadro). 401 é responsabilidade do authInterceptor.
  */
-export const errorInterceptor: HttpInterceptorFn = (req, next) => {
-  const toast = inject(ToastService);
-  return next(req).pipe(
-    catchError((err: unknown) => {
-      const skip = req.context.get(SKIP_ERROR_TOAST);
-      const status = err instanceof HttpErrorResponse ? err.status : 0;
-      if (!skip && status !== 401) {
-        toast.error(errorMessage(err));
+export const errorInterceptor: HttpInterceptorFn = (requisicao, proximo) => {
+  const notificacoes = inject(ToastService);
+  return proximo(requisicao).pipe(
+    catchError((erro: unknown) => {
+      const ignorarToast = requisicao.context.get(SKIP_ERROR_TOAST);
+      const status = erro instanceof HttpErrorResponse ? erro.status : 0;
+      if (!ignorarToast && status !== 401) {
+        notificacoes.erro(mensagemDeErro(erro));
       }
-      return throwError(() => err);
+      return throwError(() => erro);
     }),
   );
 };

@@ -9,8 +9,8 @@ import { BoardService } from '../../data/board.service';
 import { TaskInput } from '../../models/task-input.model';
 
 export interface TaskDrawerData {
-  task: Task | null;
-  members: ProjectMember[];
+  tarefa: Task | null;
+  membros: ProjectMember[];
 }
 
 @Component({
@@ -22,45 +22,45 @@ export interface TaskDrawerData {
 })
 export class TaskDrawerComponent {
   protected readonly ref = inject<DialogRef<Task | undefined>>(DialogRef);
-  protected readonly data = inject<TaskDrawerData>(DIALOG_DATA);
-  private readonly fb = inject(NonNullableFormBuilder);
-  private readonly board = inject(BoardService);
+  protected readonly dados = inject<TaskDrawerData>(DIALOG_DATA);
+  private readonly formBuilder = inject(NonNullableFormBuilder);
+  private readonly quadro = inject(BoardService);
 
-  protected readonly editing = !!this.data.task;
-  protected readonly loading = signal(false);
-  protected readonly priorities = TASK_PRIORITIES;
-  protected readonly priorityLabel = PRIORITY_LABEL;
-  protected readonly members = this.data.members;
+  protected readonly editando = !!this.dados.tarefa;
+  protected readonly carregando = signal(false);
+  protected readonly prioridades = TASK_PRIORITIES;
+  protected readonly rotuloDePrioridade = PRIORITY_LABEL;
+  protected readonly membros = this.dados.membros;
 
-  protected readonly form = this.fb.group({
-    title: [this.data.task?.title ?? '', [Validators.required, Validators.maxLength(255)]],
-    description: [this.data.task?.description ?? ''],
-    priority: [this.data.task?.priority ?? 'MEDIUM'],
-    deadline: [this.data.task?.deadline ? this.data.task.deadline.slice(0, 10) : ''],
-    assigneeId: [this.data.task?.assigneeId ?? '', [Validators.required]],
+  protected readonly form = this.formBuilder.group({
+    title: [this.dados.tarefa?.title ?? '', [Validators.required, Validators.maxLength(255)]],
+    description: [this.dados.tarefa?.description ?? ''],
+    priority: [this.dados.tarefa?.priority ?? 'MEDIUM'],
+    deadline: [this.dados.tarefa?.deadline ? this.dados.tarefa.deadline.slice(0, 10) : ''],
+    assigneeId: [this.dados.tarefa?.assigneeId ?? '', [Validators.required]],
   });
 
-  protected readonly currentStatus = computed(() => this.data.task?.status ?? 'TODO');
+  protected readonly statusAtual = computed(() => this.dados.tarefa?.status ?? 'TODO');
 
-  protected submit(): void {
-    if (this.form.invalid || this.loading()) {
+  protected enviar(): void {
+    if (this.form.invalid || this.carregando()) {
       return;
     }
-    this.loading.set(true);
-    const v = this.form.getRawValue();
-    const input: TaskInput = {
-      title: v.title.trim(),
-      description: v.description.trim() || null,
-      priority: v.priority,
-      deadline: v.deadline ? new Date(v.deadline + 'T12:00:00').toISOString() : null,
-      assigneeId: v.assigneeId,
+    this.carregando.set(true);
+    const valores = this.form.getRawValue();
+    const entrada: TaskInput = {
+      title: valores.title.trim(),
+      description: valores.description.trim() || null,
+      priority: valores.priority,
+      deadline: valores.deadline ? new Date(valores.deadline + 'T12:00:00').toISOString() : null,
+      assigneeId: valores.assigneeId,
     };
-    const req = this.editing
-      ? this.board.update(this.data.task!.id, input)
-      : this.board.create(input);
-    req.subscribe({
-      next: (task) => this.ref.close(task),
-      error: () => this.loading.set(false),
+    const requisicao = this.editando
+      ? this.quadro.atualizar(this.dados.tarefa!.id, entrada)
+      : this.quadro.criar(entrada);
+    requisicao.subscribe({
+      next: (tarefa) => this.ref.close(tarefa),
+      error: () => this.carregando.set(false),
     });
   }
 }

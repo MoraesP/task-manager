@@ -4,105 +4,113 @@ import { Observable, switchMap, tap } from 'rxjs';
 import { AuthUser, TokenResponse } from '@shared/models';
 import { ACCESS_TOKEN_KEY, API_BASE, IS_AUTH_REQUEST, REFRESH_TOKEN_KEY } from '@core/http/api.config';
 
-const authCtx = () => new HttpContext().set(IS_AUTH_REQUEST, true);
+const contextoDeAutenticacao = () => new HttpContext().set(IS_AUTH_REQUEST, true);
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private readonly http = inject(HttpClient);
 
-  private readonly _user = signal<AuthUser | null>(null);
-  private readonly _sessionChecked = signal(false);
+  private readonly _usuario = signal<AuthUser | null>(null);
+  private readonly _sessaoVerificada = signal(false);
 
-  readonly user = this._user.asReadonly();
-  readonly sessionChecked = this._sessionChecked.asReadonly();
-  readonly isAuthenticated = computed(() => this._user() !== null);
+  readonly usuario = this._usuario.asReadonly();
+  readonly sessaoVerificada = this._sessaoVerificada.asReadonly();
+  readonly estaAutenticado = computed(() => this._usuario() !== null);
 
-  get accessToken(): string | null {
+  get tokenDeAcesso(): string | null {
     return localStorage.getItem(ACCESS_TOKEN_KEY);
   }
-  private get refreshTokenValue(): string | null {
+  private get valorDoRefreshToken(): string | null {
     return localStorage.getItem(REFRESH_TOKEN_KEY);
   }
 
   /** Chamado no bootstrap: recupera a sessão a partir do token guardado. */
-  initialize(): Promise<void> {
-    if (!this.accessToken) {
-      this._sessionChecked.set(true);
+  inicializar(): Promise<void> {
+    if (!this.tokenDeAcesso) {
+      this._sessaoVerificada.set(true);
       return Promise.resolve();
     }
-    return new Promise((resolve) => {
+    return new Promise((resolver) => {
       this.http.get<AuthUser>(`${API_BASE}/users/me`).subscribe({
-        next: (u) => {
-          this._user.set(u);
-          this._sessionChecked.set(true);
-          resolve();
+        next: (usuario) => {
+          this._usuario.set(usuario);
+          this._sessaoVerificada.set(true);
+          resolver();
         },
         error: () => {
-          this.clear();
-          this._sessionChecked.set(true);
-          resolve();
+          this.limpar();
+          this._sessaoVerificada.set(true);
+          resolver();
         },
       });
     });
   }
 
-  register(name: string, email: string, password: string): Observable<AuthUser> {
+  registrar(name: string, email: string, password: string): Observable<AuthUser> {
     return this.http.post<AuthUser>(
       `${API_BASE}/auth/register`,
       { name, email, password },
-      { context: authCtx() },
+      { context: contextoDeAutenticacao() },
     );
   }
 
-  login(email: string, password: string): Observable<AuthUser> {
+  entrar(email: string, password: string): Observable<AuthUser> {
     return this.http
-      .post<TokenResponse>(`${API_BASE}/auth/login`, { email, password }, { context: authCtx() })
-      .pipe(switchMap((t) => this.completeAuth(t)));
+      .post<TokenResponse>(
+        `${API_BASE}/auth/login`,
+        { email, password },
+        { context: contextoDeAutenticacao() },
+      )
+      .pipe(switchMap((tokens) => this.concluirAutenticacao(tokens)));
   }
 
-  acceptInvitation(token: string, name?: string, password?: string): Observable<AuthUser> {
+  aceitarConvite(token: string, name?: string, password?: string): Observable<AuthUser> {
     return this.http
       .post<TokenResponse>(
         `${API_BASE}/auth/accept-invitation`,
         { token, name: name || null, password: password || null },
-        { context: authCtx() },
+        { context: contextoDeAutenticacao() },
       )
-      .pipe(switchMap((t) => this.completeAuth(t)));
+      .pipe(switchMap((tokens) => this.concluirAutenticacao(tokens)));
   }
 
-  refreshToken(): Observable<TokenResponse> {
+  renovarToken(): Observable<TokenResponse> {
     return this.http
       .post<TokenResponse>(
         `${API_BASE}/auth/refresh`,
-        { refreshToken: this.refreshTokenValue },
-        { context: authCtx() },
+        { refreshToken: this.valorDoRefreshToken },
+        { context: contextoDeAutenticacao() },
       )
-      .pipe(tap((t) => this.storeTokens(t)));
+      .pipe(tap((tokens) => this.guardarTokens(tokens)));
   }
 
-  logout(): void {
-    const refreshToken = this.refreshTokenValue;
+  sair(): void {
+    const refreshToken = this.valorDoRefreshToken;
     if (refreshToken) {
-      this.http.post(`${API_BASE}/auth/logout`, { refreshToken }, { context: authCtx() }).subscribe({
-        error: () => void 0,
-      });
+      this.http
+        .post(`${API_BASE}/auth/logout`, { refreshToken }, { context: contextoDeAutenticacao() })
+        .subscribe({
+          error: () => void 0,
+        });
     }
-    this.clear();
+    this.limpar();
   }
 
-  private completeAuth(tokens: TokenResponse): Observable<AuthUser> {
-    this.storeTokens(tokens);
-    return this.http.get<AuthUser>(`${API_BASE}/users/me`).pipe(tap((u) => this._user.set(u)));
+  private concluirAutenticacao(tokens: TokenResponse): Observable<AuthUser> {
+    this.guardarTokens(tokens);
+    return this.http
+      .get<AuthUser>(`${API_BASE}/users/me`)
+      .pipe(tap((usuario) => this._usuario.set(usuario)));
   }
 
-  private storeTokens(tokens: TokenResponse): void {
+  private guardarTokens(tokens: TokenResponse): void {
     localStorage.setItem(ACCESS_TOKEN_KEY, tokens.accessToken);
     localStorage.setItem(REFRESH_TOKEN_KEY, tokens.refreshToken);
   }
 
-  private clear(): void {
+  private limpar(): void {
     localStorage.removeItem(ACCESS_TOKEN_KEY);
     localStorage.removeItem(REFRESH_TOKEN_KEY);
-    this._user.set(null);
+    this._usuario.set(null);
   }
 }

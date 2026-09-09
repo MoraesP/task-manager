@@ -4,8 +4,10 @@ Ponto de continuação do projeto. Última revisão: **2026-09-08**, branch `mai
 
 Contexto: desafio técnico de contratação. A especificação completa está em
 [`docs/`](docs/README.md) (foi "grilada" com a skill `/grill-with-docs`).
-Convenção de idioma: **código em português** (comentários, mensagens de erro,
-logs); identificadores, campos JSON da API e enums em inglês.
+Convenção de idioma: **código em português** — incluindo variáveis, parâmetros e
+métodos (Clean Code, sem abreviações). Só o **contrato da API** fica em inglês:
+campos JSON, enums, paths, slugs de erro, DTOs, entidades JPA e nomes exigidos
+pelo framework. Detalhe em [docs/11-convencoes-de-codigo.md](docs/11-convencoes-de-codigo.md).
 
 ---
 
@@ -57,7 +59,7 @@ antes de `./mvnw verify` (o `pom.xml` já fixa `DOCKER_API_VERSION=1.43` e desli
 Cruzado com `docs/02` (RF), `docs/04` (RN) e `docs/06` (contrato REST):
 
 - **Endpoints**: todos os 24 de `docs/06` existem, com os papéis/status corretos.
-- **Máquina de estados** (RN-01..04): `TaskStatus.canTransitionTo` + 422 em
+- **Máquina de estados** (RN-01..04): `TaskStatus.podeTransicionarPara` + 422 em
   transição inválida; `TODO→DONE` e `DONE→TODO` barrados; no-op idempotente.
   O frontend também barra no cliente antes de chamar a API (`ALLOWED_TRANSITIONS`).
 - **WIP limit** (RN-10..12): `WipLimitPolicy`, global entre projetos, 409 com
@@ -147,8 +149,8 @@ Monólito modular **package-by-feature** (`auth`, `project`, `task`, `report`,
 `shared`), módulo Maven único. Cada feature tem camadas `api` / `domain` / `infra`.
 Features conversam **só por serviços públicos**:
 
-- `ProjectAuthorization` — `requireMembership` / `requireAdmin` (403), predicados
-  `isMember` / `membershipOf`. Usado por task e report.
+- `ProjectAuthorization` — `exigirMembro` / `exigirAdmin` (403), predicados
+  `ehMembro` / `membroDe`. Usado por task e report.
 - `UserDirectory` (auth) — lookup de usuários para outras features.
 - `TaskStatistics` (task) — agregados para o relatório.
 - `MemberTasksPort` (interface no `project`, implementada em `task` por

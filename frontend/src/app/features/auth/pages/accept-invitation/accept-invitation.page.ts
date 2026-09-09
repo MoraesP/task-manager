@@ -14,17 +14,17 @@ import { AuthCardComponent } from '../../ui/auth-card/auth-card.component';
   styleUrl: './accept-invitation.page.scss',
 })
 export class AcceptInvitationPage {
-  private readonly fb = inject(NonNullableFormBuilder);
-  private readonly auth = inject(AuthService);
-  private readonly router = inject(Router);
-  private readonly toast = inject(ToastService);
+  private readonly formBuilder = inject(NonNullableFormBuilder);
+  private readonly autenticacao = inject(AuthService);
+  private readonly roteador = inject(Router);
+  private readonly notificacoes = inject(ToastService);
 
   readonly token = input<string>();
 
-  protected readonly loading = signal(false);
-  protected readonly hasLinkToken = signal(false);
+  protected readonly carregando = signal(false);
+  protected readonly temTokenNoLink = signal(false);
 
-  protected readonly form = this.fb.group({
+  protected readonly form = this.formBuilder.group({
     token: ['', [Validators.required]],
     name: [''],
     password: [''],
@@ -32,26 +32,26 @@ export class AcceptInvitationPage {
 
   constructor() {
     effect(() => {
-      const t = this.token();
-      if (t) {
-        this.form.controls.token.setValue(t);
-        this.hasLinkToken.set(true);
+      const tokenDoLink = this.token();
+      if (tokenDoLink) {
+        this.form.controls.token.setValue(tokenDoLink);
+        this.temTokenNoLink.set(true);
       }
     });
   }
 
-  protected submit(): void {
-    if (this.form.controls.token.invalid || this.loading()) {
+  protected enviar(): void {
+    if (this.form.controls.token.invalid || this.carregando()) {
       return;
     }
-    this.loading.set(true);
+    this.carregando.set(true);
     const { token, name, password } = this.form.getRawValue();
-    this.auth.acceptInvitation(token, name, password).subscribe({
+    this.autenticacao.aceitarConvite(token, name, password).subscribe({
       next: () => {
-        this.toast.success('Convite aceito. Bem-vindo ao projeto!');
-        this.router.navigateByUrl('/projetos');
+        this.notificacoes.sucesso('Convite aceito. Bem-vindo ao projeto!');
+        this.roteador.navigateByUrl('/projetos');
       },
-      error: () => this.loading.set(false),
+      error: () => this.carregando.set(false),
     });
   }
 }

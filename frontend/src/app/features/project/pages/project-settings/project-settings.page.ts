@@ -21,80 +21,80 @@ import { TopbarComponent } from '@shared/components/topbar/topbar.component';
   styleUrl: './project-settings.page.scss',
 })
 export class ProjectSettingsPage {
-  private readonly fb = inject(NonNullableFormBuilder);
-  private readonly projects = inject(ProjectsService);
-  private readonly auth = inject(AuthService);
+  private readonly formBuilder = inject(NonNullableFormBuilder);
+  private readonly servicoDeProjetos = inject(ProjectsService);
+  private readonly autenticacao = inject(AuthService);
   private readonly dialog = inject(Dialog);
-  private readonly toast = inject(ToastService);
-  private readonly router = inject(Router);
+  private readonly notificacoes = inject(ToastService);
+  private readonly roteador = inject(Router);
 
-  protected readonly project = this.projects.current;
-  protected readonly saving = signal(false);
+  protected readonly projeto = this.servicoDeProjetos.projetoAtual;
+  protected readonly salvando = signal(false);
 
-  protected readonly form = this.fb.group({
+  protected readonly form = this.formBuilder.group({
     name: ['', [Validators.required, Validators.maxLength(255)]],
     description: [''],
   });
 
   constructor() {
     effect(() => {
-      const p = this.project();
-      if (p) {
-        this.form.reset({ name: p.name, description: p.description ?? '' });
+      const projeto = this.projeto();
+      if (projeto) {
+        this.form.reset({ name: projeto.name, description: projeto.description ?? '' });
       }
     });
   }
 
-  protected isOwner(): boolean {
-    return this.project()?.ownerId === this.auth.user()?.id;
+  protected ehDono(): boolean {
+    return this.projeto()?.ownerId === this.autenticacao.usuario()?.id;
   }
 
-  protected save(): void {
-    const p = this.project();
-    if (!p || this.form.invalid || this.saving()) {
+  protected salvar(): void {
+    const projeto = this.projeto();
+    if (!projeto || this.form.invalid || this.salvando()) {
       return;
     }
-    this.saving.set(true);
+    this.salvando.set(true);
     const { name, description } = this.form.getRawValue();
-    this.projects.update(p.id, name, description).subscribe({
+    this.servicoDeProjetos.atualizar(projeto.id, name, description).subscribe({
       next: () => {
-        this.saving.set(false);
+        this.salvando.set(false);
         this.form.markAsPristine();
-        this.toast.success('Projeto atualizado.');
+        this.notificacoes.sucesso('Projeto atualizado.');
       },
-      error: () => this.saving.set(false),
+      error: () => this.salvando.set(false),
     });
   }
 
-  protected discard(): void {
-    const p = this.project();
-    if (p) {
-      this.form.reset({ name: p.name, description: p.description ?? '' });
+  protected descartar(): void {
+    const projeto = this.projeto();
+    if (projeto) {
+      this.form.reset({ name: projeto.name, description: projeto.description ?? '' });
     }
   }
 
-  protected confirmDelete(): void {
-    const p = this.project();
-    if (!p) {
+  protected confirmarExclusao(): void {
+    const projeto = this.projeto();
+    if (!projeto) {
       return;
     }
     this.dialog
       .open<boolean>(ConfirmDialogComponent, {
         hasBackdrop: true,
         data: {
-          title: `Excluir “${p.name}”?`,
-          message:
+          titulo: `Excluir “${projeto.name}”?`,
+          mensagem:
             'Isso remove permanentemente o projeto, todas as tarefas, o histórico, os membros e os convites. A ação é irreversível.',
-          confirmLabel: 'Excluir projeto',
-          danger: true,
+          rotuloConfirmar: 'Excluir projeto',
+          perigo: true,
         },
       })
-      .closed.subscribe((ok) => {
-        if (ok) {
-          this.projects.remove(p.id).subscribe({
+      .closed.subscribe((confirmado) => {
+        if (confirmado) {
+          this.servicoDeProjetos.excluir(projeto.id).subscribe({
             next: () => {
-              this.toast.success('Projeto excluído.');
-              this.router.navigateByUrl('/projetos');
+              this.notificacoes.sucesso('Projeto excluído.');
+              this.roteador.navigateByUrl('/projetos');
             },
           });
         }

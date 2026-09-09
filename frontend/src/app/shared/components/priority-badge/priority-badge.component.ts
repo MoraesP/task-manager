@@ -8,6 +8,6 @@ import { PRIORITY_LABEL, TaskPriority } from '@shared/models';
   styleUrl: './priority-badge.component.scss',
 })
 export class PriorityBadgeComponent {
-  readonly value = input.required<TaskPriority>();
-  protected readonly label = computed(() => PRIORITY_LABEL[this.value()]);
+  readonly valor = input.required<TaskPriority>();
+  protected readonly rotulo = computed(() => PRIORITY_LABEL[this.valor()]);
 }

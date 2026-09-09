@@ -1,5 +1,5 @@
-<div class="shell" [class.shell--nav-open]="layout.sidebarOpen()">
-  <div class="shell__scrim" (click)="layout.closeSidebar()"></div>
+<div class="shell" [class.shell--nav-open]="layout.menuLateralAberto()">
+  <div class="shell__scrim" (click)="layout.fecharMenuLateral()"></div>
   <app-sidebar class="shell__nav" />
   <main class="shell__main">
     <router-outlet />

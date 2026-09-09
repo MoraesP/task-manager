@@ -9,7 +9,7 @@ import {
 } from '@angular/core';
 import { Router, RouterOutlet } from '@angular/router';
 import { ToastService } from '@core/notifications/toast.service';
-import { errorMessage } from '@core/http/problem-detail';
+import { mensagemDeErro } from '@core/http/problem-detail';
 import { ProjectsService } from '@features/projects/data/projects.service';
 import { PageLoaderComponent } from '@shared/components/page-loader/page-loader.component';
 
@@ -21,28 +21,28 @@ import { PageLoaderComponent } from '@shared/components/page-loader/page-loader.
   styleUrl: './project-layout.page.scss',
 })
 export class ProjectLayoutPage implements OnDestroy {
-  private readonly projects = inject(ProjectsService);
-  private readonly router = inject(Router);
-  private readonly toast = inject(ToastService);
+  private readonly servicoDeProjetos = inject(ProjectsService);
+  private readonly roteador = inject(Router);
+  private readonly notificacoes = inject(ToastService);
 
   readonly projectId = input.required<string>();
-  protected readonly ready = signal(false);
+  protected readonly pronto = signal(false);
 
   constructor() {
     effect(() => {
       const id = this.projectId();
-      this.ready.set(false);
-      this.projects.load(id).subscribe({
-        next: () => this.ready.set(true),
-        error: (err) => {
-          this.toast.error(errorMessage(err, 'Projeto indisponível.'));
-          this.router.navigateByUrl('/projetos');
+      this.pronto.set(false);
+      this.servicoDeProjetos.carregar(id).subscribe({
+        next: () => this.pronto.set(true),
+        error: (erro) => {
+          this.notificacoes.erro(mensagemDeErro(erro, 'Projeto indisponível.'));
+          this.roteador.navigateByUrl('/projetos');
         },
       });
     });
   }
 
   ngOnDestroy(): void {
-    this.projects.clearCurrent();
+    this.servicoDeProjetos.limparAtual();
   }
 }
